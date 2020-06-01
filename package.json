@@ -1,0 +1,30 @@
+{
+  "name": "@biothings-explorer/api-response-transform",
+  "version": "1.0.0",
+  "description": "a NodeJS library to transform API responses into biolink model",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "coveralls": "jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevinxin90/api-respone-transform.js.git"
+  },
+  "keywords": [
+    "transform",
+    "biolink",
+    "api",
+    "json"
+  ],
+  "author": "jiwen xin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kevinxin90/api-respone-transform.js/issues"
+  },
+  "homepage": "https://github.com/kevinxin90/api-respone-transform.js#readme",
+  "devDependencies": {
+    "coveralls": "^3.1.0",
+    "jest": "^26.0.1"
+  }
+}
