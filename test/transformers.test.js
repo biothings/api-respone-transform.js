@@ -25,7 +25,10 @@ describe("test biolink transformer", () => {
         let input = {
             response: api_response,
             edge: {
-                input: "name",
+                association: {
+                    input: "name",
+                    predicate: 'related_to'
+                },
                 response_mapping: {
                     sookie: "kevin"
                 }
@@ -269,6 +272,6 @@ describe("test base transformer", () => {
         let tf = new ctd_tf(input);
         let res = tf.wrap(api_response);
         res = tf.jsonTransform(res);
-        expect(res).toHaveProperty("MESH");
+        expect(res).toHaveProperty("related_to");
     })
 })
