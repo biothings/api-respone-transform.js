@@ -21,17 +21,66 @@ describe("test biolink transformer", () => {
         api_response = res.data;
     });
 
+
+
     test("test biolink wrapper", () => {
         let input = {
             response: api_response,
             edge: {
-                association: {
-                    input: "name",
-                    predicate: 'related_to'
+                "input": "DOID:678",
+                "query_operation": {
+                    "params": {
+                        "disease_id": "{inputs[0]}",
+                        "rows": 200
+                    },
+                    "path": "/bioentity/disease/{disease_id}/genes",
+                    "path_params": [
+                        "disease_id"
+                    ],
+                    "method": "get",
+                    "server": "https://api.monarchinitiative.org/api",
+                    "tags": [
+                        "anatomy",
+                        "disease",
+                        "gene",
+                        "phenotype",
+                        "pathway",
+                        "annotation",
+                        "query",
+                        "translator",
+                        "biolink"
+                    ],
+                    "supportBatch": false
                 },
-                response_mapping: {
-                    sookie: "kevin"
-                }
+                "association": {
+                    "input_id": "MONDO",
+                    "input_type": "Disease",
+                    "output_id": "NCBIGene",
+                    "output_type": "Gene",
+                    "predicate": "related_to",
+                    "api_name": "BioLink API",
+                    "smartapi": {
+                        "id": "d22b657426375a5295e7da8a303b9893",
+                        "meta": {
+                            "ETag": "62f25b12c5457f6924db7929d91e7d5a2e70de291e7672aebf06fa08d1526d9d",
+                            "github_username": "newgene",
+                            "timestamp": "2020-05-28T00:02:40.483712",
+                            "uptime_status": "good",
+                            "uptime_ts": "2020-06-11T00:05:38.030503",
+                            "url": "https://raw.githubusercontent.com/NCATS-Tangerine/translator-api-registry/master/biolink/openapi.yml"
+                        }
+                    }
+                },
+                "response_mapping": {
+                    "related_to": {
+                        "NCBIGene": "associations.object.NCBIGene",
+                        "pubmed": "associations.publications.id",
+                        "relation": "associations.relation.label",
+                        "source": "associations.provided_by",
+                        "taxid": "associations.object.taxon.id"
+                    }
+                },
+                "id": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
             }
         }
         let tf = new biolink_tf(input);
@@ -244,34 +293,101 @@ describe("test biothings transformer", () => {
     })
 })
 
-describe("test base transformer", () => {
+describe("test base transformer using dgidb API", () => {
 
     let api_response;
+    let input;
 
     beforeAll(async () => {
-        let res = await axios.get("http://ctdbase.org/tools/batchQuery.go?inputType=chem&inputTerms=D003634|mercury&report=diseases_curated&format=json");
+        let res = await axios.get("http://www.dgidb.org/api/v2/interactions.json?genes=CXCR3");
         api_response = res.data;
-    });
-
-    test("test base wrapper", () => {
-        let input = {
+        input = {
             response: api_response,
             edge: {
-                input: "D003634",
-                association: {
-                    output_type: "Gene",
-                    predicate: "related_to"
+                "input": "CXCR3",
+                "query_operation": {
+                    "params": {
+                        "genes": "{inputs[0]}"
+                    },
+                    "path": "/interactions.json",
+                    "path_params": [],
+                    "method": "get",
+                    "server": "http://dgidb.genome.wustl.edu/api/v2",
+                    "tags": [
+                        "drug",
+                        "gene",
+                        "annotation",
+                        "translator"
+                    ],
+                    "supportBatch": false
                 },
-                response_mapping: {
-                    MESH: "data.DiseaseID",
-                    name: "data.DiseaseName",
-                    pubmed: "data.PubMedIDs"
-                }
+                "association": {
+                    "input_id": "SYMBOL",
+                    "input_type": "Gene",
+                    "output_id": "CHEMBL.COMPOUND",
+                    "output_type": "ChemicalSubstance",
+                    "predicate": "physically_interacts_with",
+                    "api_name": "DGIdb API",
+                    "smartapi": {
+                        "id": "e3edd325c76f2992a111b43a907a4870",
+                        "meta": {
+                            "ETag": "ed2cc061d10f35a20862b542ebc7b421d176bb58906ba2300b99e88017527f9d",
+                            "github_username": "newgene",
+                            "timestamp": "2020-04-29T00:02:09.170360",
+                            "uptime_status": "good",
+                            "uptime_ts": "2020-06-11T00:05:22.359624",
+                            "url": "https://raw.githubusercontent.com/NCATS-Tangerine/translator-api-registry/master/dgidb/openapi.yml"
+                        }
+                    }
+                },
+                "response_mapping": {
+                    "physically_interacts_with": {
+                        "CHEMBL.COMPOUND": "matchedTerms.interactions.drugChemblId",
+                        "name": "matchedTerms.interactions.drugName",
+                        "publication": "matchedTerms.interactions.pmids",
+                        "source": "matchedTerms.interactions.sources"
+                    }
+                },
+                "id": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
             }
         }
-        let tf = new ctd_tf(input);
-        let res = tf.wrap(api_response);
-        res = tf.jsonTransform(res);
-        expect(res).toHaveProperty("related_to");
+    });
+
+    test("test pairInputWithAPIResponse", () => {
+        let tf = new base_tf(input);
+        let res = tf.pairInputWithAPIResponse();
+        expect(res).toHaveProperty("CXCR3");
+        expect(res["CXCR3"]).toBeInstanceOf(Array);
+        expect(res["CXCR3"][0]).toHaveProperty("matchedTerms");
+    });
+
+    test("test wrapper", () => {
+        let tf = new base_tf(input);
+        let res = tf.wrap(input.response);
+        expect(res).toHaveProperty("matchedTerms");
+    });
+
+    test("test json transform", () => {
+        let tf = new base_tf(input);
+        let res = tf.jsonTransform(input.response);
+        expect(res).toHaveProperty("physically_interacts_with");
+        expect(res["physically_interacts_with"][0]['CHEMBL.COMPOUND']).toBe("CHEMBL351042");
+        expect(res["physically_interacts_with"]).toHaveLength(input.response.matchedTerms[0]['interactions'].length);
+    });
+
+    test("add edge info", () => {
+        let tf = new base_tf(input);
+        let res = tf.jsonTransform(input.response);
+        let rec = res["physically_interacts_with"][0];
+        let result = tf.addEdgeInfo(rec);
+        expect(result).toHaveProperty("association");
+        expect(result.association.api_name).toBe("DGIdb API")
+    });
+
+    test("test main function transform", () => {
+        let tf = new base_tf(input);
+        let res = tf.transform();
+        expect(res).toHaveProperty("CXCR3");
+        expect(res["CXCR3"][0]).toHaveProperty("physically_interacts_with")
     })
 })
