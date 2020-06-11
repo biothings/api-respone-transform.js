@@ -5,9 +5,6 @@ module.exports = class BaseTransformer {
     constructor(data) {
         this.data = data;
         this.edge = data.edge;
-        this.response_mapping = {
-            [data.edge.association.predicate]: data.edge.response_mapping
-        }
     }
 
     /**
@@ -35,7 +32,7 @@ module.exports = class BaseTransformer {
      * @param {Object} res - JSON response representing an output.
      */
     jsonTransform = (res) => {
-        res = json_transform(res, this.response_mapping);
+        res = json_transform(res, this.edge.response_mapping);
         return res;
     }
 
