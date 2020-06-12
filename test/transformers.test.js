@@ -91,52 +91,119 @@ describe("test biolink transformer", () => {
 
 describe("test semmed transformer", () => {
 
-    let api_response;
+    let api_response, input;
 
     beforeAll(async () => {
-        let res = await axios.get("https://biothings.ncats.io/semmedgene/query?q=CDK7");
-        api_response = res.data.hits[0];
+        let res = await axios({
+            method: 'post',
+            url: 'https://biothings.ncats.io/semmedgene/query',
+            data: 'q=C1332823, C1332824, 123&scopes=umls',
+            params: {
+                fields: 'name,umls,positively_regulates',
+                size: '5'
+            }
+        })
+        api_response = res.data;
+        input = {
+            response: api_response,
+            edge: {
+                "input": ["C1332824", "C1332823", "123"],
+                "query_operation": {
+                    "params": {
+                        "fields": "positively_regulates"
+                    },
+                    "request_body": {
+                        "body": {
+                            "q": "{inputs[0]}",
+                            "scopes": "umls"
+                        }
+                    },
+                    "path": "/query",
+                    "path_params": [],
+                    "method": "post",
+                    "server": "https://biothings.ncats.io/semmedgene",
+                    "tags": [
+                        "disease",
+                        "annotation",
+                        "query",
+                        "translator",
+                        "biothings",
+                        "semmed"
+                    ],
+                    "supportBatch": true,
+                    "inputSeparator": ","
+                },
+                "association": {
+                    "input_id": "UMLS",
+                    "input_type": "Gene",
+                    "output_id": "UMLS",
+                    "output_type": "Gene",
+                    "predicate": "positively_regulates",
+                    "source": "SEMMED",
+                    "api_name": "SEMMED Gene API",
+                    "smartapi": {
+                        "id": "81955d376a10505c1c69cd06dbda3047",
+                        "meta": {
+                            "ETag": "f94053bc78b3c2f0b97f7afd52d7de2fe083b655e56a53090ad73e12be83673b",
+                            "github_username": "kevinxin90",
+                            "timestamp": "2020-05-27T16:53:40.804575",
+                            "uptime_status": "good",
+                            "uptime_ts": "2020-06-12T00:04:31.404599",
+                            "url": "https://raw.githubusercontent.com/NCATS-Tangerine/translator-api-registry/master/semmed/semmed_gene.yaml"
+                        }
+                    }
+                },
+                "response_mapping": {
+                    "positively_regulates": {
+                        "pmid": "positively_regulates.pmid",
+                        "umls": "positively_regulates.umls"
+                    }
+                },
+                "id": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            }
+        }
     });
 
-    test("test semmed wrapper with output as gene", () => {
-        let input = {
-            response: api_response,
-            edge: {
-                input: "CDK7",
-                association: {
-                    output_type: "Gene"
-                },
-                response_mapping: {
-                    sookie: "kevin"
-                }
-            }
-        }
+    test("test semmed pairInputWithAPIResponse", () => {
         let tf = new semmed_tf(input);
-        let res = tf.wrap(api_response);
-        expect(res.physically_interacts_with[0]['name']).toBe("CDK2 wt Allele");
-        expect(res.physically_interacts_with[0]['UMLS']).toBe("C1707113");
-        expect(res.physically_interacts_with[0]['pubmed']).toContain("10085115");
+        let res = tf.pairInputWithAPIResponse();
+        expect(res.C1332823[0]['umls']).toBe("C1332823");
+        expect(res).toHaveProperty('C1332823');
+        expect(res["123"]).toBeUndefined();
+    });
+
+    test("test wrapper", () => {
+        let tf = new semmed_tf(input);
+        let res = tf.wrap(input.response[0]);
+        expect(res).toHaveProperty("positively_regulates");
+    });
+
+    test("test json transform", () => {
+        let tf = new semmed_tf(input);
+        let res = tf.jsonTransform(input.response[0]);
+        expect(res).toEqual(input.response[0]);
+    });
+
+    test("add edge info", () => {
+        let tf = new semmed_tf(input);
+        let res = tf.pairInputWithAPIResponse();
+        let rec = res["C1332823"][0];
+        rec = tf.wrap(rec);
+        let result = tf.addEdgeInfo("C1332823", rec["positively_regulates"][0]);
+        expect(result[0]).toHaveProperty("$association");
+        expect(result[0].$association.api_name).toBe("SEMMED Gene API")
+    });
+
+    test("test main function transform", () => {
+        let tf = new semmed_tf(input);
+        let res = tf.transform();
+        expect(res[0]).toHaveProperty('UMLS');
+        expect(res[0]).toHaveProperty("$association");
+        expect(res[0]).toHaveProperty("$input", "C1332823");
+        expect(res.slice(-1)[0]).toHaveProperty("$input", "C1332824");
+        expect(res.length).toBeGreaterThan(30);
     })
 
-    test("test semmed wrapper with output as disease", () => {
-        let input = {
-            response: api_response,
-            edge: {
-                input: "CDK7",
-                association: {
-                    output_type: "Disease"
-                },
-                response_mapping: {
-                    sookie: "kevin"
-                }
-            }
-        }
-        let tf = new semmed_tf(input);
-        let res = tf.wrap(api_response);
-        expect(res.related_to[0]['name']).toBe("High weight");
-        expect(res.related_to[0]['UMLS']).toBe("C0948775");
-        expect(res.related_to[0]['pubmed']).toContain("9286668");
-    })
 })
 
 describe("test cord transformer", () => {
@@ -258,39 +325,93 @@ describe("test ctd transformer", () => {
 describe("test biothings transformer", () => {
 
     let api_response;
+    let input;
 
     beforeAll(async () => {
         let res = await axios({
             method: 'post',
             url: 'https://biothings.ncats.io/semmedgene/query',
-            data: 'q=CXCR4, 123&scopes=name, umls',
+            data: 'q=C1332823, C1332824, 123&scopes=umls',
             params: {
-                fields: 'name,umls',
+                fields: 'name,umls,positively_regulates',
                 size: '5'
             }
         })
         api_response = res.data;
+        input = {
+            response: api_response,
+            edge: {
+                "input": ["C1332824", "C1332823", "123"],
+                "query_operation": {
+                    "params": {
+                        "fields": "positively_regulates"
+                    },
+                    "request_body": {
+                        "body": {
+                            "q": "{inputs[0]}",
+                            "scopes": "umls"
+                        }
+                    },
+                    "path": "/query",
+                    "path_params": [],
+                    "method": "post",
+                    "server": "https://biothings.ncats.io/semmedgene",
+                    "tags": [
+                        "disease",
+                        "annotation",
+                        "query",
+                        "translator",
+                        "biothings",
+                        "semmed"
+                    ],
+                    "supportBatch": true,
+                    "inputSeparator": ","
+                },
+                "association": {
+                    "input_id": "UMLS",
+                    "input_type": "Gene",
+                    "output_id": "UMLS",
+                    "output_type": "Gene",
+                    "predicate": "positively_regulates",
+                    "source": "SEMMED",
+                    "api_name": "SEMMED Gene API",
+                    "smartapi": {
+                        "id": "81955d376a10505c1c69cd06dbda3047",
+                        "meta": {
+                            "ETag": "f94053bc78b3c2f0b97f7afd52d7de2fe083b655e56a53090ad73e12be83673b",
+                            "github_username": "kevinxin90",
+                            "timestamp": "2020-05-27T16:53:40.804575",
+                            "uptime_status": "good",
+                            "uptime_ts": "2020-06-12T00:04:31.404599",
+                            "url": "https://raw.githubusercontent.com/NCATS-Tangerine/translator-api-registry/master/semmed/semmed_gene.yaml"
+                        }
+                    }
+                },
+                "response_mapping": {
+                    "positively_regulates": {
+                        "pmid": "positively_regulates.pmid",
+                        "umls": "positively_regulates.umls"
+                    }
+                },
+                "id": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            }
+        }
     });
 
     test("test biothings pairInputWithAPIResponse", () => {
-        let input = {
-            response: api_response,
-            edge: {
-                input: "238",
-                association: {
-                    output_type: "Gene"
-                },
-                response_mapping: {
-                    sookie: "kevin"
-                }
-            }
-        }
         let tf = new biothings_tf(input);
         let res = tf.pairInputWithAPIResponse();
-        expect(res.CXCR4[0]['umls']).toBe("C1332823");
-        expect(res).toHaveProperty('CXCR4');
+        expect(res.C1332823[0]['umls']).toBe("C1332823");
+        expect(res).toHaveProperty('C1332823');
         expect(res["123"]).toBeUndefined();
-    })
+    });
+
+    test("test wrapper", () => {
+        let tf = new biothings_tf(input);
+        let res = tf.wrap(input.response[0]);
+        expect(res).toHaveProperty("query");
+    });
+
 })
 
 describe("test base transformer using dgidb API", () => {
@@ -379,15 +500,14 @@ describe("test base transformer using dgidb API", () => {
         let tf = new base_tf(input);
         let res = tf.jsonTransform(input.response);
         let rec = res["physically_interacts_with"][0];
-        let result = tf.addEdgeInfo(rec);
-        expect(result).toHaveProperty("association");
-        expect(result.association.api_name).toBe("DGIdb API")
+        let result = tf.addEdgeInfo(input.edge.input, rec);
+        expect(result[0]).toHaveProperty("$association");
+        expect(result[0].$association.api_name).toBe("DGIdb API")
     });
 
     test("test main function transform", () => {
         let tf = new base_tf(input);
         let res = tf.transform();
-        expect(res).toHaveProperty("CXCR3");
-        expect(res["CXCR3"][0]).toHaveProperty("physically_interacts_with")
+        expect(res).toHaveLength(input.response.matchedTerms[0]['interactions'].length);
     })
 })
