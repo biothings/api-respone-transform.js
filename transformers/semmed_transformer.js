@@ -23,4 +23,8 @@ module.exports = class SemmedTransformer extends tf {
         };
         return result;
     }
+
+    jsonTransform = (res) => {
+        return res;
+    }
 }

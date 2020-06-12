@@ -40,45 +40,65 @@ module.exports = class BaseTransformer {
      * Add edge information into individual output JSON.
      * @param {Object} res - JSON response representing an output.
      */
-    addEdgeInfo = (res) => {
-        res = {
-            ...res,
-            ...{
-                association: this.edge.association
+    addEdgeInfo = (input, res) => {
+        if (res === undefined || Object.keys(res).length === 0) {
+            return [];
+        }
+        let output_ids = this.extractOutputIDs(res);
+        let result = output_ids.map(item => {
+            res = {
+                ...res,
+                ...{
+                    $association: this.edge.association,
+                    $input: input,
+                    $output: item
+                }
             }
-        };
-        return res
+            return res;
+        });
+        return result;
     }
 
     /**
      * Main function to transform API response
      */
     transform = () => {
-        let result = {}
+        let result = [];
         let responses = this.pairInputWithAPIResponse();
         for (let curie of Object.keys(responses)) {
             if (Array.isArray(responses[curie]) && responses[curie].length > 0) {
-                result[curie] = responses[curie].map(item => {
+                responses[curie].map(item => {
                     item = this.wrap(item);
                     item = this.jsonTransform(item);
                     for (let predicate of Object.keys(item)) {
                         if (Array.isArray(item[predicate]) && item[predicate].length > 0) {
-                            item[predicate] = item[predicate].map(rec => this.addEdgeInfo(rec));
+                            item[predicate].map(rec => {
+                                rec = this.addEdgeInfo(curie, rec);
+                                result = [...result, ...rec];
+                            });
                         } else {
-                            item[predicate] = [this.addEdgeInfo(item[predicate])];
+                            result = [...result, ...this.addEdgeInfo(item[predicate])];
                         }
                     }
-                    return item;
                 });
-
             }
         };
         return result;
     }
     /**
      * Retrieve all output IDs.
+     * @param {Object} res - JSON response representing an output.
      */
-    extractOutputIDs = () => {
-
+    extractOutputIDs = (res) => {
+        let output_id_type = this.edge.association.output_id;
+        if (!(output_id_type in res)) {
+            return [];
+        } else {
+            if (Array.isArray(res[output_id_type])) {
+                return res[output_id_type]
+            } else {
+                return [res[output_id_type]]
+            }
+        }
     }
 }
