@@ -21,9 +21,13 @@ module.exports = class CordTransformer extends tf {
                 })
             };
             if (tmp.length > 0) {
-                result[predicate] = tmp;
+                result["related_to"] = tmp;
             }
         };
         return result;
+    }
+
+    jsonTransform = (res) => {
+        return res;
     }
 }
