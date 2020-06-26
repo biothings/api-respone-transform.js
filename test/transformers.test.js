@@ -93,7 +93,7 @@ describe("test semmed transformer", () => {
 
     let api_response, input;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         let res = await axios({
             method: 'post',
             url: 'https://biothings.ncats.io/semmedgene/query',
@@ -167,9 +167,9 @@ describe("test semmed transformer", () => {
     test("test semmed pairInputWithAPIResponse", () => {
         let tf = new semmed_tf(input);
         let res = tf.pairInputWithAPIResponse();
-        expect(res.C1332823[0]['umls']).toBe("C1332823");
-        expect(res).toHaveProperty('C1332823');
-        expect(res["123"]).toBeUndefined();
+        expect(res["UMLS:C1332823"][0]['umls']).toBe("C1332823");
+        expect(res).toHaveProperty('UMLS:C1332823');
+        expect(res["UMLS:123"]).toBeUndefined();
     });
 
     test("test wrapper", () => {
@@ -187,9 +187,9 @@ describe("test semmed transformer", () => {
     test("add edge info", () => {
         let tf = new semmed_tf(input);
         let res = tf.pairInputWithAPIResponse();
-        let rec = res["C1332823"][0];
+        let rec = res["UMLS:C1332823"][0];
         rec = tf.wrap(rec);
-        let result = tf.addEdgeInfo("C1332823", rec["positively_regulates"][0]);
+        let result = tf.addEdgeInfo("UMLS:C1332823", rec["positively_regulates"][0]);
         expect(result[0]).toHaveProperty("$association");
         expect(result[0].$association.api_name).toBe("SEMMED Gene API")
     });
@@ -199,8 +199,8 @@ describe("test semmed transformer", () => {
         let res = tf.transform();
         expect(res[0]).toHaveProperty('UMLS');
         expect(res[0]).toHaveProperty("$association");
-        expect(res[0]).toHaveProperty("$input", "C1332823");
-        expect(res.slice(-1)[0]).toHaveProperty("$input", "C1332824");
+        expect(res[0]).toHaveProperty("$input", "UMLS:C1332823");
+        expect(res.slice(-1)[0]).toHaveProperty("$input", "UMLS:C1332824");
         expect(res.length).toBeGreaterThan(30);
     })
 
@@ -283,8 +283,8 @@ describe("test cord transformer", () => {
     test("test cord pairInputWithAPIResponse", () => {
         let tf = new cord_tf(input);
         let res = tf.pairInputWithAPIResponse();
-        expect(res).toHaveProperty('240');
-        expect(res["239"]).toBeUndefined();
+        expect(res).toHaveProperty('HGNC:240');
+        expect(res["HGNC:239"]).toBeUndefined();
     });
 
     test("test wrapper", () => {
@@ -303,9 +303,9 @@ describe("test cord transformer", () => {
     test("add edge info", () => {
         let tf = new cord_tf(input);
         let res = tf.pairInputWithAPIResponse();
-        let rec = res["238"][0];
+        let rec = res["HGNC:238"][0];
         rec = tf.wrap(rec);
-        let result = tf.addEdgeInfo("238", rec["related_to"][0]);
+        let result = tf.addEdgeInfo("HGNC:238", rec["related_to"][0]);
         expect(result[0]).toHaveProperty("$association");
         expect(result[0].$association.api_name).toBe("CORD Gene API")
     });
@@ -315,8 +315,8 @@ describe("test cord transformer", () => {
         let res = tf.transform();
         expect(res[0]).toHaveProperty('HGNC');
         expect(res[0]).toHaveProperty("$association");
-        expect(res[0]).toHaveProperty("$input", "238");
-        expect(res.slice(-1)[0]).toHaveProperty("$input", "240");
+        expect(res[0]).toHaveProperty("$input", "HGNC:238");
+        expect(res.slice(-1)[0]).toHaveProperty("$input", "HGNC:240");
         expect(res.length).toBeGreaterThan(30);
     })
 })
@@ -487,8 +487,8 @@ describe("test biothings transformer", () => {
     test("test biothings pairInputWithAPIResponse", () => {
         let tf = new biothings_tf(input);
         let res = tf.pairInputWithAPIResponse();
-        expect(res.C1332823[0]['umls']).toBe("C1332823");
-        expect(res).toHaveProperty('C1332823');
+        expect(res["UMLS:C1332823"][0]['umls']).toBe("C1332823");
+        expect(res).toHaveProperty('UMLS:C1332823');
         expect(res["123"]).toBeUndefined();
     });
 
@@ -563,9 +563,9 @@ describe("test base transformer using dgidb API", () => {
     test("test pairInputWithAPIResponse", () => {
         let tf = new base_tf(input);
         let res = tf.pairInputWithAPIResponse();
-        expect(res).toHaveProperty("CXCR3");
-        expect(res["CXCR3"]).toBeInstanceOf(Array);
-        expect(res["CXCR3"][0]).toHaveProperty("matchedTerms");
+        expect(res).toHaveProperty("SYMBOL:CXCR3");
+        expect(res["SYMBOL:CXCR3"]).toBeInstanceOf(Array);
+        expect(res["SYMBOL:CXCR3"][0]).toHaveProperty("matchedTerms");
     });
 
     test("test wrapper", () => {

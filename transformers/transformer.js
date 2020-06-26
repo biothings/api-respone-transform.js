@@ -1,4 +1,5 @@
 const json_transform = require("@biothings-explorer/json-transformer");
+const utils = require("../utils");
 
 module.exports = class BaseTransformer {
 
@@ -11,8 +12,9 @@ module.exports = class BaseTransformer {
      * Create an object with key representing input, and value representing the output of API
      */
     pairInputWithAPIResponse = () => {
+        let input = utils.generateCurie(this.edge.association.input_id, this.edge.input);
         return {
-            [this.edge.input]: [this.data.response]
+            [input]: [this.data.response]
         }
     }
 
@@ -49,9 +51,12 @@ module.exports = class BaseTransformer {
             res = {
                 ...res,
                 ...{
+                    $reasoner_edge: this.edge.reasoner_edge,
                     $association: this.edge.association,
                     $input: input,
-                    $output: item
+                    $output: item,
+                    $original_input: this.edge.original_input,
+                    $input_resolved_identifiers: this.edge.input_resolved_identifiers
                 }
             }
             return res;
@@ -95,9 +100,9 @@ module.exports = class BaseTransformer {
             return [];
         } else {
             if (Array.isArray(res[output_id_type])) {
-                return res[output_id_type]
+                return res[output_id_type].map(item => utils.generateCurie(output_id_type, item));
             } else {
-                return [res[output_id_type]]
+                return [utils.generateCurie(output_id_type, res[output_id_type])];
             }
         }
     }

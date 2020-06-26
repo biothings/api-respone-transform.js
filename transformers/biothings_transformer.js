@@ -1,4 +1,5 @@
 const tf = require('./transformer');
+const utils = require('../utils');
 
 module.exports = class BioThingsTransformer extends tf {
     pairInputWithAPIResponse = () => {
@@ -6,10 +7,11 @@ module.exports = class BioThingsTransformer extends tf {
         this.data.response.map(item => {
             // for input not found, BioThings API returns an entry with a key "notfound" equal to true
             if (!('notfound' in item)) {
-                if (item.query in res) {
-                    res[item.query].push(item);
+                let input = utils.generateCurie(this.edge.association.input_id, item.query);
+                if (input in res) {
+                    res[input].push(item);
                 } else {
-                    res[item.query] = [item]
+                    res[input] = [item]
                 }
             }
         });
