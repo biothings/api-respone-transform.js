@@ -28,7 +28,7 @@
     "jest": "^26.1.0"
   },
   "dependencies": {
-    "@biothings-explorer/json-transformer": "0.0.2",
+    "@biothings-explorer/json-transformer": "0.0.3",
     "axios": "^0.19.2"
   }
 }
