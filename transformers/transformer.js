@@ -59,6 +59,18 @@ module.exports = class BaseTransformer {
                     $input_resolved_identifiers: this.edge.input_resolved_identifiers
                 }
             }
+            if ("pubmed" in res) {
+                if (!(Array.isArray(res["pubmed"]))) {
+                    res["pubmed"] = [res["pubmed"]]
+                }
+                res["publications"] = res["pubmed"].map(item => "PMID:" + item)
+            }
+            if ("pmc" in res) {
+                if (!(Array.isArray(res["pmc"]))) {
+                    res["pmc"] = [res["pmc"]]
+                }
+                res["publications"] = res["pmc"].map(item => "PMC:" + item)
+            }
             return res;
         });
         return result;
