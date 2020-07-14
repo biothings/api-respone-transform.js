@@ -56,7 +56,9 @@ module.exports = class BaseTransformer {
                     $input: input,
                     $output: item,
                     $original_input: this.edge.original_input,
-                    $input_resolved_identifiers: this.edge.input_resolved_identifiers
+                    $input_resolved_identifiers: this.edge.input_resolved_identifiers,
+                    api: this.edge.association.api_name,
+                    provided_by: this.edge.association.source
                 }
             }
             if ("pubmed" in res) {
