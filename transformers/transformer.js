@@ -11,7 +11,7 @@ module.exports = class BaseTransformer {
     /**
      * Create an object with key representing input, and value representing the output of API
      */
-    pairInputWithAPIResponse = () => {
+    pairInputWithAPIResponse() {
         let input = utils.generateCurie(this.edge.association.input_id, this.edge.input);
         return {
             [input]: [this.data.response]
@@ -22,7 +22,7 @@ module.exports = class BaseTransformer {
      * Wrapper functions to transform API response before passing to JSON Transformer
      * @return {Object} - key is curie representing input, value is an array of outputs.
      */
-    wrap = (res) => {
+    wrap(res) {
         if (Array.isArray(res)) {
             res = { data: res }
         }
@@ -33,7 +33,7 @@ module.exports = class BaseTransformer {
      * Transform Individual JSON response into Biolink compatible format
      * @param {Object} res - JSON response representing an output.
      */
-    jsonTransform = (res) => {
+    jsonTransform(res) {
         res = json_transform(res, this.edge.response_mapping);
         return res;
     }
@@ -42,7 +42,7 @@ module.exports = class BaseTransformer {
      * Add edge information into individual output JSON.
      * @param {Object} res - JSON response representing an output.
      */
-    addEdgeInfo = (input, res) => {
+    addEdgeInfo(input, res) {
         if (res === undefined || Object.keys(res).length === 0) {
             return [];
         }
@@ -81,7 +81,7 @@ module.exports = class BaseTransformer {
     /**
      * Main function to transform API response
      */
-    transform = () => {
+    transform() {
         let result = [];
         let responses = this.pairInputWithAPIResponse();
         for (let curie of Object.keys(responses)) {
@@ -108,7 +108,7 @@ module.exports = class BaseTransformer {
      * Retrieve all output IDs.
      * @param {Object} res - JSON response representing an output.
      */
-    extractOutputIDs = (res) => {
+    extractOutputIDs(res) {
         let output_id_type = this.edge.association.output_id;
         if (!(output_id_type in res)) {
             return [];

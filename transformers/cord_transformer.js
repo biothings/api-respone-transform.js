@@ -2,7 +2,7 @@ const tf = require('./biothings_transformer');
 
 module.exports = class CordTransformer extends tf {
 
-    wrap = (res) => {
+    wrap(res) {
         const PREFIXES = ['pr', 'go', 'mop', 'hgnc', 'uberon', 'so', 'cl', 'doid', 'chebi'];
         let result = {};
         for (let predicate of Object.keys(res)) {
@@ -27,7 +27,7 @@ module.exports = class CordTransformer extends tf {
         return result;
     }
 
-    jsonTransform = (res) => {
+    jsonTransform(res) {
         return res;
     }
 }

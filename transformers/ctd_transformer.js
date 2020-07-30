@@ -1,7 +1,7 @@
 const tf = require('./transformer');
 
 module.exports = class CTDTransformer extends tf {
-    wrap = (res) => {
+    wrap(res) {
         res = res.map(item => {
             if (item.PubMedIDs) {
                 item.PubMedIDs = item.PubMedIDs.split('|');

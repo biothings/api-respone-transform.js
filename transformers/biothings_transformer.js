@@ -2,7 +2,7 @@ const tf = require('./transformer');
 const utils = require('../utils');
 
 module.exports = class BioThingsTransformer extends tf {
-    pairInputWithAPIResponse = () => {
+    pairInputWithAPIResponse() {
         let res = {};
         this.data.response.map(item => {
             // for input not found, BioThings API returns an entry with a key "notfound" equal to true

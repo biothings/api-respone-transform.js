@@ -1,7 +1,7 @@
 const tf = require('./transformer');
 
 module.exports = class AutomatTransformer extends tf {
-    wrap = (res) => {
+    wrap(res) {
         res = { data: res };
         let result = { chembl: new Set() };
         const ID_WITH_PREFIXES = ["MONDO", "CHEBI", "DOID"];

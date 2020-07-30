@@ -1,7 +1,7 @@
 const tf = require('./transformer');
 
 module.exports = class BiolinkTransformer extends tf {
-    wrap = (res) => {
+    wrap(res) {
         //super.wrap();
         const PREFIXES = ['HGNC', 'NCBIGene', 'REACT'];
         if ("associations" in res) {

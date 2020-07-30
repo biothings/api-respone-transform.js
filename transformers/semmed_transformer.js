@@ -2,7 +2,7 @@ const tf = require('./biothings_transformer');
 
 module.exports = class SemmedTransformer extends tf {
 
-    wrap = (res) => {
+    wrap(res) {
         let result = {};
         for (let predicate of Object.keys(res)) {
             let tmp = [];
@@ -24,7 +24,7 @@ module.exports = class SemmedTransformer extends tf {
         return result;
     }
 
-    jsonTransform = (res) => {
+    jsonTransform(res) {
         return res;
     }
 }
