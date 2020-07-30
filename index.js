@@ -13,7 +13,7 @@ module.exports = class Transformer {
         this.route();
     }
 
-    route = () => {
+    route() {
         let api = this.data.edge.association.api_name;
         let tags = this.data.edge.query_operation.tags;
         if (api.startsWith('CORD')) {
@@ -35,7 +35,7 @@ module.exports = class Transformer {
         }
     }
 
-    transform = () => {
+    transform() {
         return this.tf.transform();
     }
 }
