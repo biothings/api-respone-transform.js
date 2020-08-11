@@ -96,7 +96,7 @@ module.exports = class BaseTransformer {
                                 result = [...result, ...rec];
                             });
                         } else {
-                            result = [...result, ...this.addEdgeInfo(item[predicate])];
+                            result = [...result, ...this.addEdgeInfo(curie, item[predicate])];
                         }
                     }
                 });
