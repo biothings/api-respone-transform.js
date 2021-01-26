@@ -68,9 +68,8 @@ module.exports = class BaseTransformer {
                 if (!(Array.isArray(res["pubmed"]))) {
                     res["pubmed"] = [res["pubmed"]]
                 }
-                debug
                 res["publications"] = res["pubmed"].map(item => {
-                    if (!("PMID" in item)) {
+                    if (!(item.startsWith("PMID:"))) {
                         return "PMID:" + item;
                     } else {
                         return item;
