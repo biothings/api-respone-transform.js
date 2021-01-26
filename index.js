@@ -6,6 +6,7 @@ const opentarget_tf = require("./transformers/opentarget_transformer");
 const automat_tf = require("./transformers/automat_transformer");
 const biothings_tf = require("./transformers/biothings_transformer");
 const base_tf = require("./transformers/transformer");
+const debug = require("debug")("api-response-transform:index");
 
 module.exports = class Transformer {
     constructor(data) {
@@ -15,7 +16,9 @@ module.exports = class Transformer {
 
     route() {
         let api = this.data.edge.association.api_name;
+        debug(`api name ${api}`);
         let tags = this.data.edge.query_operation.tags;
+        debug(`api tags: ${tags}`);
         if (api.startsWith('CORD')) {
             this.tf = new cord_tf(this.data);
         } else if (api.startsWith('SEMMED')) {

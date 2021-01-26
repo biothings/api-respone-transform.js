@@ -1,5 +1,6 @@
 const json_transform = require("@biothings-explorer/json-transformer");
 const utils = require("../utils");
+const debug = require("debug")("api-response-transform:transformer");
 
 module.exports = class BaseTransformer {
 
@@ -58,14 +59,23 @@ module.exports = class BaseTransformer {
                     $original_input: this.edge.original_input,
                     $input_resolved_identifiers: this.edge.input_resolved_identifiers,
                     api: this.edge.association.api_name,
-                    provided_by: this.edge.association.source
+                    provided_by: this.edge.association.source,
+                    $filter: this.edge.filter
                 }
             }
             if ("pubmed" in res) {
+                debug(`pubmed field value is ${res['pubmed']}`)
                 if (!(Array.isArray(res["pubmed"]))) {
                     res["pubmed"] = [res["pubmed"]]
                 }
-                res["publications"] = res["pubmed"].map(item => "PMID:" + item)
+                debug
+                res["publications"] = res["pubmed"].map(item => {
+                    if (!("PMID" in item)) {
+                        return "PMID:" + item;
+                    } else {
+                        return item;
+                    }
+                })
             }
             if ("pmc" in res) {
                 if (!(Array.isArray(res["pmc"]))) {
