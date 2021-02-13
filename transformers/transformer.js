@@ -39,53 +39,52 @@ module.exports = class BaseTransformer {
         return res;
     }
 
+    _updatePublications(res) {
+        if ("pubmed" in res) {
+            res.pubmed = utils.toArray(res.pubmed);
+            res.publications = res.pubmed.map(item => (typeof item === "string" && item.toUpperCase().startsWith("PMID:")) ? item.toUpperCase() : "PMID:" + item);
+        }
+        if ("pmc" in res) {
+            res.pmc = utils.toArray(res.pmc);
+            res.publications = res.pmc.map(item => (typeof item === "string" && item.toUpperCase().startsWith("PMC:")) ? item.toUpperCase() : "PMC:" + item);
+        }
+        return res;
+    }
+
+    _updateEdgeMetadata(res) {
+        res.$edge_metadata = {
+            ...this.edge.association,
+            trapi_qEdge_id: this.edge.reasoner_edge,
+            filter: this.edge.filter
+        }
+        return res;
+    }
+
+    _updateInput(res, input) {
+        res.$input = {
+            curie: input,
+            original: this.edge.original_input,
+            obj: this.edge.input_resolved_identifiers
+        }
+        return res;
+    }
+
     /**
      * Add edge information into individual output JSON.
      * @param {Object} res - JSON response representing an output.
      */
     addEdgeInfo(input, res) {
-        if (res === undefined || Object.keys(res).length === 0) {
+        if (res === undefined || (Object.keys(res).length === 0)) {
             return [];
         }
-        let output_ids = this.extractOutputIDs(res);
+        res = this._updateEdgeMetadata(res);
+        res = this._updateInput(res, input);
+        const output_ids = this.extractOutputIDs(res);
         let result = output_ids.map(item => {
-            res = {
-                ...res,
-                ...{
-                    $edge_metadata: {
-                        ...this.edge.association,
-                        trapi_qEdge_id: this.edge.reasoner_edge,
-                        filter: this.edge.filter
-                    },
-                    $input: {
-                        curie: input,
-                        original: this.edge.original_input,
-                        obj: this.edge.input_resolved_identifiers
-                    },
-                    $output: {
-                        original: item
-                    }
-                }
+            res.$output = {
+                original: item
             }
-            if ("pubmed" in res) {
-                debug(`pubmed field value is ${res['pubmed']}`)
-                if (!(Array.isArray(res["pubmed"]))) {
-                    res["pubmed"] = [res["pubmed"]]
-                }
-                res["publications"] = res["pubmed"].map(item => {
-                    if (!(item.startsWith("PMID:"))) {
-                        return "PMID:" + item;
-                    } else {
-                        return item;
-                    }
-                })
-            }
-            if ("pmc" in res) {
-                if (!(Array.isArray(res["pmc"]))) {
-                    res["pmc"] = [res["pmc"]]
-                }
-                res["publications"] = res["pmc"].map(item => "PMC:" + item)
-            }
+            res = this._updatePublications(res);
             return res;
         });
         return result;
@@ -125,12 +124,8 @@ module.exports = class BaseTransformer {
         let output_id_type = this.edge.association.output_id;
         if (!(output_id_type in res)) {
             return [];
-        } else {
-            if (Array.isArray(res[output_id_type])) {
-                return res[output_id_type].map(item => utils.generateCurie(output_id_type, item));
-            } else {
-                return [utils.generateCurie(output_id_type, res[output_id_type])];
-            }
         }
+        res[output_id_type] = utils.toArray(res[output_id_type]);
+        return res[output_id_type].map(item => utils.generateCurie(output_id_type, item));
     }
 }
