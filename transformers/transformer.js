@@ -54,7 +54,7 @@ module.exports = class BaseTransformer {
     _updateEdgeMetadata(res) {
         res.$edge_metadata = {
             ...this.edge.association,
-            trapi_qEdge_id: this.edge.reasoner_edge,
+            trapi_qEdge_obj: this.edge.reasoner_edge,
             filter: this.edge.filter
         }
         return res;
@@ -62,9 +62,8 @@ module.exports = class BaseTransformer {
 
     _updateInput(res, input) {
         res.$input = {
-            curie: input,
-            original: this.edge.original_input,
-            obj: this.edge.input_resolved_identifiers
+            original: input,
+            obj: (typeof this.edge.input_resolved_identifiers === "undefined") ? undefined : this.edge.input_resolved_identifiers[input]
         }
         return res;
     }
