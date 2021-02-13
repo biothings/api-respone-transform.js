@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.1](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.6.0...v1.6.1) (2021-02-13)
+
+
+### Bug Fixes
+
+* :bug: update logics to retrieve input original and input obj ([8281ea4](https://github.com/kevinxin90/api-respone-transform.js/commit/8281ea4b400a12f0ca1d34043b2b8ac023d31c32))
+
 ## [1.6.0](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.5.0...v1.6.0) (2021-02-13)
 
 
