@@ -61,9 +61,10 @@ module.exports = class BaseTransformer {
     }
 
     _updateInput(res, input) {
+        debug(`input: ${input}`)
         res.$input = {
-            original: input,
-            obj: (typeof this.edge.input_resolved_identifiers === "undefined") ? undefined : this.edge.input_resolved_identifiers[input]
+            original: (typeof this.edge.original_input === "undefined") ? undefined : this.edge.original_input[input],
+            obj: (typeof this.edge.input_resolved_identifiers === "undefined" || typeof this.edge.original_input === "undefined") ? undefined : this.edge.input_resolved_identifiers[this.edge.original_input[input]]
         }
         return res;
     }
