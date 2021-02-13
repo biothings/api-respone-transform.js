@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.5.0...v1.6.0) (2021-02-13)
+
+
+### Features
+
+* :boom: align structure of $input and $output ([7806571](https://github.com/kevinxin90/api-respone-transform.js/commit/7806571d86e42ecb296d20d547e316f3519660a6))
+
+
+### Bug Fixes
+
+* :bug: fix wrong url in CHANGELOG ([58cb49c](https://github.com/kevinxin90/api-respone-transform.js/commit/58cb49c8fc3702c2aa7f450f91355b1a0f2bae96))
+
 ## [1.5.0](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.4.1...v1.5.0) (2021-02-13)
 
 
