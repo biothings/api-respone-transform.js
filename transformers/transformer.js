@@ -52,15 +52,19 @@ module.exports = class BaseTransformer {
             res = {
                 ...res,
                 ...{
-                    $reasoner_edge: this.edge.reasoner_edge,
-                    $association: this.edge.association,
-                    $input: input,
-                    $output: item,
-                    $original_input: this.edge.original_input,
-                    $input_resolved_identifiers: this.edge.input_resolved_identifiers,
-                    api: this.edge.association.api_name,
-                    provided_by: this.edge.association.source,
-                    $filter: this.edge.filter
+                    $edge_metadata: {
+                        ...this.edge.association,
+                        trapi_qEdge_id: this.edge.reasoner_edge,
+                        filter: this.edge.filter
+                    },
+                    $input: {
+                        curie: input,
+                        original: this.edge.original_input,
+                        obj: this.edge.input_resolved_identifiers
+                    },
+                    $output: {
+                        original: item
+                    }
                 }
             }
             if ("pubmed" in res) {
