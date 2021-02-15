@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/kevinxin90/transform-api-response.js.svg?branch=master)](https://travis-ci.com/kevinxin90/api-respone-transform.js)
+![Test Coveralls](https://github.com/kevinxin90/api-respone-transform.js/workflows/Test%20Coveralls/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/kevinxin90/api-respone-transform.js/badge.svg?branch=master)](https://coveralls.io/github/kevinxin90/api-respone-transform.js?branch=master)
 <a href="https://github.com/kevinxin90/api-respone-transform.js#readme" target="_blank">
     <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" />
