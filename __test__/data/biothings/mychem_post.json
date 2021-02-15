@@ -1,6 +1,10 @@
 [
     {
         "query": "DB00188",
+        "fake": true
+    },
+    {
+        "query": "DB00188",
         "_id": "GXJABQQUPOEUTA-RDJZCZTQSA-N",
         "_score": 6.163889,
         "drugbank": {

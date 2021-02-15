@@ -28,7 +28,7 @@ describe("test biothings transformer", () => {
             let res = tf.pairInputWithAPIResponse();
             expect(Object.keys(res)).toHaveLength(2);
             expect(res).toHaveProperty("DRUGBANK:DB00188");
-            expect(res["DRUGBANK:DB00188"]).toHaveLength(1);
+            expect(res["DRUGBANK:DB00188"]).toHaveLength(2);
             expect(res).not.toHaveProperty("DRUGBANK:DB0000");
         })
     })
