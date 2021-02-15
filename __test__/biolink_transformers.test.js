@@ -57,8 +57,23 @@ describe("test biolink transformer", () => {
         const fake_response = {
             associations: [
                 {
-                    object: {
+                    object1: {
                         id: "MONDO:12345"
+                    }
+                }
+            ]
+        }
+        const res = tf.wrap(fake_response);
+        expect(res).toEqual(fake_response)
+    });
+
+    test("test biolink wrapper if no object.id field present", () => {
+        const tf = new biolink_tf(input);
+        const fake_response = {
+            associations: [
+                {
+                    object: {
+                        id1: "MONDO:12345"
                     }
                 }
             ]
