@@ -25,8 +25,6 @@ module.exports = class Transformer {
             this.tf = new semmed_tf(this.data);
         } else if (api === 'BioLink API') {
             this.tf = new biolink_tf(this.data);
-        } else if (tags.includes("automat")) {
-            this.tf = new automat_tf(this.data);
         } else if (tags.includes("biothings")) {
             this.tf = new biothings_tf(this.data);
         } else if (tags.includes("ctd")) {
