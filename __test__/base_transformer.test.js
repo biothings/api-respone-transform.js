@@ -95,4 +95,22 @@ describe("test base transformer", () => {
         expect(res.publications).toEqual(["PMC:123"])
     })
 
+    test("Test extractOutputIDs function if output id type not in result", () => {
+        const tf = new base_tf(input);
+        const fake = {
+            kk: 1
+        };
+        const res = tf.extractOutputIDs(fake);
+        expect(res).toEqual([]);
+    })
+
+    test("Test extractOutputIDs function if output id type is in result", () => {
+        const tf = new base_tf(input);
+        const fake = {
+            DOID: 1
+        };
+        const res = tf.extractOutputIDs(fake);
+        expect(res).toEqual(["DOID:1"]);
+    })
+
 })

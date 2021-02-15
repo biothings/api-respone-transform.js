@@ -121,7 +121,7 @@ module.exports = class BaseTransformer {
      * @param {Object} res - JSON response representing an output.
      */
     extractOutputIDs(res) {
-        let output_id_type = this.edge.association.output_id;
+        const output_id_type = this.edge.association.output_id;
         if (!(output_id_type in res)) {
             return [];
         }
