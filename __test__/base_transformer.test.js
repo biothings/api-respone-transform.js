@@ -113,4 +113,10 @@ describe("test base transformer", () => {
         expect(res).toEqual(["DOID:1"]);
     })
 
+    test("Test addEdgeInfo function if result is empty", () => {
+        const tf = new base_tf(input);
+        const fake = {};
+        const res = tf.addEdgeInfo("NCBIGene:1017", fake);
+        expect(res).toEqual([]);
+    })
 })
