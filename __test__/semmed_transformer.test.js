@@ -1,4 +1,4 @@
-const semmed_tf = require("../transformers/semmed_transformer");
+const semmed_tf = require("../src/transformers/semmed_transformer");
 const axios = require("axios");
 
 describe("test semmed transformer", () => {

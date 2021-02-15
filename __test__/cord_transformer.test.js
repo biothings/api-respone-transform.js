@@ -1,4 +1,4 @@
-const cord_tf = require("../transformers/cord_transformer");
+const cord_tf = require("../src/transformers/cord_transformer");
 const axios = require("axios");
 
 describe("test cord transformer", () => {

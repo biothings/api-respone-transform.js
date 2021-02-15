@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-const biolink_tf = require("../transformers/biolink_transformer");
+const biolink_tf = require("../src/transformers/biolink_transformer");
 const axios = require("axios");
 
 describe("test biolink transformer", () => {

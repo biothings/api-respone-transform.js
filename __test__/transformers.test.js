@@ -2,11 +2,10 @@
  * @jest-environment node
  */
 
-const ctd_tf = require("../transformers/ctd_transformer");
-const opentarget_tf = require("../transformers/opentarget_transformer");
-const automat_tf = require("../transformers/automat_transformer");
-const biothings_tf = require("../transformers/biothings_transformer");
-const base_tf = require("../transformers/transformer");
+const ctd_tf = require("../src/transformers/ctd_transformer");
+const opentarget_tf = require("../src/transformers/opentarget_transformer");
+const biothings_tf = require("../src/transformers/biothings_transformer");
+const base_tf = require("../src/transformers/transformer");
 const axios = require("axios");
 
 
