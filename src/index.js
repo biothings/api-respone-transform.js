@@ -3,7 +3,6 @@ const semmed_tf = require("./transformers/semmed_transformer");
 const cord_tf = require("./transformers/cord_transformer");
 const ctd_tf = require("./transformers/ctd_transformer");
 const opentarget_tf = require("./transformers/opentarget_transformer");
-const automat_tf = require("./transformers/automat_transformer");
 const biothings_tf = require("./transformers/biothings_transformer");
 const base_tf = require("./transformers/transformer");
 const debug = require("debug")("api-response-transform:index");
