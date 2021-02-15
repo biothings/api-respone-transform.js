@@ -29,6 +29,42 @@ describe("test biolink transformer", () => {
         expect(res.associations[0].publications[0].id).toBe("21685912");
         expect(res.associations[1]).not.toHaveProperty("publications");
         expect(res.associations[1]).not.toHaveProperty("provided_by");
-    })
+    });
+
+    test("test biolink wrapper if no association field as root key", () => {
+        let tf = new biolink_tf(input);
+        let res = tf.wrap({ "data": [] });
+        expect(res).toEqual({ "data": [] })
+    });
+
+    test("test biolink wrapper if no object id should be prefixed", () => {
+        const tf = new biolink_tf(input);
+        const res = tf.wrap(
+            {
+                associations: [
+                    {
+                        object: {
+                            id: "MONDO:12345"
+                        }
+                    }
+                ]
+            });
+        expect(res.associations[0].object.MONDO).toEqual("MONDO:12345")
+    });
+
+    test("test biolink wrapper if no object field present", () => {
+        const tf = new biolink_tf(input);
+        const fake_response = {
+            associations: [
+                {
+                    object: {
+                        id: "MONDO:12345"
+                    }
+                }
+            ]
+        }
+        const res = tf.wrap(fake_response);
+        expect(res).toEqual(fake_response)
+    });
 
 })
