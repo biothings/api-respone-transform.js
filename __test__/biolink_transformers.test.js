@@ -83,7 +83,6 @@ describe("test biolink transformer", () => {
     test("test biolink transformer", () => {
         let tf = new biolink_tf(input);
         let res = tf.transform();
-        console.log(res[0]);
         let res_6119 = res.filter(item => item.HGNC[0] === '6119');
         expect(res_6119[0].publications).toContain('PMID:21685912');
     })
