@@ -11,7 +11,7 @@ describe("test biolink transformer", () => {
     let response;
     let input;
 
-    beforeAll(() => {
+    beforeEach(() => {
         const response_path = path.resolve(__dirname, './data/biolink/response.json');
         response = JSON.parse(fs.readFileSync(response_path));
         const edge_path = path.resolve(__dirname, './data/biolink/edge.json');
@@ -80,6 +80,18 @@ describe("test biolink transformer", () => {
         }
         const res = tf.wrap(fake_response);
         expect(res).toEqual(fake_response)
+    });
+
+    test("test biolink jsonTransform function", () => {
+        let tf = new biolink_tf(input);
+        const wrapped_response = tf.wrap(response);
+        let res = tf.jsonTransform(wrapped_response);
+        expect(res).toHaveProperty("related_to");
+        expect(res.related_to[0].HGNC).toEqual("10956");
+        expect(res.related_to[0].pubmed[0]).toEqual("21685912");
+        expect(res.related_to[0].relation).toEqual("contributes to condition");
+        expect(res.related_to[0].source[0]).toEqual("https://archive.monarchinitiative.org/#gwascatalog");
+        expect(res.related_to[0].taxid).toEqual("NCBITaxon:9606")
     });
 
 })
