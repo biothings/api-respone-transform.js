@@ -102,18 +102,18 @@ describe("test semmed transformer", () => {
         let rec = res["UMLS:C1332823"][0];
         rec = tf.wrap(rec);
         let result = tf.addEdgeInfo("UMLS:C1332823", rec["positively_regulates"][0]);
-        expect(result[0]).toHaveProperty("$association");
-        expect(result[0].$association.api_name).toBe("SEMMED Gene API")
+        expect(result[0]).toHaveProperty("$edge_metadata");
+        expect(result[0].$edge_metadata.api_name).toBe("SEMMED Gene API")
     });
 
     test("test main function transform", () => {
         let tf = new semmed_tf(input);
         let res = tf.transform();
         expect(res[0]).toHaveProperty('UMLS');
-        expect(res[0]).toHaveProperty("$association");
-        expect(res[0]).toHaveProperty("$input", "UMLS:C1332823");
-        expect(res.slice(-1)[0]).toHaveProperty("$input", "UMLS:C1332824");
+        expect(res[0]).toHaveProperty("$edge_metadata");
+        expect(res[0]).toHaveProperty("$input");
+        expect(res.slice(-1)[0]).toHaveProperty("$input");
         expect(res.length).toBeGreaterThan(30);
     })
 
-})
+}) 
