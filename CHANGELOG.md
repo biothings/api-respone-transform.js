@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.6.1...v1.7.0) (2021-02-17)
+
+
+### Features
+
+* :fire: remove automat transformer since the API is deprecated ([61da425](https://github.com/kevinxin90/api-respone-transform.js/commit/61da425d5b4dca6a6cdbbc8d9410f7e67ebefa55))
+
 ### [1.6.1](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.6.0...v1.6.1) (2021-02-13)
 
 
