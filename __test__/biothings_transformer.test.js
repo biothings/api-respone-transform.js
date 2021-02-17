@@ -33,6 +33,38 @@ describe("test biothings transformer", () => {
         })
     })
 
+    describe("test biothings transformer for post query using mygene", () => {
+        let input;
+        let response;
+
+        beforeAll(() => {
+            const post_query_response_path = path.resolve(__dirname, './data/biothings/mygene_post.json');
+            response = JSON.parse(fs.readFileSync(post_query_response_path));
+            const edge_path = path.resolve(__dirname, './data/biothings/mygene_example_edge.json');
+            const edge = JSON.parse(fs.readFileSync(edge_path));
+            input = {
+                response,
+                edge
+            }
+        })
+
+        test("test biothings wrapper", () => {
+            let tf = new biothings_tf(input);
+            let res = tf.pairInputWithAPIResponse();
+            expect(Object.keys(res)).toHaveLength(1);
+            expect(res).toHaveProperty("NCBIGene:1017");
+            expect(res["NCBIGene:1017"]).toHaveLength(1);
+        })
+
+        test("test biothings transform", () => {
+            let tf = new biothings_tf(input);
+            let res = tf.transform();
+            expect(res).toHaveLength(27);
+            expect(res[0]).toHaveProperty('pubmed', [21873635]);
+            expect(res[0]).toHaveProperty('publications', ["PMID:21873635"]);
+        })
+    })
+
     describe("test biothings transformer for get query", () => {
         let input;
         let response;
