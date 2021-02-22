@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.7.0...v1.8.0) (2021-02-22)
+
+
+### Features
+
+* :sparkles: remove non-edge data from root level result ([0dc8be4](https://github.com/kevinxin90/api-respone-transform.js/commit/0dc8be431bfe705b5cc590d29a1be5c51c6f2cb9))
+
 ## [1.7.0](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.6.1...v1.7.0) (2021-02-17)
 
 
