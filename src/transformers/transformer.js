@@ -43,10 +43,12 @@ module.exports = class BaseTransformer {
         if ("pubmed" in res) {
             res.pubmed = utils.toArray(res.pubmed);
             res.publications = res.pubmed.map(item => (typeof item === "string" && item.toUpperCase().startsWith("PMID:")) ? item.toUpperCase() : "PMID:" + item);
+            delete res.pubmed;
         }
         if ("pmc" in res) {
             res.pmc = utils.toArray(res.pmc);
             res.publications = res.pmc.map(item => (typeof item === "string" && item.toUpperCase().startsWith("PMC:")) ? item.toUpperCase() : "PMC:" + item);
+            delete res.pmc;
         }
         return res;
     }
@@ -69,6 +71,12 @@ module.exports = class BaseTransformer {
         return res;
     }
 
+    _removeNonEdgeData(res) {
+        delete res["@type"];
+        delete res[this.edge.association.output_id];
+        return res;
+    }
+
     /**
      * Add edge information into individual output JSON.
      * @param {Object} res - JSON response representing an output.
@@ -84,6 +92,7 @@ module.exports = class BaseTransformer {
             res.$output = {
                 original: item
             }
+            res = this._removeNonEdgeData(res);
             res = this._updatePublications(res);
             return res;
         });
