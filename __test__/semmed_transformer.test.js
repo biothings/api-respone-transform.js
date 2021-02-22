@@ -109,7 +109,8 @@ describe("test semmed transformer", () => {
     test("test main function transform", () => {
         let tf = new semmed_tf(input);
         let res = tf.transform();
-        expect(res[0]).toHaveProperty('UMLS');
+        expect(res[0]).not.toHaveProperty('UMLS');
+        expect(res[0]).not.toHaveProperty('@type');
         expect(res[0]).toHaveProperty("$edge_metadata");
         expect(res[0]).toHaveProperty("$input");
         expect(res.slice(-1)[0]).toHaveProperty("$input");

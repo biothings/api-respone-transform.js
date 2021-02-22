@@ -60,7 +60,7 @@ describe("test biothings transformer", () => {
             let tf = new biothings_tf(input);
             let res = tf.transform();
             expect(res).toHaveLength(27);
-            expect(res[0]).toHaveProperty('pubmed', [21873635]);
+            expect(res[0]).not.toHaveProperty('pubmed');
             expect(res[0]).toHaveProperty('publications', ["PMID:21873635"]);
         })
     })

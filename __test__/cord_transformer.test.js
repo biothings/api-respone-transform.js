@@ -100,6 +100,7 @@ describe("test cord transformer", () => {
         let res = tf.pairInputWithAPIResponse();
         let rec = res["HGNC:238"][0];
         rec = tf.wrap(rec);
+        console.log("rec", rec);
         let result = tf.addEdgeInfo("HGNC:238", rec["related_to"][0]);
         expect(result[0]).toHaveProperty("$edge_metadata");
         expect(result[0].$edge_metadata.api_name).toBe("CORD Gene API")
@@ -108,9 +109,9 @@ describe("test cord transformer", () => {
     test("test main function transform", () => {
         let tf = new cord_tf(input);
         let res = tf.transform();
-        expect(res[0]).toHaveProperty('HGNC');
+        expect(res[0]).not.toHaveProperty('HGNC');
         expect(res[0]).toHaveProperty("$edge_metadata");
         expect(res[0]).toHaveProperty("$input");
-        expect(res.length).toBeGreaterThan(30);
+        expect(res.length).toBeGreaterThan(20);
     })
 })

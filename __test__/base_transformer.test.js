@@ -61,7 +61,7 @@ describe("test base transformer", () => {
             pubmed: "PMID:1233"
         }
         const res = tf._updatePublications(fake);
-        expect(res.pubmed).toEqual(["PMID:1233"]);
+        expect(res).not.toHaveProperty('pubmed');
         expect(res.publications).toEqual(["PMID:1233"]);
     })
 
@@ -71,7 +71,7 @@ describe("test base transformer", () => {
             pubmed: 1233
         }
         const res = tf._updatePublications(fake);
-        expect(res.pubmed).toEqual([1233]);
+        expect(res).not.toHaveProperty('pubmed');
         expect(res.publications).toEqual(["PMID:1233"])
     })
 
@@ -81,7 +81,7 @@ describe("test base transformer", () => {
             pmc: "PMC:1233"
         }
         const res = tf._updatePublications(fake);
-        expect(res.pmc).toEqual(["PMC:1233"]);
+        expect(res).not.toHaveProperty('pmc');
         expect(res.publications).toEqual(["PMC:1233"]);
     })
 
@@ -91,7 +91,7 @@ describe("test base transformer", () => {
             pmc: 123
         }
         const res = tf._updatePublications(fake);
-        expect(res.pmc).toEqual([123]);
+        expect(res).not.toHaveProperty('pmc');
         expect(res.publications).toEqual(["PMC:123"])
     })
 
