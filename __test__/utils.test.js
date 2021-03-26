@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-const utils = require("../src/utils");
+const utils = require("../built/utils");
 
 describe("test utils module", () => {
 

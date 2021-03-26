@@ -112,7 +112,7 @@ This package is desgined to be used as a downstream consumer of [@biothings-expl
   - Transform into biolink-compatible format
 
     ```javascript
-    let transformer = new tf(input);
+    let transformer = new tf.default(input);
     let res = transformer.transform();
 
     //returns [

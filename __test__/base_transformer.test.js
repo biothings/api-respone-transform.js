@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-const base_tf = require("../src/transformers/transformer");
+const base_tf = require("../built/transformers/transformer");
 const fs = require("fs");
 const path = require("path");
 
@@ -23,20 +23,20 @@ describe("test base transformer", () => {
     })
 
     test("Test pairInputWithAPIResponse function", () => {
-        const tf = new base_tf(input);
+        const tf = new base_tf.default(input);
         const res = tf.pairInputWithAPIResponse();
         expect(res).toHaveProperty("DOID:9562");
         expect(res["DOID:9562"]).toHaveLength(1);
     })
 
     test("Test wrap function if response is not an array", () => {
-        const tf = new base_tf(input);
+        const tf = new base_tf.default(input);
         const res = tf.wrap(response);
         expect(res).toHaveProperty("_embedded");
     })
 
     test("Test wrap function if response is an array", () => {
-        const tf = new base_tf(input);
+        const tf = new base_tf.default(input);
         const fake = ["1"]
         const res = tf.wrap(fake);
         expect(res).toHaveProperty("data");
@@ -44,7 +44,7 @@ describe("test base transformer", () => {
     })
 
     test("Test jsonTransform function", () => {
-        const tf = new base_tf(input);
+        const tf = new base_tf.default(input);
         const res = tf.jsonTransform(response);
         expect(res).toHaveProperty("has_subclass");
         expect(res.has_subclass[0]).toHaveProperty("DOID");
@@ -56,7 +56,7 @@ describe("test base transformer", () => {
     })
 
     test("Test _updatePublications function if pubmed id is prefixed", () => {
-        const tf = new base_tf(input);
+        const tf = new base_tf.default(input);
         const fake = {
             pubmed: "PMID:1233"
         }
@@ -66,7 +66,7 @@ describe("test base transformer", () => {
     })
 
     test("Test _updatePublications function if pubmed id is NOT prefixed", () => {
-        const tf = new base_tf(input);
+        const tf = new base_tf.default(input);
         const fake = {
             pubmed: 1233
         }
@@ -76,7 +76,7 @@ describe("test base transformer", () => {
     })
 
     test("Test _updatePublications function if pmc id is prefixed", () => {
-        const tf = new base_tf(input);
+        const tf = new base_tf.default(input);
         const fake = {
             pmc: "PMC:1233"
         }
@@ -86,7 +86,7 @@ describe("test base transformer", () => {
     })
 
     test("Test _updatePublications function if pmc id is NOT prefixed", () => {
-        const tf = new base_tf(input);
+        const tf = new base_tf.default(input);
         const fake = {
             pmc: 123
         }
@@ -96,7 +96,7 @@ describe("test base transformer", () => {
     })
 
     test("Test extractOutputIDs function if output id type not in result", () => {
-        const tf = new base_tf(input);
+        const tf = new base_tf.default(input);
         const fake = {
             kk: 1
         };
@@ -105,7 +105,7 @@ describe("test base transformer", () => {
     })
 
     test("Test extractOutputIDs function if output id type is in result", () => {
-        const tf = new base_tf(input);
+        const tf = new base_tf.default(input);
         const fake = {
             DOID: 1
         };
@@ -114,7 +114,7 @@ describe("test base transformer", () => {
     })
 
     test("Test addEdgeInfo function if result is empty", () => {
-        const tf = new base_tf(input);
+        const tf = new base_tf.default(input);
         const fake = {};
         const res = tf.addEdgeInfo("NCBIGene:1017", fake);
         expect(res).toEqual([]);

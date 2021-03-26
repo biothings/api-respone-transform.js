@@ -2,10 +2,10 @@
  * @jest-environment node
  */
 
-const ctd_tf = require("../src/transformers/ctd_transformer");
-const opentarget_tf = require("../src/transformers/opentarget_transformer");
-const biothings_tf = require("../src/transformers/biothings_transformer");
-const base_tf = require("../src/transformers/transformer");
+const ctd_tf = require("../built/transformers/ctd_transformer");
+const opentarget_tf = require("../built/transformers/opentarget_transformer");
+const biothings_tf = require("../built/transformers/biothings_transformer");
+const base_tf = require("../built/transformers/transformer");
 const axios = require("axios");
 
 
@@ -31,7 +31,7 @@ describe("test opentarget transformer", () => {
                 }
             }
         }
-        let tf = new opentarget_tf(input);
+        let tf = new opentarget_tf.default(input);
         let res = tf.wrap(api_response);
         expect(res.data[0]['drug']['id']).toBe("CHEMBL1200686");
         expect(res.data[0]['drug']['molecule_name']).toContain("PIMECROLIMUS");
@@ -61,7 +61,7 @@ describe("test ctd transformer", () => {
                 }
             }
         }
-        let tf = new ctd_tf(input);
+        let tf = new ctd_tf.default(input);
         let res = tf.wrap(api_response);
         expect(res.data[0]['DiseaseID']).toBe("D000022");
         expect(res.data[0]['PubMedIDs']).toContain("16120699");
@@ -146,7 +146,7 @@ describe("test biothings transformer", () => {
     });
 
     test("test biothings pairInputWithAPIResponse", () => {
-        let tf = new biothings_tf(input);
+        let tf = new biothings_tf.default(input);
         let res = tf.pairInputWithAPIResponse();
         expect(res["UMLS:C1332823"][0]['umls']).toBe("C1332823");
         expect(res).toHaveProperty('UMLS:C1332823');
@@ -154,7 +154,7 @@ describe("test biothings transformer", () => {
     });
 
     test("test wrapper", () => {
-        let tf = new biothings_tf(input);
+        let tf = new biothings_tf.default(input);
         let res = tf.wrap(input.response[0]);
         expect(res).toHaveProperty("query");
     });

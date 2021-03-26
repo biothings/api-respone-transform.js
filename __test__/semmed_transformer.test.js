@@ -1,4 +1,4 @@
-const semmed_tf = require("../src/transformers/semmed_transformer");
+const semmed_tf = require("../built/transformers/semmed_transformer");
 const axios = require("axios");
 
 describe("test semmed transformer", () => {
@@ -77,7 +77,7 @@ describe("test semmed transformer", () => {
     });
 
     test("test semmed pairInputWithAPIResponse", () => {
-        let tf = new semmed_tf(input);
+        let tf = new semmed_tf.default(input);
         let res = tf.pairInputWithAPIResponse();
         expect(res["UMLS:C1332823"][0]['umls']).toBe("C1332823");
         expect(res).toHaveProperty('UMLS:C1332823');
@@ -85,19 +85,19 @@ describe("test semmed transformer", () => {
     });
 
     test("test wrapper", () => {
-        let tf = new semmed_tf(input);
+        let tf = new semmed_tf.default(input);
         let res = tf.wrap(input.response[0]);
         expect(res).toHaveProperty("positively_regulates");
     });
 
     test("test json transform", () => {
-        let tf = new semmed_tf(input);
+        let tf = new semmed_tf.default(input);
         let res = tf.jsonTransform(input.response[0]);
         expect(res).toEqual(input.response[0]);
     });
 
     test("add edge info", () => {
-        let tf = new semmed_tf(input);
+        let tf = new semmed_tf.default(input);
         let res = tf.pairInputWithAPIResponse();
         let rec = res["UMLS:C1332823"][0];
         rec = tf.wrap(rec);
@@ -107,7 +107,7 @@ describe("test semmed transformer", () => {
     });
 
     test("test main function transform", () => {
-        let tf = new semmed_tf(input);
+        let tf = new semmed_tf.default(input);
         let res = tf.transform();
         expect(res[0]).not.toHaveProperty('UMLS');
         expect(res[0]).not.toHaveProperty('@type');

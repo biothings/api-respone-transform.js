@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-const biothings_tf = require("../src/transformers/biothings_transformer");
+const biothings_tf = require("../built/transformers/biothings_transformer");
 const fs = require("fs");
 const path = require("path");
 
@@ -24,7 +24,7 @@ describe("test biothings transformer", () => {
         })
 
         test("test biothings wrapper", () => {
-            let tf = new biothings_tf(input);
+            let tf = new biothings_tf.default(input);
             let res = tf.pairInputWithAPIResponse();
             expect(Object.keys(res)).toHaveLength(2);
             expect(res).toHaveProperty("DRUGBANK:DB00188");
@@ -49,7 +49,7 @@ describe("test biothings transformer", () => {
         })
 
         test("test biothings wrapper", () => {
-            let tf = new biothings_tf(input);
+            let tf = new biothings_tf.default(input);
             let res = tf.pairInputWithAPIResponse();
             expect(Object.keys(res)).toHaveLength(1);
             expect(res).toHaveProperty("NCBIGene:1017");
@@ -57,7 +57,7 @@ describe("test biothings transformer", () => {
         })
 
         test("test biothings transform", () => {
-            let tf = new biothings_tf(input);
+            let tf = new biothings_tf.default(input);
             let res = tf.transform();
             expect(res).toHaveLength(27);
             expect(res[0]).not.toHaveProperty('pubmed');
@@ -81,7 +81,7 @@ describe("test biothings transformer", () => {
         })
 
         test("test biothings wrapper", () => {
-            let tf = new biothings_tf(input);
+            let tf = new biothings_tf.default(input);
             let res = tf.pairInputWithAPIResponse();
             expect(Object.keys(res)).toHaveLength(1);
             expect(res).toHaveProperty("PUBCHEM:11373846");

@@ -1,6 +1,6 @@
-import BaseTransformer from "./transformer";
+import BioThingsTransformer from "./biothings_transformer";
 
-export default class CordTransformer extends BaseTransformer {
+export default class CordTransformer extends BioThingsTransformer {
 
     wrap(res) {
         const PREFIXES = ['pr', 'go', 'mop', 'hgnc', 'uberon', 'so', 'cl', 'doid', 'chebi'];

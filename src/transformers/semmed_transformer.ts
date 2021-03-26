@@ -1,6 +1,6 @@
-import BaseTransformer from './transformer';
+import BioThingsTransformer from './biothings_transformer';
 
-export default class SemmedTransformer extends BaseTransformer {
+export default class SemmedTransformer extends BioThingsTransformer {
 
     wrap(res) {
         let result = {};

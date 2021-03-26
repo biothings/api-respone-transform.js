@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-const biolink_tf = require("../src/transformers/biolink_transformer");
+const biolink_tf = require("../built/transformers/biolink_transformer");
 const fs = require("fs");
 const path = require("path");
 
@@ -23,7 +23,7 @@ describe("test biolink transformer", () => {
     })
 
     test("test biolink wrapper", () => {
-        let tf = new biolink_tf(input);
+        let tf = new biolink_tf.default(input);
         let res = tf.wrap(response);
         expect(res.associations[0].object.HGNC).toBe("10956");
         expect(res.associations[0].publications[0].id).toBe("21685912");
@@ -32,13 +32,13 @@ describe("test biolink transformer", () => {
     });
 
     test("test biolink wrapper if no association field as root key", () => {
-        let tf = new biolink_tf(input);
+        let tf = new biolink_tf.default(input);
         let res = tf.wrap({ "data": [] });
         expect(res).toEqual({ "data": [] })
     });
 
     test("test biolink wrapper if no object id should be prefixed", () => {
-        const tf = new biolink_tf(input);
+        const tf = new biolink_tf.default(input);
         const res = tf.wrap(
             {
                 associations: [
@@ -53,7 +53,7 @@ describe("test biolink transformer", () => {
     });
 
     test("test biolink wrapper if no object field present", () => {
-        const tf = new biolink_tf(input);
+        const tf = new biolink_tf.default(input);
         const fake_response = {
             associations: [
                 {
@@ -68,7 +68,7 @@ describe("test biolink transformer", () => {
     });
 
     test("test biolink wrapper if no object.id field present", () => {
-        const tf = new biolink_tf(input);
+        const tf = new biolink_tf.default(input);
         const fake_response = {
             associations: [
                 {
@@ -83,7 +83,7 @@ describe("test biolink transformer", () => {
     });
 
     test("test biolink jsonTransform function", () => {
-        let tf = new biolink_tf(input);
+        let tf = new biolink_tf.default(input);
         const wrapped_response = tf.wrap(response);
         let res = tf.jsonTransform(wrapped_response);
         expect(res).toHaveProperty("related_to");

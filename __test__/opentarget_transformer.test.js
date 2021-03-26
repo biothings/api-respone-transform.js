@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-const opentarget_tf = require("../src/transformers/opentarget_transformer");
+const opentarget_tf = require("../built/transformers/opentarget_transformer");
 const fs = require("fs");
 const path = require("path");
 
@@ -23,14 +23,14 @@ describe("test opentarget transformer", () => {
     })
 
     test("test opentarget wrapper", () => {
-        let tf = new opentarget_tf(input);
+        let tf = new opentarget_tf.default(input);
         let res = tf.wrap(response);
         expect(res).toHaveProperty("data");
         expect(res.data[0].drug.id).toEqual("CHEMBL220492");
     })
 
     test("test opentarget wrapper if id field is not chembl", () => {
-        let tf = new opentarget_tf(input);
+        let tf = new opentarget_tf.default(input);
         const fake = {
             data: [
                 {
