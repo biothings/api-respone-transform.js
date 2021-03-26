@@ -97,6 +97,7 @@ export default class BaseTransformer {
         const output_ids = this.extractOutputIDs(res);
         let result = output_ids.map(item => {
             let copy_res = _.cloneDeep(res);
+            copy_res.$edge_metadata = res.$edge_metadata;
             copy_res.$output = {
                 original: item
             }
