@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.9.2](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.9.1...v1.9.2) (2021-03-26)
+
+
+### Bug Fixes
+
+* :bug: edge_metadata should not be copied ([4f5d681](https://github.com/kevinxin90/api-respone-transform.js/commit/4f5d6817bde2eabc98578e40b946d1241fb14605))
+
 ### [1.9.1](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.9.0...v1.9.1) (2021-03-26)
 
 ## [1.9.0](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.8.0...v1.9.0) (2021-03-26)
