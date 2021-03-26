@@ -1,4 +1,4 @@
-exports.generateCurie = (idType, id) => {
+export function generateCurie(idType: string, id: string | string[]) {
     if (Array.isArray(id)) {
         id = id[0];
     }
@@ -8,7 +8,7 @@ exports.generateCurie = (idType, id) => {
     return idType + ':' + id;
 }
 
-exports.toArray = (item) => {
+export function toArray(item) {
     if (!(Array.isArray(item))) {
         return [item];
     }

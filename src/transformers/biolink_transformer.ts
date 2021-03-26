@@ -1,6 +1,6 @@
-const tf = require('./transformer');
+import BaseTransformer from "./transformer";
 
-module.exports = class BiolinkTransformer extends tf {
+export default class BiolinkTransformer extends BaseTransformer {
     wrap(res) {
         //super.wrap();
         const PREFIXES = ['HGNC', 'NCBIGene', 'REACT'];

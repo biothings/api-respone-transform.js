@@ -1,10 +1,17 @@
-const json_transform = require("@biothings-explorer/json-transformer");
-const utils = require("../utils");
-const debug = require("debug")("api-response-transform:transformer");
+import { transform } from "../json_transform/index";
+import { JSONDoc } from "../json_transform/types";
+import { generateCurie, toArray } from '../utils';
+import { BTEKGOperationObject, BTEQueryObject } from "../types";
+import * as _ from "lodash";
+import Debug from "debug";
+const debug = Debug("api-response-transform:transformer");
 
-module.exports = class BaseTransformer {
 
-    constructor(data) {
+export default class BaseTransformer {
+    protected edge: BTEKGOperationObject;
+    protected data: BTEQueryObject;
+
+    constructor(data: BTEQueryObject) {
         this.data = data;
         this.edge = data.edge;
     }
@@ -13,7 +20,7 @@ module.exports = class BaseTransformer {
      * Create an object with key representing input, and value representing the output of API
      */
     pairInputWithAPIResponse() {
-        let input = utils.generateCurie(this.edge.association.input_id, this.edge.input);
+        let input = generateCurie(this.edge.association.input_id, this.edge.input);
         return {
             [input]: [this.data.response]
         }
@@ -34,19 +41,19 @@ module.exports = class BaseTransformer {
      * Transform Individual JSON response into Biolink compatible format
      * @param {Object} res - JSON response representing an output.
      */
-    jsonTransform(res) {
-        res = json_transform(res, this.edge.response_mapping);
+    jsonTransform(res: JSONDoc | JSONDoc[]) {
+        res = transform(res, this.edge.response_mapping);
         return res;
     }
 
     _updatePublications(res) {
         if ("pubmed" in res) {
-            res.pubmed = utils.toArray(res.pubmed);
+            res.pubmed = toArray(res.pubmed);
             res.publications = res.pubmed.map(item => (typeof item === "string" && item.toUpperCase().startsWith("PMID:")) ? item.toUpperCase() : "PMID:" + item);
             delete res.pubmed;
         }
         if ("pmc" in res) {
-            res.pmc = utils.toArray(res.pmc);
+            res.pmc = toArray(res.pmc);
             res.publications = res.pmc.map(item => (typeof item === "string" && item.toUpperCase().startsWith("PMC:")) ? item.toUpperCase() : "PMC:" + item);
             delete res.pmc;
         }
@@ -89,12 +96,13 @@ module.exports = class BaseTransformer {
         res = this._updateInput(res, input);
         const output_ids = this.extractOutputIDs(res);
         let result = output_ids.map(item => {
-            res.$output = {
+            let copy_res = _.cloneDeep(res);
+            copy_res.$output = {
                 original: item
             }
-            res = this._removeNonEdgeData(res);
-            res = this._updatePublications(res);
-            return res;
+            copy_res = this._removeNonEdgeData(copy_res);
+            copy_res = this._updatePublications(copy_res);
+            return copy_res;
         });
         return result;
     }
@@ -134,7 +142,7 @@ module.exports = class BaseTransformer {
         if (!(output_id_type in res)) {
             return [];
         }
-        res[output_id_type] = utils.toArray(res[output_id_type]);
-        return res[output_id_type].map(item => utils.generateCurie(output_id_type, item));
+        res[output_id_type] = toArray(res[output_id_type]);
+        return res[output_id_type].map(item => generateCurie(output_id_type, item));
     }
 }

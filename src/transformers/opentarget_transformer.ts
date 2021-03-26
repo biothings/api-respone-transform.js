@@ -1,6 +1,7 @@
-const tf = require('./transformer');
+import BaseTransformer from "./transformer";
 
-module.exports = class OpenTargetTransformer extends tf {
+
+export default class OpenTargetTransformer extends BaseTransformer {
     wrap(res) {
         res.data = res.data.map(item => {
             if ('drug' in item && "id" in item.drug && typeof item.drug.id === "string" && item.drug.id.includes("CHEMBL")) {
