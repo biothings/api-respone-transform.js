@@ -1,6 +1,6 @@
 {
   "name": "@biothings-explorer/api-response-transform",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "a NodeJS library to transform API responses into biolink model",
   "main": "built/index.js",
   "scripts": {
