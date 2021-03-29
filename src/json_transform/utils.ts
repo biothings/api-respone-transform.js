@@ -98,6 +98,9 @@ export const transformComplexObject = (json_doc: JSONDoc, template: BaseTemplate
         trimmed_json_doc = json_doc;
         trimmed_template = template;
     }
+    if (typeof trimmed_json_doc === "undefined") {
+        return {}
+    }
     if (Array.isArray(trimmed_json_doc)) {
         new_doc = transformArrayOfSimpleObject(trimmed_json_doc, trimmed_template)
     } else {
