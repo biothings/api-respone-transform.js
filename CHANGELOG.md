@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.9.3...v1.10.0) (2021-03-30)
+
+
+### Features
+
+* :sparkles: support transforming trapi response ([c9aa327](https://github.com/kevinxin90/api-respone-transform.js/commit/c9aa327f7d8283832e4d4619962a1fcef4a297fc))
+
 ### [1.9.3](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.9.2...v1.9.3) (2021-03-29)
 
 
