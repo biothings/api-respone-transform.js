@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/kevinxin90/api-respone-transform.js#readme",
   "devDependencies": {
+    "@biothings-explorer/smartapi-kg": "^3.2.0",
     "@types/lodash": "^4.14.168",
     "coveralls": "^3.1.0",
     "debug": "^4.3.1",
