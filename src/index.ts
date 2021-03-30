@@ -5,6 +5,7 @@ import CTDTransformer from "./transformers/ctd_transformer";
 import SemmedTransformer from "./transformers/semmed_transformer";
 import OpenTargetTransformer from "./transformers/opentarget_transformer";
 import BaseTransformer from "./transformers/transformer";
+import TRAPITransformer from './transformers/trapi_transformer'
 import { BTEQueryObject } from "./types";
 const debug = require("debug")("api-response-transform:index");
 
@@ -21,7 +22,9 @@ export class Transformer {
         debug(`api name ${api}`);
         let tags = this.data.edge.query_operation.tags;
         debug(`api tags: ${tags}`);
-        if (api.startsWith('CORD')) {
+        if (tags.includes('bte-trapi')) {
+            this.tf = new TRAPITransformer(this.data)
+        } else if (api.startsWith('CORD')) {
             this.tf = new CordTransformer(this.data);
         } else if (api.startsWith('SEMMED')) {
             this.tf = new SemmedTransformer(this.data);
