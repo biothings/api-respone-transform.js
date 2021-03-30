@@ -2,11 +2,16 @@ import BaseTransformer from "./transformer";
 
 export default class TRAPITransformer extends BaseTransformer {
     _getUniqueEdges() {
+        const edges = {};
         if ('message' in this.data.response && 'results' in this.data.response.message && Array.isArray(this.data.response.message.results)) {
-            const edges = this.data.response.message.results.map(item => item.edge_bindings.e01[0].id);
-            return Array.from(new Set(edges));
+            this.data.response.message.results.map(item => {
+                edges[item.edge_bindings.e01[0].id] = {
+                    subject: item.node_bindings.n0[0].id,
+                    object: item.node_bindings.n1[0].id
+                }
+            });
         }
-        return [];
+        return edges;
     }
 
     _getEdgeInfo(edgeID) {
@@ -16,10 +21,10 @@ export default class TRAPITransformer extends BaseTransformer {
         return undefined;
     }
 
-    _transformIndividualEdge(edge) {
+    _transformIndividualEdge(edge, edgeBinding) {
         let res = {
             "$output": {
-                original: edge.object
+                original: edgeBinding.object
             }
         };
         if ("attributes" in edge && Array.isArray(edge.attributes)) {
@@ -33,16 +38,16 @@ export default class TRAPITransformer extends BaseTransformer {
             }
         }
         res = this._updateEdgeMetadata(res);
-        res = this._updateInput(res, edge.subject);
+        res = this._updateInput(res, edgeBinding.subject);
         return res;
     }
 
     transform() {
-        const edgeIDs = this._getUniqueEdges();
-        return edgeIDs.map(edge => {
+        const edgeBindings = this._getUniqueEdges();
+        return Object.keys(edgeBindings).map(edge => {
             const edgeInfo = this._getEdgeInfo(edge);
             if (!(typeof edgeInfo === "undefined")) {
-                return this._transformIndividualEdge(edgeInfo);
+                return this._transformIndividualEdge(edgeInfo, edgeBindings[edge]);
             }
         })
     }
