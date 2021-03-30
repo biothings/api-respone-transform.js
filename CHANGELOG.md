@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.10.1](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.10.0...v1.10.1) (2021-03-30)
+
+
+### Bug Fixes
+
+* :bug: handle issue when edge is reversed ([a680cd3](https://github.com/kevinxin90/api-respone-transform.js/commit/a680cd37394eb7cf03875457d052bd1f6d59c1bf))
+
 ## [1.10.0](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.9.3...v1.10.0) (2021-03-30)
 
 
