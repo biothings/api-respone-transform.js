@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.11.0](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.10.1...v1.11.0) (2021-05-04)
+
+
+### Features
+
+* :sparkles: add customized transformer for EBI Protein API ([acb62f0](https://github.com/kevinxin90/api-respone-transform.js/commit/acb62f0fc4c6117c28aa5cf07f1aeb7ab032ddaf))
+
 ### [1.10.1](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.10.0...v1.10.1) (2021-03-30)
 
 
