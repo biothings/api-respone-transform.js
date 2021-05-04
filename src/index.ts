@@ -5,7 +5,8 @@ import CTDTransformer from "./transformers/ctd_transformer";
 import SemmedTransformer from "./transformers/semmed_transformer";
 import OpenTargetTransformer from "./transformers/opentarget_transformer";
 import BaseTransformer from "./transformers/transformer";
-import TRAPITransformer from './transformers/trapi_transformer'
+import TRAPITransformer from './transformers/trapi_transformer';
+import EBIProteinTransformer from './transformers/ebi_protein_transformer'
 import { BTEQueryObject } from "./types";
 const debug = require("debug")("api-response-transform:index");
 
@@ -30,6 +31,8 @@ export class Transformer {
             this.tf = new SemmedTransformer(this.data);
         } else if (api === 'BioLink API') {
             this.tf = new BiolinkTransformer(this.data);
+        } else if (api === 'EBI Proteins API') {
+            this.tf = new EBIProteinTransformer(this.data)
         } else if (tags.includes("biothings")) {
             this.tf = new BioThingsTransformer(this.data);
         } else if (tags.includes("ctd")) {
