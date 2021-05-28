@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npm run build && jest",
     "build": "tsc",
-    "test-cov": "num run build && jest --coverage",
+    "test-cov": "npm run build && jest --coverage",
     "prepare": "npm run build",
     "prepublishOnly": "npm test",
     "coveralls": "jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
