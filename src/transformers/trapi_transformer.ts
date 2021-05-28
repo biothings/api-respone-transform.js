@@ -39,7 +39,10 @@ export default class TRAPITransformer extends BaseTransformer {
         }
         res = this._updateEdgeMetadata(res);
         res = this._updateInput(res, edgeBinding.subject);
-        return res;
+        if ("$input" in res && "obj" in res["$input"] && !(typeof res["$input"]["obj"] === "undefined")) {
+            return res;
+        }
+
     }
 
     transform() {
