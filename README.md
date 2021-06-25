@@ -1,6 +1,6 @@
-![Test Coveralls](https://github.com/kevinxin90/api-respone-transform.js/workflows/Test%20Coveralls/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/kevinxin90/api-respone-transform.js/badge.svg?branch=master)](https://coveralls.io/github/kevinxin90/api-respone-transform.js?branch=master)
-<a href="https://github.com/kevinxin90/api-respone-transform.js#readme" target="_blank">
+![Test Coveralls](https://github.com/biothings/api-respone-transform.js/workflows/Test%20Coveralls/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/biothings/api-respone-transform.js/badge.svg)](https://coveralls.io/github/biothings/api-respone-transform.js)
+<a href="https://github.com/biothings/api-respone-transform.js#readme" target="_blank">
     <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" />
   </a>
 <a href="https://www.npmjs.com/package/@biothings-explorer/api-response-transform" target="_blank">
@@ -11,7 +11,7 @@
 
 A NodeJS module to transform the JSON output from API into BioLink-compatible JSON structure
 
-### 🏠 [Homepage](https://github.com/kevinxin90/api-respone-transform.js)
+### 🏠 [Homepage](https://github.com/biothings/api-respone-transform.js)
 
 ## Install
 
@@ -149,14 +149,14 @@ npm run test
 
 ## Author
 
-👤 **Jiwen Xin**
+👤 **BioThings team**
 
-* Website: http://github.com/kevinxin90
-* Github: [@kevinxin90](https://github.com/kevinxin90)
+* Website: http://biothings.io
+* Github: [@biothings](https://github.com/biothings)
 
 ## 🤝 Contributing
 
-Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/kevinxin90/api-respone-transform.js/issues).
+Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/biothings/api-respone-transform.js/issues).
 
 ## Show your support
 
@@ -164,5 +164,5 @@ Give a ⭐️ if this project helped you!
 
 ## 📝 License
 
-Copyright © 2020 [Jiwen Xin](https://github.com/kevinxin90).<br />
-This project is [ISC](https://github.com/kevinxin90/api-respone-transform.js/blob/master/LICENSE) licensed.
+Copyright © 2021 [BioThings Team](https://github.com/biothings).<br />
+This project is [ISC](https://github.com/biothings/api-respone-transform.js/blob/main/LICENSE) licensed.
