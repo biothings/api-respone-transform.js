@@ -4,7 +4,7 @@ import { generateCurie, toArray } from '../utils';
 import { BTEKGOperationObject, BTEQueryObject } from "../types";
 import * as _ from "lodash";
 import Debug from "debug";
-const debug = Debug("api-response-transform:transformer");
+const debug = Debug("bte:api-response-transform:transformer");
 
 
 export default class BaseTransformer {

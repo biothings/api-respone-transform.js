@@ -8,7 +8,7 @@ import BaseTransformer from "./transformers/transformer";
 import TRAPITransformer from './transformers/trapi_transformer';
 import EBIProteinTransformer from './transformers/ebi_protein_transformer'
 import { BTEQueryObject } from "./types";
-const debug = require("debug")("api-response-transform:index");
+const debug = require("debug")("bte:api-response-transform:index");
 
 export class Transformer {
     private data: BTEQueryObject;
