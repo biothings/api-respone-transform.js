@@ -8,35 +8,35 @@ const biothings_tf = require("../built/transformers/biothings_transformer");
 const base_tf = require("../built/transformers/transformer");
 const axios = require("axios");
 
+// not ingesting opentargets right now; no need for this test; this api is no longer there
+// describe("test opentarget transformer", () => {
 
-describe("test opentarget transformer", () => {
+//     let api_response;
 
-    let api_response;
+//     beforeAll(async () => {
+//         let res = await axios.get("https://platform-api.opentargets.io/v3/platform/public/evidence/filter?target=ENSG00000088832&size=100&fields=drug&datasource=chembl");
+//         api_response = res.data;
+//     });
 
-    beforeAll(async () => {
-        let res = await axios.get("https://platform-api.opentargets.io/v3/platform/public/evidence/filter?target=ENSG00000088832&size=100&fields=drug&datasource=chembl");
-        api_response = res.data;
-    });
-
-    test("test opentarget wrapper", () => {
-        let input = {
-            response: api_response,
-            edge: {
-                input: "238",
-                association: {
-                    output_type: "Gene"
-                },
-                response_mapping: {
-                    sookie: "kevin"
-                }
-            }
-        }
-        let tf = new opentarget_tf.default(input);
-        let res = tf.wrap(api_response);
-        expect(res.data[0]['drug']['id']).toBe("CHEMBL1200686");
-        expect(res.data[0]['drug']['molecule_name']).toContain("PIMECROLIMUS");
-    })
-})
+//     test("test opentarget wrapper", () => {
+//         let input = {
+//             response: api_response,
+//             edge: {
+//                 input: "238",
+//                 association: {
+//                     output_type: "Gene"
+//                 },
+//                 response_mapping: {
+//                     sookie: "kevin"
+//                 }
+//             }
+//         }
+//         let tf = new opentarget_tf.default(input);
+//         let res = tf.wrap(api_response);
+//         expect(res.data[0]['drug']['id']).toBe("CHEMBL1200686");
+//         expect(res.data[0]['drug']['molecule_name']).toContain("PIMECROLIMUS");
+//     })
+// })
 
 
 describe("test ctd transformer", () => {

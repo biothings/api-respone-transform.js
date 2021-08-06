@@ -22,14 +22,15 @@ describe("test opentarget transformer", () => {
         }
     })
 
-    test("test opentarget wrapper", () => {
+// skip these tests since we're not ingesting opentargets right now
+    test.skip("test opentarget wrapper", () => {
         let tf = new opentarget_tf.default(input);
         let res = tf.wrap(response);
         expect(res).toHaveProperty("data");
         expect(res.data[0].drug.id).toEqual("CHEMBL220492");
     })
 
-    test("test opentarget wrapper if id field is not chembl", () => {
+    test.skip("test opentarget wrapper if id field is not chembl", () => {
         let tf = new opentarget_tf.default(input);
         const fake = {
             data: [
