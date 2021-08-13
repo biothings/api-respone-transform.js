@@ -29,9 +29,9 @@ export default class TRAPITransformer extends BaseTransformer {
         };
         if ("attributes" in edge && Array.isArray(edge.attributes)) {
             for (const attr of edge.attributes) {
-                if ('name' in attr && 'value' in attr) {
-                    if (!['subject', 'object'].includes(attr.name)) {
-                        res[attr.name] = attr.value;
+                if ('original_attribute_name' in attr && 'value' in attr) {
+                    if (!['subject', 'object'].includes(attr.original_attribute_name)) {
+                        res[attr.original_attribute_name] = attr.value;
                     }
 
                 }
