@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.12.0](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.10.1...v1.12.0) (2021-08-16)
+
+
+### Features
+
+* :sparkles: add customized transformer for EBI Protein API ([acb62f0](https://github.com/kevinxin90/api-respone-transform.js/commit/acb62f0fc4c6117c28aa5cf07f1aeb7ab032ddaf))
+
+
+### Bug Fixes
+
+* fix edge attributes: name -> original_attribute_name ([64bda31](https://github.com/kevinxin90/api-respone-transform.js/commit/64bda31d457e182d5890073453d94bc8ce08a00e))
+* skip or comment out opentargets tests; BTE not using opentargets right now ([6b098a1](https://github.com/kevinxin90/api-respone-transform.js/commit/6b098a197642366ef1c43b04af42d571a63d116d))
+
 ## [1.11.0](https://github.com/kevinxin90/api-respone-transform.js/compare/v1.10.1...v1.11.0) (2021-05-04)
 
 
