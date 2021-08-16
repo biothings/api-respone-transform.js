@@ -75,6 +75,17 @@ export default class BaseTransformer {
             original: (typeof this.edge.original_input === "undefined") ? undefined : this.edge.original_input[input],
             obj: (typeof this.edge.input_resolved_identifiers === "undefined" || typeof this.edge.original_input === "undefined") ? undefined : this.edge.input_resolved_identifiers[this.edge.original_input[input]]
         }
+        if (res.$input.original === undefined && res.$input.obj === undefined) { //try to find an equivalent ids object if the original input doesn't match (for ICEES)
+            for (let curie of Object.keys(this.edge.input_resolved_identifiers)) {
+                if (this.edge.input_resolved_identifiers[curie][0].curies.includes(input)) {
+                    res.$input = {
+                        original: curie,
+                        obj: this.edge.input_resolved_identifiers[curie]
+                    };
+                    break;
+                }
+            }
+        }
         return res;
     }
 
