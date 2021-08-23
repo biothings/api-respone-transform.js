@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kevinxin90/api-respone-transform.js.git"
+    "url": "git+https://github.com/biothings/api-respone-transform.js.git"
   },
   "keywords": [
     "transform",
@@ -25,12 +25,12 @@
     "api",
     "json"
   ],
-  "author": "jiwen xin",
+  "author": "BioThings Team",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/kevinxin90/api-respone-transform.js/issues"
+    "url": "https://github.com/biothings/api-respone-transform.js/issues"
   },
-  "homepage": "https://github.com/kevinxin90/api-respone-transform.js#readme",
+  "homepage": "https://github.com/biothings/api-respone-transform.js#readme",
   "devDependencies": {
     "@types/lodash": "^4.14.168",
     "coveralls": "^3.1.0",
