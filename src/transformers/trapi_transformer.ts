@@ -28,14 +28,8 @@ export default class TRAPITransformer extends BaseTransformer {
             }
         };
         if ("attributes" in edge && Array.isArray(edge.attributes)) {
-            for (const attr of edge.attributes) {
-                if ('original_attribute_name' in attr && 'value' in attr) {
-                    if (!['subject', 'object'].includes(attr.original_attribute_name)) {
-                        res[attr.original_attribute_name] = attr.value;
-                    }
-
-                }
-            }
+            //@ts-ignore
+            res.attributes = edge.attributes;
         }
         res = this._updateEdgeMetadata(res);
         res = this._updateInput(res, edgeBinding.subject);
