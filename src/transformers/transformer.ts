@@ -125,9 +125,9 @@ export default class BaseTransformer {
             let blockingSince = Date.now();
 
             let copy_res = _.cloneDeep(res);
-            if (blockingSince + 3 < Date.now()) {
-                await setImmediatePromise();
-                blockingSince = Date.now();
+            if (blockingSince + (parseInt(process.env.SETIMMEDIATE_TIME) || 3) < Date.now()) {
+              await setImmediatePromise();
+              blockingSince = Date.now();
             }
             copy_res.$edge_metadata = res.$edge_metadata;
             copy_res.$output = {
