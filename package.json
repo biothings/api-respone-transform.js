@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/biothings/api-respone-transform.js#readme",
   "devDependencies": {
+    "@types/async": "^3.2.8",
     "@types/lodash": "^4.14.168",
     "coveralls": "^3.1.0",
     "debug": "^4.3.1",
@@ -42,10 +43,11 @@
   "dependencies": {
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
+    "async": "^3.2.1",
     "axios": "^0.21.1",
+    "common-path-prefix": "^3.0.0",
     "husky": "^4.3.8",
     "jsonata": "^1.8.4",
-    "common-path-prefix": "^3.0.0",
     "lodash": "^4.17.21"
   },
   "husky": {

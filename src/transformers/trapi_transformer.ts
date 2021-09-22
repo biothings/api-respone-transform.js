@@ -39,7 +39,7 @@ export default class TRAPITransformer extends BaseTransformer {
 
     }
 
-    transform() {
+    async transform() {
         const edgeBindings = this._getUniqueEdges();
         return Object.keys(edgeBindings).map(edge => {
             const edgeInfo = this._getEdgeInfo(edge);

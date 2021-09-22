@@ -44,7 +44,7 @@ export class Transformer {
         }
     }
 
-    transform() {
-        return this.tf.transform();
+    async transform() {
+        return await this.tf.transform();
     }
 }
