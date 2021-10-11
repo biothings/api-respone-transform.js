@@ -122,9 +122,9 @@ export default class BaseTransformer {
 
         res = this._updateEdgeMetadata(res);
         res = this._updateInput(res, input);
+        const output_ids = this.extractOutputIDs(res);
         res = this._removeNonEdgeData(res);
         res = this._updatePublications(res);
-        const output_ids = this.extractOutputIDs(res);
 
         let result = await async.mapSeries(output_ids, async item => {
             let copy_res = { ...res };
