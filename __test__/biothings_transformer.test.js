@@ -56,9 +56,9 @@ describe("test biothings transformer", () => {
             expect(res["NCBIGene:1017"]).toHaveLength(1);
         })
 
-        test("test biothings transform", () => {
+        test("test biothings transform", async () => {
             let tf = new biothings_tf.default(input);
-            let res = tf.transform();
+            let res = await tf.transform();
             expect(res).toHaveLength(27);
             expect(res[0]).not.toHaveProperty('pubmed');
             expect(res[0]).toHaveProperty('publications', ["PMID:21873635"]);
