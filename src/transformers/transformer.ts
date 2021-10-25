@@ -74,7 +74,7 @@ export default class BaseTransformer {
     }
 
     _updateInput(res, input) {
-        debug(`input: ${input}`);
+        //debug(`input: ${input}`);
         res.$input = {
         original: typeof this.edge.original_input === "undefined" ? undefined : this.edge.original_input[input],
         obj:
