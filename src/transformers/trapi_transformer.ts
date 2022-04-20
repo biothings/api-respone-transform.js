@@ -1,4 +1,5 @@
 import BaseTransformer from "./transformer";
+import { Record } from "../record";
 
 export default class TRAPITransformer extends BaseTransformer {
     _getUniqueEdges() {
@@ -22,19 +23,18 @@ export default class TRAPITransformer extends BaseTransformer {
     }
 
     _transformIndividualEdge(edge, edgeBinding) {
-        let res = {
-            "$output": {
-                original: edgeBinding.object
-            }
-        };
-        if ("attributes" in edge && Array.isArray(edge.attributes)) {
-            //@ts-ignore
-            res['edge-attributes'] = edge.attributes;
+        let frozenRecord = {
+            subject: this._getSubject(edgeBinding.subject),
+            object: {
+                original: edgeBinding.object,
+            },
+            apiEdge: this.edge.association,
+            qXEdge: this.edge.reasoner_edge,
+            mappedResponse: { 'edge-attributes': [...edge.attributes] }
         }
-        res = this._updateEdgeMetadata(res);
-        res = this._updateInput(res, edgeBinding.subject);
-        if ("$input" in res && "obj" in res["$input"] && !(typeof res["$input"]["obj"] === "undefined")) {
-            return res;
+
+        if ("subject" in frozenRecord && "normalizedInfo" in frozenRecord["subject"] && !(typeof frozenRecord.subject.normalizedInfo === "undefined")) {
+            return new Record(frozenRecord, this.config, this.edge.association, this.edge.reasoner_edge);
         }
 
     }

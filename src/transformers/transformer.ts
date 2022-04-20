@@ -2,6 +2,8 @@ import { transform } from "../json_transform/index";
 import { JSONDoc } from "../json_transform/types";
 import { generateCurie, toArray } from "../utils";
 import { BTEKGOperationObject, BTEQueryObject } from "../types";
+import { Record } from "../record";
+import { FrozenRecord } from "../record";
 import * as _ from "lodash";
 import Debug from "debug";
 import async from "async";
@@ -10,16 +12,18 @@ const debug = Debug("bte:api-response-transform:transformer");
 export default class BaseTransformer {
     protected edge: BTEKGOperationObject;
     protected data: BTEQueryObject;
+    public config: any;
 
-    constructor(data: BTEQueryObject) {
+    constructor(data: BTEQueryObject, config: any) {
         this.data = data;
         this.edge = data.edge;
+        this.config = config;
     }
 
     /**
      * Create an object with key representing input, and value representing the output of API
      */
-    pairInputWithAPIResponse() {
+    pairCurieWithAPIResponse() {
         let input = generateCurie(this.edge.association.input_id, this.edge.input);
         return {
             [input]: [this.data.response],
@@ -46,69 +50,70 @@ export default class BaseTransformer {
         return res;
     }
 
-    _updatePublications(res) {
-        if ("pubmed" in res) {
-            res.pubmed = toArray(res.pubmed);
-            res.publications = res.pubmed.map(item =>
+    _updatePublications(mappedResponse: any) {
+        if ("pubmed" in mappedResponse) {
+            mappedResponse.pubmed = toArray(mappedResponse.pubmed);
+            mappedResponse.publications = mappedResponse.pubmed.map(item =>
                 typeof item === "string" && item.toUpperCase().startsWith("PMID:") ? item.toUpperCase() : "PMID:" + item,
             );
-            delete res.pubmed;
+            delete mappedResponse.pubmed;
         }
-        if ("pmc" in res) {
-            res.pmc = toArray(res.pmc);
-            res.publications = res.pmc.map(item =>
+        if ("pmc" in mappedResponse) {
+            mappedResponse.pmc = toArray(mappedResponse.pmc);
+            mappedResponse.publications = mappedResponse.pmc.map(item =>
                 typeof item === "string" && item.toUpperCase().startsWith("PMC:") ? item.toUpperCase() : "PMC:" + item,
             );
-            delete res.pmc;
+            delete mappedResponse.pmc;
         }
-        return res;
+        return mappedResponse;
     }
 
-    _updateEdgeMetadata(res) {
-        res.$edge_metadata = {
-            ...this.edge.association,
-            trapi_qEdge_obj: this.edge.reasoner_edge,
-            filter: this.edge.filter,
-        };
-        return res;
-    }
+    // _updateEdgeMetadata(res) {
+    //     res.$edge_metadata = {
+    //         ...this.edge.association,
+    //         trapi_qEdge_obj: this.edge.reasoner_edge,
+    //         filter: this.edge.filter,
+    //     };
+    //     return res;
+    // }
 
-    _updateInput(res, input) {
+    _getSubject(subjectCurie: any) {
+
         //debug(`input: ${input}`);
-        res.$input = {
-        original: typeof this.edge.original_input === "undefined" ? undefined : this.edge.original_input[input],
-        obj:
-            typeof this.edge.input_resolved_identifiers === "undefined" || typeof this.edge.original_input === "undefined"
-            ? undefined
-            : this.edge.input_resolved_identifiers[this.edge.original_input[input]],
-        };
-        if (this.edge.input_resolved_identifiers && res.$input.original === undefined && res.$input.obj === undefined) {
-        //try to find an equivalent ids object if the original input doesn't match (for ICEES)
-        for (let curie of Object.keys(this.edge.input_resolved_identifiers)) {
-            if (this.edge.input_resolved_identifiers[curie][0].curies.includes(input)) {
-            res.$input = {
-                original: curie,
-                obj: this.edge.input_resolved_identifiers[curie],
-            };
-            break;
+        let subject = {
+            original: typeof this.edge.original_input === "undefined" ? undefined : this.edge.original_input[subjectCurie],
+            normalizedInfo:
+                typeof this.edge.input_resolved_identifiers === "undefined" || typeof this.edge.original_input === "undefined"
+                ? undefined
+                : this.edge.input_resolved_identifiers[this.edge.original_input[subjectCurie]],
+        }
+        if (this.edge.input_resolved_identifiers && subject.original === undefined && subject.normalizedInfo === undefined) {
+            //try to find an equivalent ids object if the original input doesn't match (for ICEES)
+            for (let curie of Object.keys(this.edge.input_resolved_identifiers)) {
+                if (this.edge.input_resolved_identifiers[curie][0].curies.includes(subjectCurie)) {
+                subject = {
+                    original: curie,
+                    normalizedInfo: this.edge.input_resolved_identifiers[curie],
+                };
+                break;
+                }
             }
         }
-        }
-        return res;
+        return subject;
     }
 
-    _removeNonEdgeData(res) {
-        delete res["@type"];
-        delete res[this.edge.association.output_id];
-        return res;
+    _removeNonEdgeData(mappedResponse: any) {
+        delete mappedResponse["@type"];
+        delete mappedResponse[this.edge.association.output_id];
+        return mappedResponse;
     }
 
     /**
      * Add edge information into individual output JSON.
-     * @param {Object} res - JSON response representing an output.
+     * @param {Object} mappedResponse - JSON response representing an output.
      */
-    async addEdgeInfo(input, res) {
-        if (res === undefined || Object.keys(res).length === 0) {
+    async formatRecords(subjectCurie: string, mappedResponse: any) {
+        if (mappedResponse === undefined || Object.keys(mappedResponse).length === 0) {
             return [];
         }
 
@@ -120,65 +125,73 @@ export default class BaseTransformer {
         // blocking timer is kept because this part still blocks w/o it
         let blockingSince = Date.now();
 
-        res = this._updateEdgeMetadata(res);
-        res = this._updateInput(res, input);
-        const output_ids = this.extractOutputIDs(res);
-        res = this._removeNonEdgeData(res);
-        res = this._updatePublications(res);
 
-        let result = await async.mapSeries(output_ids, async item => {
-            let copy_res = { ...res };
-            copy_res.$output = {
-                original: item,
-            };
-            return copy_res;
-        });
-        // timer default set to 1ms because this function *should* usually take <1ms
-        if (blockingSince + (parseInt(process.env.SETIMMEDIATE_TIME) || 1) < Date.now()) {
-            await setImmediatePromise();
-            blockingSince = Date.now();
+        // mappedResponse = this._updateEdgeMetadata(mappedResponse);
+        const objectIDs = this.extractObjectIDs(mappedResponse);
+        mappedResponse = this._removeNonEdgeData(mappedResponse);
+        mappedResponse = this._updatePublications(mappedResponse);
+
+        const frozenRecord = {
+            subject: this._getSubject(subjectCurie),
+            apiEdge: {...this.edge.association},
+            qXEdge: this.edge.reasoner_edge,
+            mappedResponse: {...mappedResponse},
         }
-        return result;
+
+        let transformedRecords = await async.mapSeries(objectIDs, async (curie: string) => {
+            // timer default set to 1ms because this function *should* usually take <1ms
+            if (blockingSince + (parseInt(process.env.SETIMMEDIATE_TIME) || 1) < Date.now()) {
+                await setImmediatePromise();
+                blockingSince = Date.now();
+            }
+
+            let copyRecord = {
+                ...frozenRecord,
+                 object: {
+                     original: curie,
+                 }
+            };
+            return new Record(copyRecord, this.config, this.edge.association, this.edge.reasoner_edge);
+        });
+        return transformedRecords;
     }
 
     /**
      * Main function to transform API response
      */
     async transform() {
-        let result = [];
-        let responses = this.pairInputWithAPIResponse();
+        let transformedRecords = [];
+        let responses = this.pairCurieWithAPIResponse();
 
-        await async.eachSeries(Object.keys(responses), async curie => {
-        if (Array.isArray(responses[curie]) && responses[curie].length > 0) {
-            await async.eachSeries(responses[curie], async item => {
-            item = this.wrap(item);
-            item = this.jsonTransform(item);
-            await async.eachSeries(Object.keys(item), async predicate => {
-                if (Array.isArray(item[predicate]) && item[predicate].length > 0) {
-                await async.eachSeries(item[predicate], async (rec: any[]) => {
-                    rec = await this.addEdgeInfo(curie, rec);
-                    result.push(...rec);
+        await async.eachSeries(Object.entries(responses), async ([curie, curieResponses]) => {
+            if (Array.isArray(curieResponses) && curieResponses.length > 0) {
+                await async.eachSeries(curieResponses, async response => {
+                    const predicateResponse = this.jsonTransform(this.wrap(response));
+                    await async.eachSeries(Object.entries(predicateResponse), async ([predicate, mappedResponses]) => {
+                        if (Array.isArray(mappedResponses) && mappedResponses.length > 0) {
+                            await async.eachSeries(mappedResponses, async (mappedResponse: any[]) => {
+                                transformedRecords.push(...(await this.formatRecords(curie, mappedResponse)));
+                            });
+                        } else {
+                            transformedRecords.push(...(await this.formatRecords(curie, mappedResponses)));
+                        }
+                    });
                 });
-                } else {
-                    result.push(...(await this.addEdgeInfo(curie, item[predicate])));
-                }
-            });
-            });
-        }
-        });
-        return result;
+            }
+        })
+        return transformedRecords;
     }
 
     /**
      * Retrieve all output IDs.
-     * @param {Object} res - JSON response representing an output.
+     * @param {Object} mappedResponse - JSON response representing an output.
      */
-    extractOutputIDs(res) {
+    extractObjectIDs(mappedResponse: object) {
         const output_id_type = this.edge.association.output_id;
-        if (!(output_id_type in res)) {
+        if (!(output_id_type in mappedResponse)) {
             return [];
         }
-        res[output_id_type] = toArray(res[output_id_type]);
-        return res[output_id_type].map(item => generateCurie(output_id_type, item));
+        mappedResponse[output_id_type] = toArray(mappedResponse[output_id_type]);
+        return mappedResponse[output_id_type].map((id: string) => generateCurie(output_id_type, id));
     }
 }
