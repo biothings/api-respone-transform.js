@@ -1,5 +1,6 @@
 import BioThingsTransformer from "./biothings_transformer";
 
+// deprecated
 export default class CordTransformer extends BioThingsTransformer {
 
     wrap(res) {

@@ -24,7 +24,7 @@ describe("test base transformer", () => {
 
     test("Test pairInputWithAPIResponse function", () => {
         const tf = new base_tf.default(input);
-        const res = tf.pairInputWithAPIResponse();
+        const res = tf.pairCurieWithAPIResponse();
         expect(res).toHaveProperty("DOID:9562");
         expect(res["DOID:9562"]).toHaveLength(1);
     })
@@ -95,28 +95,28 @@ describe("test base transformer", () => {
         expect(res.publications).toEqual(["PMC:123"])
     })
 
-    test("Test extractOutputIDs function if output id type not in result", () => {
+    test("Test extractObjectIDs function if output id type not in result", () => {
         const tf = new base_tf.default(input);
         const fake = {
             kk: 1
         };
-        const res = tf.extractOutputIDs(fake);
+        const res = tf.extractObjectIDs(fake);
         expect(res).toEqual([]);
     })
 
-    test("Test extractOutputIDs function if output id type is in result", () => {
+    test("Test extractObjectIDs function if output id type is in result", () => {
         const tf = new base_tf.default(input);
         const fake = {
             DOID: 1
         };
-        const res = tf.extractOutputIDs(fake);
+        const res = tf.extractObjectIDs(fake);
         expect(res).toEqual(["DOID:1"]);
     })
 
-    test("Test addEdgeInfo function if result is empty", async () => {
+    test("Test formatRecords function if result is empty", async () => {
         const tf = new base_tf.default(input);
         const fake = {};
-        const res = await tf.addEdgeInfo("NCBIGene:1017", fake);
+        const res = await tf.formatRecords("NCBIGene:1017", fake);
         expect(res).toEqual([]);
     })
 })

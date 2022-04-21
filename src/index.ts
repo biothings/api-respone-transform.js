@@ -1,6 +1,6 @@
 import BiolinkTransformer from "./transformers/biolink_transformer";
 import BioThingsTransformer from "./transformers/biothings_transformer";
-import CordTransformer from "./transformers/cord_transformer";
+// import CordTransformer from "./transformers/cord_transformer";
 import CTDTransformer from "./transformers/ctd_transformer";
 import SemmedTransformer from "./transformers/semmed_transformer";
 import OpenTargetTransformer from "./transformers/opentarget_transformer";
@@ -28,8 +28,6 @@ export class Transformer {
         debug(`api tags: ${tags}`);
         if (tags.includes('bte-trapi')) {
             this.tf = new TRAPITransformer(this.data, this.config);
-        } else if (api.startsWith('CORD')) {
-            this.tf = new CordTransformer(this.data, this.config);
         } else if (api.startsWith('SEMMED')) {
             this.tf = new SemmedTransformer(this.data, this.config);
         } else if (api === 'BioLink API') {
