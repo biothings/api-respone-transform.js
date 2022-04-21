@@ -145,9 +145,9 @@ describe("test biothings transformer", () => {
         }
     });
 
-    test("test biothings pairInputWithAPIResponse", () => {
+    test("test biothings pairCurieWithAPIResponse", () => {
         let tf = new biothings_tf.default(input);
-        let res = tf.pairInputWithAPIResponse();
+        let res = tf.pairCurieWithAPIResponse();
         expect(res["UMLS:C1332823"][0]['umls']).toBe("C1332823");
         expect(res).toHaveProperty('UMLS:C1332823');
         expect(res["123"]).toBeUndefined();
