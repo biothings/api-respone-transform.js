@@ -120,11 +120,11 @@ class RecordNode {
 
   constructor(node: FrozenNode | MinimalFrozenNode, qNode: QNode) {
     this.original = node.original;
-    this.normalizedInfo = node.normalizedInfo ? node.normalizedInfo : this.makeFakeObj(node);
+    this.normalizedInfo = node.normalizedInfo ? node.normalizedInfo : this.makeFakeInfo(node);
     this._qNode = qNode;
   }
 
-  makeFakeObj(node: FrozenNode | MinimalFrozenNode): NodeNormalizerResultObj[] {
+  makeFakeInfo(node: FrozenNode | MinimalFrozenNode): NodeNormalizerResultObj[] {
     return [
       {
         id: {
@@ -242,7 +242,7 @@ export class Record {
             return record.subject.qNodeID;
           },
           isSet(): boolean {
-            return record.subject.isSet;
+            return record.subject.isSet || false;
           },
         };
       },
@@ -252,7 +252,7 @@ export class Record {
             return record.object.qNodeID;
           },
           isSet(): boolean {
-            return record.object.isSet;
+            return record.object.isSet || false;
           },
         };
       },
@@ -271,7 +271,7 @@ export class Record {
 
   protected makeAPIEdge(record: FrozenRecord | MinimalFrozenRecord): APIEdge {
     return {
-      predicate: record.predicate.replace('biolink:', ''),
+      predicate: record.predicate?.replace('biolink:', ''),
       api_name: record.api,
       source: record.metaEdgeSource,
       "x-translator": {
