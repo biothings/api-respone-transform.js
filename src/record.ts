@@ -4,13 +4,12 @@ export interface FrozenRecord {
   subject: FrozenNode;
   object: FrozenNode;
   predicate?: string; // not required if given apiEdge, qXEdge
-  edgeAttributes?: EdgeAttribute[]; // not always present
   publications?: string[]; // not required if given apiEdge, qXEdge
   recordHash?: string; // always supplied by Record, not required from user
   api?: string; // not required if given apiEdge, qXEdge
   apiInforesCurie?: string; // not required if given apiEdge, qXEdge
   metaEdgeSource?: string; // not required if given apiEdge, qXEdge
-  mappedResponse?: any;
+  mappedResponse?: MappedResponse;
 }
 
 // removes all computed values on assumption that apiEdge and qXEdge are saved elsewhere
@@ -19,8 +18,8 @@ interface MinimalFrozenRecord {
   object: FrozenNode | MinimalFrozenNode;
   edgeAttributes?: EdgeAttribute[]; // not always present
   publications?: string[]; // not always present
+  mappedResponse?: MappedResponse;
   [additionalProperties: string]: any;
-  mappedResponse?: any;
 }
 
 interface FrozenNode {
@@ -49,7 +48,7 @@ type RecordPackage = [
 ];
 
 interface MappedResponse {
-  'edge-attributes': any[];
+  'edge-attributes'?: any[];
   [mappedItems: string]: any;
 }
 
@@ -219,7 +218,7 @@ export class Record {
   config: any;
   subject: RecordNode;
   object: RecordNode;
-  mappedResponse: any;
+  mappedResponse: MappedResponse;
 
   constructor(record: FrozenRecord | MinimalFrozenRecord, config?: any, apiEdge?: APIEdge, qXEdge?: QXEdge) {
     this.apiEdge = apiEdge ? apiEdge : this.makeAPIEdge(record);
