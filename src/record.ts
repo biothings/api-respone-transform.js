@@ -16,7 +16,6 @@ export interface FrozenRecord {
 interface MinimalFrozenRecord {
   subject: FrozenNode | MinimalFrozenNode;
   object: FrozenNode | MinimalFrozenNode;
-  edgeAttributes?: EdgeAttribute[]; // not always present
   publications?: string[]; // not always present
   mappedResponse?: MappedResponse;
   [additionalProperties: string]: any;
@@ -48,7 +47,7 @@ type RecordPackage = [
 ];
 
 interface MappedResponse {
-  'edge-attributes'?: any[];
+  'edge-attributes'?: EdgeAttribute[];
   [mappedItems: string]: any;
 }
 
