@@ -12,16 +12,42 @@ export interface FrozenRecord {
   mappedResponse?: MappedResponse;
 }
 
+export interface VerboseFrozenRecord {
+  subject: VerboseFrozenNode;
+  object: VerboseFrozenNode;
+  apiEdge: APIEdge;
+  predicate?: string; // not required if given apiEdge, qXEdge
+  publications?: string[]; // not required if given apiEdge, qXEdge
+  recordHash?: string; // always supplied by Record, not required from user
+  api?: string; // not required if given apiEdge, qXEdge
+  apiInforesCurie?: string; // not required if given apiEdge, qXEdge
+  metaEdgeSource?: string; // not required if given apiEdge, qXEdge
+  mappedResponse?: MappedResponse;
+}
+
 // removes all computed values on assumption that apiEdge and qXEdge are saved elsewhere
 interface MinimalFrozenRecord {
-  subject: FrozenNode | MinimalFrozenNode;
-  object: FrozenNode | MinimalFrozenNode;
+  subject: VerboseFrozenNode | MinimalFrozenNode;
+  object: VerboseFrozenNode | MinimalFrozenNode;
   publications?: string[]; // not always present
   mappedResponse?: MappedResponse;
   [additionalProperties: string]: any;
 }
 
 interface FrozenNode {
+  // less verbose, loses extra information from nodeNormalizer
+  original: string;
+  qNodeID: string;
+  isSet: boolean;
+  curie: string;
+  UMLS: string;
+  semanticType: string;
+  label: string;
+  attributes: any;
+  [additionalProperties: string]: any; // cleanest way to handler undefined properties
+}
+
+interface VerboseFrozenNode {
   original: string;
   normalizedInfo?: NodeNormalizerResultObj[]; // always supplied by Record, not required from user
   qNodeID: string;
@@ -38,16 +64,13 @@ interface FrozenNode {
 interface MinimalFrozenNode {
   original: string;
   normalizedInfo?: NodeNormalizerResultObj[]; // always supplied by Record, not required from user
-  [additionalProperties: string]: any;
+  [additionalProperties: string]: any; // cleanest way to handler undefined properties
 }
 
-type RecordPackage = [
-  apiEdges: any[],
-  ...frozenRecords: FrozenRecord[],
-];
+type RecordPackage = [apiEdges: any[], ...frozenRecords: FrozenRecord[]];
 
 interface MappedResponse {
-  'edge-attributes'?: EdgeAttribute[];
+  "edge-attributes"?: EdgeAttribute[];
   [mappedItems: string]: any;
 }
 
@@ -60,20 +83,21 @@ interface APIEdge {
   source?: string;
   api_name?: string;
   "x-translator"?: any;
-  // [additionalProperties: string]: unknown;
+  // [additionalProperties: string]: any;
 }
 
 interface QXEdge {
   getSubject(): QNode;
   getObject(): QNode;
   getHashedEdgeRepresentation(): string;
-  [additionalProperties: string]: unknown;
+  isReversed(): boolean;
+  [additionalProperties: string]: any;
 }
 
 interface QNode {
   getID(): string;
   isSet(): boolean;
-  [additionalProperties: string]: unknown;
+  [additionalProperties: string]: any;
 }
 
 interface EdgeAttribute {
@@ -82,7 +106,7 @@ interface EdgeAttribute {
   value: any;
   value_type_id: string;
   attributes?: EdgeAttribute[];
-  [additionalProperties: string]: unknown;
+  [additionalProperties: string]: any;
 }
 
 interface Identifier {
@@ -104,7 +128,7 @@ interface NodeNormalizerResultObj {
   curies?: string[];
   dbIDs?: any;
   _dbIDs?: any;
-  [additionalProperties: string]: unknown;
+  [additionalProperties: string]: any;
 }
 
 function hash(string: string) {
@@ -116,13 +140,13 @@ class RecordNode {
   normalizedInfo: NodeNormalizerResultObj[];
   _qNode: QNode;
 
-  constructor(node: FrozenNode | MinimalFrozenNode, qNode: QNode) {
+  constructor(node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode, qNode: QNode) {
     this.original = node.original;
     this.normalizedInfo = node.normalizedInfo ? node.normalizedInfo : this.makeFakeInfo(node);
     this._qNode = qNode;
   }
 
-  makeFakeInfo(node: FrozenNode | MinimalFrozenNode): NodeNormalizerResultObj[] {
+  makeFakeInfo(node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode): NodeNormalizerResultObj[] {
     return [
       {
         id: {
@@ -147,7 +171,7 @@ class RecordNode {
     ];
   }
 
-  toJSON(): FrozenNode {
+  toJSON(): VerboseFrozenNode {
     return {
       original: this.original,
       normalizedInfo: this.normalizedInfo,
@@ -164,14 +188,22 @@ class RecordNode {
   }
 
   freeze(): FrozenNode {
+    const node = this.toJSON() as FrozenNode;
+    delete node.normalizedInfo;
+    delete node.equivalentCuries;
+    delete node.names;
+    return node;
+  }
+
+  freezeVerbose(): VerboseFrozenNode {
     return this.toJSON();
   }
 
   freezeMinimal(): MinimalFrozenNode {
     return {
       original: this.original,
-      normalizedInfo: this.normalizedInfo
-    }
+      normalizedInfo: this.normalizedInfo,
+    };
   }
 
   get qNodeID(): string {
@@ -219,20 +251,52 @@ export class Record {
   object: RecordNode;
   mappedResponse: MappedResponse;
 
-  constructor(record: FrozenRecord | MinimalFrozenRecord, config?: any, apiEdge?: APIEdge, qXEdge?: QXEdge) {
+  constructor(
+    record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord,
+    config?: any,
+    apiEdge?: APIEdge,
+    qXEdge?: QXEdge,
+    reverse?: boolean,
+  ) {
     this.apiEdge = apiEdge ? apiEdge : this.makeAPIEdge(record);
     this.qXEdge = qXEdge ? qXEdge : this.makeFakeQXEdge(record);
     this.config = config ? config : { EDGE_ATTRIBUTES_USED_IN_RECORD_HASH: [] };
-    this.subject = new RecordNode(record.subject, this.qXEdge.getSubject());
-    this.object = new RecordNode(record.object, this.qXEdge.getObject());
+    if (!reverse) {
+      this.subject = new RecordNode(record.subject, this.qXEdge.getSubject());
+      this.object = new RecordNode(record.object, this.qXEdge.getObject());
+    } else {
+      this.subject = new RecordNode(record.subject, this.qXEdge.getObject());
+      this.object = new RecordNode(record.object, this.qXEdge.getSubject());
+    }
     this.mappedResponse = record.mappedResponse ? record.mappedResponse : {};
     if (!this.mappedResponse.publications) {
       this.mappedResponse.publications = record.publications;
     }
   }
 
+  queryDirection() {
+    if (!this.qXEdge.isReversed()) {
+      return this;
+    } else {
+      const frozen = { ...this.freezeVerbose() };
+      const reversedAPIEdge: any = { ...frozen.apiEdge };
+      reversedAPIEdge.input_id = frozen.apiEdge.output_id;
+      reversedAPIEdge.input_type = frozen.apiEdge.output_type;
+      reversedAPIEdge.output_id = frozen.apiEdge.input_id;
+      reversedAPIEdge.output_type = frozen.apiEdge.input_type;
+      const predicate = this.qXEdge.getReversedPredicate(frozen.apiEdge.predicate);
+      reversedAPIEdge.predicate = predicate;
+      // frozen.predicate = 'biolink:' + predicate;
+      frozen.apiEdge = reversedAPIEdge;
+      let temp = frozen.subject;
+      frozen.subject = frozen.object;
+      frozen.object = temp;
+      return new Record(frozen, this.config, frozen.apiEdge, this.qXEdge, true);
+    }
+  }
+
   // for user-made records lacking qXEdge
-  protected makeFakeQXEdge(record: FrozenRecord | MinimalFrozenRecord): QXEdge {
+  protected makeFakeQXEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): QXEdge {
     return {
       getSubject(): QNode {
         return {
@@ -254,6 +318,9 @@ export class Record {
           },
         };
       },
+      isReversed(): boolean {
+        return false;
+      },
       // WARNING not useable alongside actual QXEdge.getHashedEdgeRepresentation
       // However the two should never show up together as this is only for testing purposes
       getHashedEdgeRepresentation(): string {
@@ -267,9 +334,9 @@ export class Record {
     };
   }
 
-  protected makeAPIEdge(record: FrozenRecord | MinimalFrozenRecord): APIEdge {
+  protected makeAPIEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): APIEdge {
     return {
-      predicate: record.predicate?.replace('biolink:', ''),
+      predicate: record.predicate?.replace("biolink:", ""),
       api_name: record.api,
       source: record.metaEdgeSource,
       "x-translator": {
@@ -308,8 +375,6 @@ export class Record {
         ...frozenRecord,
         apiEdge: apiEdgeHashIndex,
       });
-
-
     });
 
     return [apiEdges, ...frozenRecords];
@@ -323,10 +388,11 @@ export class Record {
     });
   }
 
-  toJSON(): FrozenRecord {
+  toJSON(): VerboseFrozenRecord {
     return {
-      subject: this.subject.freeze(),
-      object: this.object.freeze(),
+      subject: this.subject.freezeVerbose(),
+      object: this.object.freezeVerbose(),
+      apiEdge: this.apiEdge,
       predicate: this.predicate,
       publications: this.publications,
       recordHash: this.recordHash,
@@ -338,6 +404,19 @@ export class Record {
   }
 
   freeze(): FrozenRecord {
+    const record = this.toJSON() as FrozenRecord;
+    record.subject = this.subject.freeze();
+    record.object = this.object.freeze();
+    //@ts-ignore
+    delete record.association;
+    record.mappedResponse = {
+      ...record.mappedResponse,
+      publications: undefined,
+    };
+    return record;
+  }
+
+  freezeVerbose(): VerboseFrozenRecord {
     return this.toJSON();
   }
 
@@ -362,7 +441,7 @@ export class Record {
   }
 
   protected get _configuredEdgeAttributesForHash(): string {
-    return this._getFlattenedEdgeAttributes(this.mappedResponse['edge-attributes'])
+    return this._getFlattenedEdgeAttributes(this.mappedResponse["edge-attributes"])
       .filter(attribute => {
         return this.config.EDGE_ATTRIBUTES_USED_IN_RECORD_HASH.includes(attribute.attribute_type_id);
       })
@@ -388,7 +467,7 @@ export class Record {
   }
 
   get predicate(): string {
-    return 'biolink:' + this.apiEdge.predicate;
+    return "biolink:" + this.apiEdge.predicate;
   }
 
   get api(): string {
