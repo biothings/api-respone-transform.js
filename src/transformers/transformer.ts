@@ -133,7 +133,7 @@ export default class BaseTransformer {
 
         const frozenRecord = {
             subject: this._getSubject(subjectCurie),
-            apiEdge: {...this.edge.association},
+            association: {...this.edge.association},
             qXEdge: this.edge.reasoner_edge,
             mappedResponse: {...mappedResponse},
         }

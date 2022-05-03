@@ -15,7 +15,7 @@ export interface FrozenRecord {
 export interface VerboseFrozenRecord {
   subject: VerboseFrozenNode;
   object: VerboseFrozenNode;
-  apiEdge: APIEdge;
+  association: Association;
   predicate?: string; // not required if given apiEdge, qXEdge
   publications?: string[]; // not required if given apiEdge, qXEdge
   recordHash?: string; // always supplied by Record, not required from user
@@ -74,7 +74,7 @@ interface MappedResponse {
   [mappedItems: string]: any;
 }
 
-interface APIEdge {
+interface Association {
   input_id?: string;
   input_type?: string;
   output_id?: string;
@@ -244,7 +244,7 @@ class RecordNode {
 }
 
 export class Record {
-  apiEdge: APIEdge;
+  association: Association;
   qXEdge: QXEdge;
   config: any;
   subject: RecordNode;
@@ -254,11 +254,11 @@ export class Record {
   constructor(
     record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord,
     config?: any,
-    apiEdge?: APIEdge,
+    apiEdge?: Association,
     qXEdge?: QXEdge,
     reverse?: boolean,
   ) {
-    this.apiEdge = apiEdge ? apiEdge : this.makeAPIEdge(record);
+    this.association = apiEdge ? apiEdge : this.makeAPIEdge(record);
     this.qXEdge = qXEdge ? qXEdge : this.makeFakeQXEdge(record);
     this.config = config ? config : { EDGE_ATTRIBUTES_USED_IN_RECORD_HASH: [] };
     if (!reverse) {
@@ -279,19 +279,19 @@ export class Record {
       return this;
     } else {
       const frozen = { ...this.freezeVerbose() };
-      const reversedAPIEdge: any = { ...frozen.apiEdge };
-      reversedAPIEdge.input_id = frozen.apiEdge.output_id;
-      reversedAPIEdge.input_type = frozen.apiEdge.output_type;
-      reversedAPIEdge.output_id = frozen.apiEdge.input_id;
-      reversedAPIEdge.output_type = frozen.apiEdge.input_type;
-      const predicate = this.qXEdge.getReversedPredicate(frozen.apiEdge.predicate);
+      const reversedAPIEdge: any = { ...frozen.association };
+      reversedAPIEdge.input_id = frozen.association.output_id;
+      reversedAPIEdge.input_type = frozen.association.output_type;
+      reversedAPIEdge.output_id = frozen.association.input_id;
+      reversedAPIEdge.output_type = frozen.association.input_type;
+      const predicate = this.qXEdge.getReversedPredicate(frozen.association.predicate);
       reversedAPIEdge.predicate = predicate;
       // frozen.predicate = 'biolink:' + predicate;
-      frozen.apiEdge = reversedAPIEdge;
+      frozen.association = reversedAPIEdge;
       let temp = frozen.subject;
       frozen.subject = frozen.object;
       frozen.object = temp;
-      return new Record(frozen, this.config, frozen.apiEdge, this.qXEdge, true);
+      return new Record(frozen, this.config, frozen.association, this.qXEdge, true);
     }
   }
 
@@ -334,7 +334,7 @@ export class Record {
     };
   }
 
-  protected makeAPIEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): APIEdge {
+  protected makeAPIEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): Association {
     return {
       predicate: record.predicate?.replace("biolink:", ""),
       api_name: record.api,
@@ -361,13 +361,13 @@ export class Record {
     records.forEach((record: Record, i: number) => {
       const frozenRecord = record.freezeMinimal();
 
-      const apiEdgeHash = hash(JSON.stringify(record.apiEdge));
+      const apiEdgeHash = hash(JSON.stringify(record.association));
 
       let apiEdgeHashIndex = apiEdgeHashes.findIndex(hash => hash === apiEdgeHash);
 
       if (apiEdgeHashIndex === -1) {
         apiEdgeHashes.push(apiEdgeHash);
-        apiEdges.push(record.apiEdge);
+        apiEdges.push(record.association);
         apiEdgeHashIndex = apiEdgeHashes.length - 1;
       }
 
@@ -392,7 +392,7 @@ export class Record {
     return {
       subject: this.subject.freezeVerbose(),
       object: this.object.freezeVerbose(),
-      apiEdge: this.apiEdge,
+      association: this.association,
       predicate: this.predicate,
       publications: this.publications,
       recordHash: this.recordHash,
@@ -467,22 +467,22 @@ export class Record {
   }
 
   get predicate(): string {
-    return "biolink:" + this.apiEdge.predicate;
+    return "biolink:" + this.association.predicate;
   }
 
   get api(): string {
-    return this.apiEdge.api_name;
+    return this.association.api_name;
   }
 
   get apiInforesCurie(): string {
-    if (this.apiEdge["x-translator"]) {
-      return this.apiEdge["x-translator"]["infores"] || undefined;
+    if (this.association["x-translator"]) {
+      return this.association["x-translator"]["infores"] || undefined;
     }
     return undefined;
   }
 
   get metaEdgeSource(): string {
-    return this.apiEdge.source;
+    return this.association.source;
   }
 
   get publications(): string[] {
