@@ -55,11 +55,11 @@ describe("test record class", () => {
   const testRecord = new Record(testFrozenRecord);
   describe("test initialization, record behavior", () => {
 
-    test("Record produces fake apiEdge", () => {
-      expect(testRecord.apiEdge.predicate).toEqual(testFrozenRecord.predicate)
-      expect(testRecord.apiEdge.api_name).toEqual(testFrozenRecord.api)
-      expect(testRecord.apiEdge.source).toEqual(testFrozenRecord.metaEdgeSource)
-      expect(testRecord.apiEdge['x-translator'].infores).toEqual(testFrozenRecord.apiInforesCurie);
+    test("Record produces fake association", () => {
+      expect(testRecord.association.predicate).toEqual(testFrozenRecord.predicate)
+      expect(testRecord.association.api_name).toEqual(testFrozenRecord.api)
+      expect(testRecord.association.source).toEqual(testFrozenRecord.metaEdgeSource)
+      expect(testRecord.association['x-translator'].infores).toEqual(testFrozenRecord.apiInforesCurie);
     });
 
     });
