@@ -76,9 +76,9 @@ describe("test semmed transformer", () => {
         }
     });
 
-    test("test semmed pairInputWithAPIResponse", () => {
+    test("test semmed pairCurieWithAPIResponse", () => {
         let tf = new semmed_tf.default(input);
-        let res = tf.pairInputWithAPIResponse();
+        let res = tf.pairCurieWithAPIResponse();
         expect(res["UMLS:C1332823"][0]['umls']).toBe("C1332823");
         expect(res).toHaveProperty('UMLS:C1332823');
         expect(res["UMLS:123"]).toBeUndefined();
@@ -98,12 +98,12 @@ describe("test semmed transformer", () => {
 
     test("add edge info", async () => {
         let tf = new semmed_tf.default(input);
-        let res = tf.pairInputWithAPIResponse();
+        let res = tf.pairCurieWithAPIResponse();
         let rec = res["UMLS:C1332823"][0];
         rec = tf.wrap(rec);
-        let result = await tf.addEdgeInfo("UMLS:C1332823", rec["positively_regulates"][0]);
-        expect(result[0]).toHaveProperty("$edge_metadata");
-        expect(result[0].$edge_metadata.api_name).toBe("SEMMED Gene API")
+        let result = await tf.formatRecords("UMLS:C1332823", rec["positively_regulates"][0]);
+        expect(result[0]).toHaveProperty("association");
+        expect(result[0].api).toBe("SEMMED Gene API")
     });
 
     test("test main function transform", async () => {
@@ -111,9 +111,9 @@ describe("test semmed transformer", () => {
         let res = await tf.transform();
         expect(res[0]).not.toHaveProperty('UMLS');
         expect(res[0]).not.toHaveProperty('@type');
-        expect(res[0]).toHaveProperty("$edge_metadata");
-        expect(res[0]).toHaveProperty("$input");
-        expect(res.slice(-1)[0]).toHaveProperty("$input");
+        expect(res[0]).toHaveProperty("association");
+        expect(res[0]).toHaveProperty("subject");
+        expect(res.slice(-1)[0]).toHaveProperty("subject");
         expect(res.length).toBeGreaterThan(30);
     })
 

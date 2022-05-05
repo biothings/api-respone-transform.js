@@ -37,7 +37,7 @@ interface SmartAPIKGOperationObject {
 
 export interface BTEKGOperationObject extends SmartAPIKGOperationObject {
     input: string | string[];
-    reasoner_edge?: string;
+    reasoner_edge?: any;
     filter?: string;
     original_input?: object;
     input_resolved_identifiers?: object;
@@ -47,4 +47,3 @@ export interface BTEQueryObject {
     response: JSONDoc | JSONDoc[];
     edge: BTEKGOperationObject;
 }
-

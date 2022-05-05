@@ -1,6 +1,6 @@
 import BiolinkTransformer from "./transformers/biolink_transformer";
 import BioThingsTransformer from "./transformers/biothings_transformer";
-import CordTransformer from "./transformers/cord_transformer";
+// import CordTransformer from "./transformers/cord_transformer";
 import CTDTransformer from "./transformers/ctd_transformer";
 import SemmedTransformer from "./transformers/semmed_transformer";
 import OpenTargetTransformer from "./transformers/opentarget_transformer";
@@ -9,12 +9,15 @@ import TRAPITransformer from './transformers/trapi_transformer';
 import EBIProteinTransformer from './transformers/ebi_protein_transformer'
 import { BTEQueryObject } from "./types";
 const debug = require("debug")("bte:api-response-transform:index");
+export { Record } from "./record";
 
 export class Transformer {
     private data: BTEQueryObject;
     private tf: BaseTransformer;
-    constructor(data: BTEQueryObject) {
+    config: any;
+    constructor(data: BTEQueryObject, config: any) {
         this.data = data;
+        this.config = config;
         this.route();
     }
 
@@ -24,23 +27,21 @@ export class Transformer {
         let tags = this.data.edge.query_operation.tags;
         debug(`api tags: ${tags}`);
         if (tags.includes('bte-trapi')) {
-            this.tf = new TRAPITransformer(this.data)
-        } else if (api.startsWith('CORD')) {
-            this.tf = new CordTransformer(this.data);
+            this.tf = new TRAPITransformer(this.data, this.config);
         } else if (api.startsWith('SEMMED')) {
-            this.tf = new SemmedTransformer(this.data);
+            this.tf = new SemmedTransformer(this.data, this.config);
         } else if (api === 'BioLink API') {
-            this.tf = new BiolinkTransformer(this.data);
+            this.tf = new BiolinkTransformer(this.data, this.config);
         } else if (api === 'EBI Proteins API') {
-            this.tf = new EBIProteinTransformer(this.data)
+            this.tf = new EBIProteinTransformer(this.data, this.config)
         } else if (tags.includes("biothings")) {
-            this.tf = new BioThingsTransformer(this.data);
+            this.tf = new BioThingsTransformer(this.data, this.config);
         } else if (tags.includes("ctd")) {
-            this.tf = new CTDTransformer(this.data);
+            this.tf = new CTDTransformer(this.data, this.config);
         } else if (tags.includes("opentarget")) {
-            this.tf = new OpenTargetTransformer(this.data)
+            this.tf = new OpenTargetTransformer(this.data, this.config)
         } else {
-            this.tf = new BaseTransformer(this.data)
+            this.tf = new BaseTransformer(this.data, this.config)
         }
     }
 

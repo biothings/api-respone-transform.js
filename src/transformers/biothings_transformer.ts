@@ -2,7 +2,7 @@ import BaseTransformer from "./transformer";
 import { generateCurie } from '../utils';
 
 export default class BioThingsTransformer extends BaseTransformer {
-    pairInputWithAPIResponse() {
+    pairCurieWithAPIResponse() {
         if (this.edge.query_operation.method === "post") {
             let res = {};
             this.data.response.map(item => {
