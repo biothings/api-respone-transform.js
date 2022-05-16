@@ -235,7 +235,7 @@ class RecordNode {
   }
 
   get names(): string[] {
-    return this.normalizedInfo?.[0].dbIDs.name;
+    return this.normalizedInfo?.[0].dbIDs?.name;
   }
 
   get attributes(): any {
