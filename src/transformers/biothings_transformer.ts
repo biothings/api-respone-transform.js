@@ -18,7 +18,10 @@ export default class BioThingsTransformer extends BaseTransformer {
             });
             return res;
         } else {
-            let _input = generateCurie(this.edge.association.input_id, this.edge.input);
+            let _input = generateCurie(
+                this.edge.association.input_id,
+                this.edge.input.hasOwnProperty('queryInputs') ? this.edge.input["queryInputs"] : this.edge.input as string
+            );
             return { [_input]: [this.data["response"]] }
         }
 
