@@ -18,8 +18,7 @@ export default class BioThingsTransformer extends BaseTransformer {
             });
             return res;
         } else {
-            let _input = generateCurie(this.edge.association.input_id, this.edge.input);
-            return { [_input]: [this.data["response"]] }
+            return super.pairCurieWithAPIResponse();
         }
 
     }

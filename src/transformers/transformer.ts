@@ -24,7 +24,10 @@ export default class BaseTransformer {
      * Create an object with key representing input, and value representing the output of API
      */
     pairCurieWithAPIResponse() {
-        let input = generateCurie(this.edge.association.input_id, this.edge.input);
+        let input = generateCurie(
+            this.edge.association.input_id,
+            this.edge.input.hasOwnProperty('queryInputs') ? this.edge.input["queryInputs"] : this.edge.input as string
+        );
         return {
             [input]: [this.data.response],
         };
