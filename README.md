@@ -1,5 +1,5 @@
 [![Test Codecov with Workspace](https://github.com/biothings/api-respone-transform.js/actions/workflows/test_ws_codecov.yml/badge.svg)](https://github.com/biothings/api-respone-transform.js/actions/workflows/test_ws_codecov.yml)
-[![codecov](https://codecov.io/gh/biothings/api-respone-transform.js/branch/master/graph/badge.svg?token=2ZVEY8JACN)](https://codecov.io/gh/biothings/api-respone-transform.js)
+[![codecov](https://codecov.io/gh/biothings/api-respone-transform.js/branch/main/graph/badge.svg?token=2ZVEY8JACN)](https://codecov.io/gh/biothings/api-respone-transform.js)
 <a href="https://github.com/biothings/api-respone-transform.js#readme" target="_blank">
     <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" />
   </a>
