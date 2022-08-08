@@ -9,7 +9,7 @@
 
 # Welcome to @biothings-explorer/api-response-transform 👋
 
-A NodeJS module to transform the JSON output from API into BioLink-compatible JSON structure
+A NodeJS module to transform the JSON output from APIs into BioLink-compatible JSON structure.
 
 ### 🏠 [Homepage](https://github.com/biothings/api-respone-transform.js)
 
