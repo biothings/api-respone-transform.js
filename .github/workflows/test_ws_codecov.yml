@@ -28,5 +28,4 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         working-directory: ./packages/@biothings-explorer/api-response-transform
-        files: ./coverage/lcov.info
         verbose: true
