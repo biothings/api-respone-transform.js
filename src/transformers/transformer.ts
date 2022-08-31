@@ -169,7 +169,7 @@ export default class BaseTransformer {
         await async.eachSeries(Object.entries(responses), async ([curie, curieResponses]) => {
             if (Array.isArray(curieResponses) && curieResponses.length > 0) {
                 await async.eachSeries(curieResponses, async response => {
-                    const predicateResponse = this.jsonTransform(this.wrap(response));
+                    const predicateResponse = this.jsonTransform(await this.wrap(response));
                     await async.eachSeries(Object.entries(predicateResponse), async ([predicate, mappedResponses]) => {
                         if (Array.isArray(mappedResponses) && mappedResponses.length > 0) {
                             await async.eachSeries(mappedResponses, async (mappedResponse: any[]) => {
