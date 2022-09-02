@@ -10,7 +10,7 @@ export default class OpenTargetTransformer extends BaseTransformer {
 //             return item;
 //         });
 //         return res;
-        const filterString = '.data = [(.data | .[] | select(.drug.id != null) | select(.drug.id | contains("CHEMBL")) | .drug.id |= (split("/") | last))] + [(.data | .[] | select(.drug.id == null))] + [(.data | .[] | select(.drug.id != null) | select(.drug.id | contains("CHEMBL") | not))]';
+        const filterString = '(.data | .[] | select(.drug.id != null) | select(.drug.id | contains("CHEMBL")) | .drug.id) |= (split("/") | last)';
         return await jq.run(filterString, res);
     }
 }
