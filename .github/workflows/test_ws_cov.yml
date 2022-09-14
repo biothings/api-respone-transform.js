@@ -29,11 +29,11 @@ jobs:
         id: findPr
 
       - name: Run tests, generate coverage report
+        id: coverage
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
-          id: coverage
-          prnumber: ${{ steps.findPr.outputs.number }}
           working-directory: ./packages/@biothings-explorer/api-response-transform
+          prnumber: ${{ steps.findPr.outputs.number }}
           skip-step: install
           test-script: npm run test-cov --workspace=@biothings-explorer/api-response-transform
           output: report-markdown
