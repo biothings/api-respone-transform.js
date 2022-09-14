@@ -39,7 +39,7 @@ jobs:
           output: report-markdown
 
       - name: Comment report on PR
-        uses: marocchino/stick-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
           message: ${{ steps.coverage.outputs.report }}
 
