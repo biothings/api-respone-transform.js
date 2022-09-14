@@ -1,0 +1,50 @@
+name: "Test in workspace"
+on: [push, pull_request]
+jobs:
+  test-coverage:
+    name: Run tests and generate coverage report
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: write
+    steps:
+      - name: Clone workspace
+        uses: actions/checkout@v3
+        with:
+          repository: biothings/bte-trapi-workspace
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+
+      - name: Install workspace
+        run: |
+          npm run clone
+          npm i || true && npm i
+
+      - name: Get PR number (for activate on push)
+        uses: jwalton/gh-find-current-pr@v1
+        id: findPr
+
+      - name: Run tests, generate coverage report
+        uses: ArtiomTr/jest-coverage-report-action@v2
+        with:
+          id: coverage
+          prnumber: ${{ steps.findPr.outputs.number }}
+          working-directory: ./packages/@biothings-explorer/api-response-transform
+          skip-step: install
+          test-script: npm run test-cov --workspace=@biothings-explorer/api-response-transform
+          output: report-markdown
+
+      - name: Comment report on PR
+        uses: marocchino/stick-pull-request-comment@v2
+        with:
+          message: ${{ steps.coverage.outputs.report }}
+
+      - name: Generate badge
+        uses: jpb06/jest-badges-action@v1
+        with:
+          branches: main,jest-actions
+          coverage-summary-path: ./packages/@biothings-explorer/api-response-transform/coverage/coverage-summary.json
