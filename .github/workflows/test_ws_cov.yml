@@ -53,4 +53,5 @@ jobs:
         uses: tokebe/jest-badges-action@master
         with:
           branches: main,jest-actions
-          coverage-summary-path: ./packages/@biothings-explorer/api-response-transform/coverage/coverage-summary.json
+          # coverage-summary-path: ./packages/@biothings-explorer/api-response-transform/coverage/coverage-summary.json
+          working-directory: ./packages/@biothings-explorer/api-response-transform
