@@ -44,7 +44,7 @@ jobs:
           message: ${{ steps.coverage.outputs.report }}
 
       - name: Generate badge
-        uses: jpb06/jest-badges-action@v1
+        uses: jpb06/jest-badges-action@latest
         with:
           branches: main,jest-actions
           coverage-summary-path: ./packages/@biothings-explorer/api-response-transform/coverage/coverage-summary.json
