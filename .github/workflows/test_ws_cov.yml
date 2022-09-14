@@ -28,6 +28,8 @@ jobs:
         uses: jwalton/gh-find-current-pr@v1
         id: findPr
 
+      - run: ls ./packages/@biothings-explorer/api-response-transform
+
       - name: Run tests, generate coverage report
         id: coverage
         uses: ArtiomTr/jest-coverage-report-action@v2
