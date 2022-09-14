@@ -35,7 +35,7 @@ jobs:
           working-directory: ./packages/@biothings-explorer/api-response-transform
           prnumber: ${{ steps.findPr.outputs.number }}
           skip-step: install
-          test-script: npm run test-cov --workspace=@biothings-explorer/api-response-transform
+          test-script: npm run test-cov
           output: report-markdown
 
       - name: Comment report on PR
