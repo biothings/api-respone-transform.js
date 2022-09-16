@@ -9,6 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+    - name: Get branch name
+      id: branch-name
+      uses: tj-actions/branch-names@v6
+
     - uses: actions/checkout@v3
       with:
         repository: biothings/bte-trapi-workspace
