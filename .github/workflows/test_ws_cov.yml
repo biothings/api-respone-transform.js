@@ -23,13 +23,19 @@ jobs:
         id: branch-name
         uses: tj-actions/branch-names@v6
 
-      - name: Install workspace with PR
+      - name: Clone packages and use PR branch
         # checkout all same-named branches for cases of multi-PR dependent features
         run: |
           npm run clone
-          npm run git remote set-url origin git@github.com:biothings/$(basename $(git remote get-url origin))
           npm run git checkout ${{ steps.branch-name.outputs.current_branch }}
-          npm i || true && npm i
+
+      - name: Clone specific PR
+        uses: actions/checkout@v3
+        with:
+          path: ./packages/@biothings-explorer/api-response-transform
+
+      - name: Install workspace
+        run: npm i || true && npm i
 
       - name: Get PR number (for activate on push)
         uses: jwalton/gh-find-current-pr@v1
