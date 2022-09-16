@@ -1,10 +1,8 @@
-/**
- * @jest-environment node
- */
 
-const biothings_tf = require("../built/transformers/biothings_transformer");
-const fs = require("fs");
-const path = require("path");
+import biothings_tf from "../src/transformers/biothings_transformer";
+import {describe, expect, test} from '@jest/globals';
+import fs from "fs";
+import path from "path";
 
 describe("test biothings transformer", () => {
 
@@ -14,9 +12,9 @@ describe("test biothings transformer", () => {
 
         beforeAll(() => {
             const post_query_response_path = path.resolve(__dirname, './data/biothings/mychem_post.json');
-            response = JSON.parse(fs.readFileSync(post_query_response_path));
+            response = JSON.parse(fs.readFileSync(post_query_response_path, { encoding: 'utf8' }));
             const edge_path = path.resolve(__dirname, './data/biothings/mychem_example_edge.json');
-            const edge = JSON.parse(fs.readFileSync(edge_path));
+            const edge = JSON.parse(fs.readFileSync(edge_path, { encoding: 'utf8' }));
             input = {
                 response,
                 edge
@@ -24,7 +22,7 @@ describe("test biothings transformer", () => {
         })
 
         test("test biothings wrapper", () => {
-            let tf = new biothings_tf.default(input);
+            let tf = new biothings_tf(input, {});
             let res = tf.pairCurieWithAPIResponse();
             expect(Object.keys(res)).toHaveLength(2);
             expect(res).toHaveProperty("DRUGBANK:DB00188");
@@ -39,9 +37,9 @@ describe("test biothings transformer", () => {
 
         beforeAll(() => {
             const post_query_response_path = path.resolve(__dirname, './data/biothings/mygene_post.json');
-            response = JSON.parse(fs.readFileSync(post_query_response_path));
+            response = JSON.parse(fs.readFileSync(post_query_response_path, { encoding: 'utf8' }));
             const edge_path = path.resolve(__dirname, './data/biothings/mygene_example_edge.json');
-            const edge = JSON.parse(fs.readFileSync(edge_path));
+            const edge = JSON.parse(fs.readFileSync(edge_path, { encoding: 'utf8' }));
             input = {
                 response,
                 edge
@@ -49,7 +47,7 @@ describe("test biothings transformer", () => {
         })
 
         test("test biothings wrapper", () => {
-            let tf = new biothings_tf.default(input);
+            let tf = new biothings_tf(input, {});
             let res = tf.pairCurieWithAPIResponse();
             expect(Object.keys(res)).toHaveLength(1);
             expect(res).toHaveProperty("NCBIGene:1017");
@@ -57,7 +55,7 @@ describe("test biothings transformer", () => {
         })
 
         test("test biothings transform", async () => {
-            let tf = new biothings_tf.default(input);
+            let tf = new biothings_tf(input, {});
             let res = await tf.transform();
             expect(res).toHaveLength(27);
             expect(res[0]).not.toHaveProperty('pubmed');
@@ -71,9 +69,9 @@ describe("test biothings transformer", () => {
 
         beforeAll(() => {
             const get_query_response_path = path.resolve(__dirname, './data/biothings/drug_response_get_response.json');
-            response = JSON.parse(fs.readFileSync(get_query_response_path));
+            response = JSON.parse(fs.readFileSync(get_query_response_path, { encoding: 'utf8' }));
             const edge_path = path.resolve(__dirname, './data/biothings/drug_response_example_edge.json');
-            const edge = JSON.parse(fs.readFileSync(edge_path));
+            const edge = JSON.parse(fs.readFileSync(edge_path, { encoding: 'utf8' }));
             input = {
                 response,
                 edge
@@ -81,7 +79,7 @@ describe("test biothings transformer", () => {
         })
 
         test("test biothings wrapper", () => {
-            let tf = new biothings_tf.default(input);
+            let tf = new biothings_tf(input, {});
             let res = tf.pairCurieWithAPIResponse();
             expect(Object.keys(res)).toHaveLength(1);
             expect(res).toHaveProperty("PUBCHEM:11373846");

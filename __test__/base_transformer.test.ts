@@ -1,10 +1,9 @@
-/**
- * @jest-environment node
- */
+import {describe, expect, test} from '@jest/globals';
 
-const base_tf = require("../built/transformers/transformer");
-const fs = require("fs");
-const path = require("path");
+import base_tf from "../src/transformers/transformer";
+import fs from "fs";
+import path from "path";
+import { JSONDoc } from '../src/json_transform/types';
 
 describe("test base transformer", () => {
 
@@ -13,9 +12,9 @@ describe("test base transformer", () => {
 
     beforeEach(() => {
         const response_path = path.resolve(__dirname, './data/ols/response.json');
-        response = JSON.parse(fs.readFileSync(response_path));
+        response = JSON.parse(fs.readFileSync(response_path, { encoding: 'utf8' }));
         const edge_path = path.resolve(__dirname, './data/ols/edge.json');
-        const edge = JSON.parse(fs.readFileSync(edge_path));
+        const edge = JSON.parse(fs.readFileSync(edge_path, { encoding: 'utf8' }));
         input = {
             response,
             edge
@@ -23,20 +22,20 @@ describe("test base transformer", () => {
     })
 
     test("Test pairInputWithAPIResponse function", () => {
-        const tf = new base_tf.default(input);
+        const tf = new base_tf(input, {});
         const res = tf.pairCurieWithAPIResponse();
         expect(res).toHaveProperty("DOID:9562");
         expect(res["DOID:9562"]).toHaveLength(1);
     })
 
     test("Test wrap function if response is not an array", () => {
-        const tf = new base_tf.default(input);
+        const tf = new base_tf(input, {});
         const res = tf.wrap(response);
         expect(res).toHaveProperty("_embedded");
     })
 
     test("Test wrap function if response is an array", () => {
-        const tf = new base_tf.default(input);
+        const tf = new base_tf(input, {});
         const fake = ["1"]
         const res = tf.wrap(fake);
         expect(res).toHaveProperty("data");
@@ -44,8 +43,8 @@ describe("test base transformer", () => {
     })
 
     test("Test jsonTransform function", () => {
-        const tf = new base_tf.default(input);
-        const res = tf.jsonTransform(response);
+        const tf = new base_tf(input, {});
+        const res: JSONDoc = tf.jsonTransform(response);
         expect(res).toHaveProperty("has_subclass");
         expect(res.has_subclass[0]).toHaveProperty("DOID");
         expect(res.has_subclass[0].DOID).toEqual("DOID:0110596");
@@ -56,7 +55,7 @@ describe("test base transformer", () => {
     })
 
     test("Test _updatePublications function if pubmed id is prefixed", () => {
-        const tf = new base_tf.default(input);
+        const tf = new base_tf(input, {});
         const fake = {
             pubmed: "PMID:1233"
         }
@@ -66,7 +65,7 @@ describe("test base transformer", () => {
     })
 
     test("Test _updatePublications function if pubmed id is NOT prefixed", () => {
-        const tf = new base_tf.default(input);
+        const tf = new base_tf(input, {});
         const fake = {
             pubmed: 1233
         }
@@ -76,7 +75,7 @@ describe("test base transformer", () => {
     })
 
     test("Test _updatePublications function if pmc id is prefixed", () => {
-        const tf = new base_tf.default(input);
+        const tf = new base_tf(input, {});
         const fake = {
             pmc: "PMC:1233"
         }
@@ -86,7 +85,7 @@ describe("test base transformer", () => {
     })
 
     test("Test _updatePublications function if pmc id is NOT prefixed", () => {
-        const tf = new base_tf.default(input);
+        const tf = new base_tf(input, {});
         const fake = {
             pmc: 123
         }
@@ -96,7 +95,7 @@ describe("test base transformer", () => {
     })
 
     test("Test extractObjectIDs function if output id type not in result", () => {
-        const tf = new base_tf.default(input);
+        const tf = new base_tf(input, {});
         const fake = {
             kk: 1
         };
@@ -105,7 +104,7 @@ describe("test base transformer", () => {
     })
 
     test("Test extractObjectIDs function if output id type is in result", () => {
-        const tf = new base_tf.default(input);
+        const tf = new base_tf(input, {});
         const fake = {
             DOID: 1
         };
@@ -114,7 +113,7 @@ describe("test base transformer", () => {
     })
 
     test("Test formatRecords function if result is empty", async () => {
-        const tf = new base_tf.default(input);
+        const tf = new base_tf(input, {});
         const fake = {};
         const res = await tf.formatRecords("NCBIGene:1017", fake);
         expect(res).toEqual([]);
