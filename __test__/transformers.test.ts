@@ -2,11 +2,11 @@
  * @jest-environment node
  */
 
-const ctd_tf = require("../built/transformers/ctd_transformer");
-const opentarget_tf = require("../built/transformers/opentarget_transformer");
-const biothings_tf = require("../built/transformers/biothings_transformer");
-const base_tf = require("../built/transformers/transformer");
-const axios = require("axios");
+import ctd_tf from "../src/transformers/ctd_transformer";
+import opentarget_tf from "../src/transformers/opentarget_transformer";
+import biothings_tf from "../src/transformers/biothings_transformer";
+import base_tf from "../src/transformers/transformer";
+import axios from "axios";
 
 // not ingesting opentargets right now; no need for this test; this api is no longer there
 // describe("test opentarget transformer", () => {
@@ -31,7 +31,7 @@ const axios = require("axios");
 //                 }
 //             }
 //         }
-//         let tf = new opentarget_tf.default(input);
+//         let tf = new opentarget_tf(input, {});
 //         let res = tf.wrap(api_response);
 //         expect(res.data[0]['drug']['id']).toBe("CHEMBL1200686");
 //         expect(res.data[0]['drug']['molecule_name']).toContain("PIMECROLIMUS");
@@ -54,14 +54,16 @@ describe("test ctd transformer", () => {
             edge: {
                 input: "238",
                 association: {
-                    output_type: "Gene"
+                    output_type: "Gene",
+                    input_type: "",
+                    predicate: "",
                 },
                 response_mapping: {
                     sookie: "kevin"
                 }
             }
         }
-        let tf = new ctd_tf.default(input);
+        let tf = new ctd_tf(input, {});
         let res = tf.wrap(api_response);
         expect(res.data[0]['DiseaseID']).toBe("D000022");
         expect(res.data[0]['PubMedIDs']).toContain("16120699");
@@ -146,7 +148,7 @@ describe("test biothings transformer", () => {
     });
 
     test("test biothings pairCurieWithAPIResponse", () => {
-        let tf = new biothings_tf.default(input);
+        let tf = new biothings_tf(input, {});
         let res = tf.pairCurieWithAPIResponse();
         expect(res["UMLS:C1332823"][0]['umls']).toBe("C1332823");
         expect(res).toHaveProperty('UMLS:C1332823');
@@ -154,7 +156,7 @@ describe("test biothings transformer", () => {
     });
 
     test("test wrapper", () => {
-        let tf = new biothings_tf.default(input);
+        let tf = new biothings_tf(input, {});
         let res = tf.wrap(input.response[0]);
         expect(res).toHaveProperty("query");
     });

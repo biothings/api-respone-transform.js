@@ -1,5 +1,5 @@
-const semmed_tf = require("../built/transformers/semmed_transformer");
-const axios = require("axios");
+import semmed_tf from "../src/transformers/semmed_transformer";
+import axios from "axios";
 
 describe("test semmed transformer", () => {
 
@@ -12,7 +12,6 @@ describe("test semmed transformer", () => {
             data: 'q=C1332823, C1332824, 123&scopes=umls',
             params: {
                 fields: 'name,umls,positively_regulates',
-                size: '5'
             }
         })
         api_response = res.data;
@@ -26,6 +25,7 @@ describe("test semmed transformer", () => {
                     },
                     "request_body": {
                         "body": {
+                            size: '5',
                             "q": "{inputs[0]}",
                             "scopes": "umls"
                         }
@@ -77,7 +77,7 @@ describe("test semmed transformer", () => {
     });
 
     test("test semmed pairCurieWithAPIResponse", () => {
-        let tf = new semmed_tf.default(input);
+        let tf = new semmed_tf(input, {});
         let res = tf.pairCurieWithAPIResponse();
         expect(res["UMLS:C1332823"][0]['umls']).toBe("C1332823");
         expect(res).toHaveProperty('UMLS:C1332823');
@@ -85,19 +85,19 @@ describe("test semmed transformer", () => {
     });
 
     test("test wrapper", () => {
-        let tf = new semmed_tf.default(input);
+        let tf = new semmed_tf(input, {});
         let res = tf.wrap(input.response[0]);
         expect(res).toHaveProperty("positively_regulates");
     });
 
     test("test json transform", () => {
-        let tf = new semmed_tf.default(input);
+        let tf = new semmed_tf(input, {});
         let res = tf.jsonTransform(input.response[0]);
         expect(res).toEqual(input.response[0]);
     });
 
     test("add edge info", async () => {
-        let tf = new semmed_tf.default(input);
+        let tf = new semmed_tf(input, {});
         let res = tf.pairCurieWithAPIResponse();
         let rec = res["UMLS:C1332823"][0];
         rec = tf.wrap(rec);
@@ -107,7 +107,7 @@ describe("test semmed transformer", () => {
     });
 
     test("test main function transform", async () => {
-        let tf = new semmed_tf.default(input);
+        let tf = new semmed_tf(input, {});
         let res = await tf.transform();
         expect(res[0]).not.toHaveProperty('UMLS');
         expect(res[0]).not.toHaveProperty('@type');
