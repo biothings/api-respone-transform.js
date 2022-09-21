@@ -7,6 +7,7 @@ import OpenTargetTransformer from "./transformers/opentarget_transformer";
 import BaseTransformer from "./transformers/transformer";
 import TRAPITransformer from './transformers/trapi_transformer';
 import EBIProteinTransformer from './transformers/ebi_protein_transformer'
+import JQTransformer from "./transformers/jq_transfomer";
 import { BTEQueryObject } from "./types";
 const debug = require("debug")("bte:api-response-transform:index");
 export { Record } from "./record";
@@ -31,7 +32,8 @@ export class Transformer {
         } else if (api.startsWith('SEMMED')) {
             this.tf = new SemmedTransformer(this.data, this.config);
         } else if (api === 'BioLink API') {
-            this.tf = new BiolinkTransformer(this.data, this.config);
+            // this.tf = new BiolinkTransformer(this.data, this.config);
+            this.tf = new JQTransformer(this.data, { ...this.config, type: "biolink" })
         } else if (api === 'EBI Proteins API') {
             this.tf = new EBIProteinTransformer(this.data, this.config)
         } else if (tags.includes("biothings")) {
