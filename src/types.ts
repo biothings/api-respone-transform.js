@@ -48,6 +48,6 @@ export interface BTEKGOperationObject extends SmartAPIKGOperationObject {
 }
 
 export interface BTEQueryObject {
-    response: JSONDoc | JSONDoc[];
+    response: JSONDoc | JSONDoc[] | { hits: JSONDoc[] };
     edge: BTEKGOperationObject;
 }
