@@ -1,136 +1,5 @@
 import crypto from "crypto";
 
-export interface FrozenRecord {
-  subject: FrozenNode;
-  object: FrozenNode;
-  predicate?: string; // not required if given apiEdge, qXEdge
-  publications?: string[]; // not required if given apiEdge, qXEdge
-  recordHash?: string; // always supplied by Record, not required from user
-  api?: string; // not required if given apiEdge, qXEdge
-  apiInforesCurie?: string; // not required if given apiEdge, qXEdge
-  metaEdgeSource?: string; // not required if given apiEdge, qXEdge
-  mappedResponse?: MappedResponse;
-}
-
-export interface VerboseFrozenRecord {
-  subject: VerboseFrozenNode;
-  object: VerboseFrozenNode;
-  association: Association;
-  predicate?: string; // not required if given apiEdge, qXEdge
-  publications?: string[]; // not required if given apiEdge, qXEdge
-  recordHash?: string; // always supplied by Record, not required from user
-  api?: string; // not required if given apiEdge, qXEdge
-  apiInforesCurie?: string; // not required if given apiEdge, qXEdge
-  metaEdgeSource?: string; // not required if given apiEdge, qXEdge
-  mappedResponse?: MappedResponse;
-}
-
-// removes all computed values on assumption that apiEdge and qXEdge are saved elsewhere
-interface MinimalFrozenRecord {
-  subject: VerboseFrozenNode | MinimalFrozenNode;
-  object: VerboseFrozenNode | MinimalFrozenNode;
-  publications?: string[]; // not always present
-  mappedResponse?: MappedResponse;
-  [additionalProperties: string]: any;
-}
-
-interface FrozenNode {
-  // less verbose, loses extra information from nodeNormalizer
-  original: string;
-  qNodeID: string;
-  isSet: boolean;
-  curie: string;
-  UMLS: string;
-  semanticType: string;
-  label: string;
-  attributes: any;
-  [additionalProperties: string]: any; // cleanest way to handler undefined properties
-}
-
-interface VerboseFrozenNode {
-  original: string;
-  normalizedInfo?: NodeNormalizerResultObj[]; // always supplied by Record, not required from user
-  qNodeID: string;
-  isSet: boolean;
-  curie: string;
-  UMLS: string;
-  semanticType: string;
-  label: string;
-  equivalentCuries?: string[]; // always supplied by Record, not required from user
-  names: string[];
-  attributes: any;
-}
-
-interface MinimalFrozenNode {
-  original: string;
-  normalizedInfo?: NodeNormalizerResultObj[]; // always supplied by Record, not required from user
-  [additionalProperties: string]: any; // cleanest way to handler undefined properties
-}
-
-type RecordPackage = [apiEdges: any[], ...frozenRecords: FrozenRecord[]];
-
-interface MappedResponse {
-  "edge-attributes"?: EdgeAttribute[];
-  [mappedItems: string]: any;
-}
-
-interface Association {
-  input_id?: string;
-  input_type?: string;
-  output_id?: string;
-  output_type?: string;
-  predicate: string;
-  source?: string;
-  api_name?: string;
-  "x-translator"?: any;
-  // [additionalProperties: string]: any;
-}
-
-interface QXEdge {
-  getSubject(): QNode;
-  getObject(): QNode;
-  getHashedEdgeRepresentation(): string;
-  isReversed(): boolean;
-  [additionalProperties: string]: any;
-}
-
-interface QNode {
-  getID(): string;
-  isSet(): boolean;
-  [additionalProperties: string]: any;
-}
-
-interface EdgeAttribute {
-  attribute_source: string;
-  attribute_type_id: string;
-  value: any;
-  value_type_id: string;
-  attributes?: EdgeAttribute[];
-  [additionalProperties: string]: any;
-}
-
-interface Identifier {
-  identifier: string;
-  label?: string;
-}
-
-interface NodeNormalizerResultObj {
-  id?: Identifier;
-  equivalent_identifiers?: Identifier[];
-  type?: string[];
-  information_content?: number;
-  primaryID?: string;
-  label?: string;
-  attributes?: any;
-  semanticType?: string;
-  _leafSemanticType?: string;
-  semanticTypes?: string[];
-  curies?: string[];
-  dbIDs?: any;
-  _dbIDs?: any;
-  [additionalProperties: string]: any;
-}
-
 function hash(string: string) {
   return crypto.createHash("md5").update(string).digest("hex");
 }
@@ -279,13 +148,31 @@ export class Record {
       return this;
     } else {
       const frozen = { ...this.freezeVerbose() };
-      const reversedAPIEdge: any = { ...frozen.association };
+      const reversedAPIEdge: Association = { ...frozen.association };
       reversedAPIEdge.input_id = frozen.association.output_id;
       reversedAPIEdge.input_type = frozen.association.output_type;
       reversedAPIEdge.output_id = frozen.association.input_id;
       reversedAPIEdge.output_type = frozen.association.input_type;
       const predicate = this.qXEdge.getReversedPredicate(frozen.association.predicate);
       reversedAPIEdge.predicate = predicate;
+      if (reversedAPIEdge.qualifiers) {
+        Object.fromEntries(
+          Object.entries(reversedAPIEdge).map(([qualifierType, qualifier]) => {
+            let newQualifierType: string;
+            let newQualifier: string;
+            if (qualifierType.includes('predicate')) {
+              newQualifier = this.qXEdge.getReversedPredicate(qualifier);
+            }
+            if (qualifierType.includes('subject')) {
+              newQualifierType = qualifierType.replace('subject', 'object');
+            }
+            if (qualifierType.includes('object')) {
+              newQualifierType = qualifierType.replace('object', 'subject');
+            }
+            return [newQualifierType, newQualifier];
+          })
+        );
+      }
       // frozen.predicate = 'biolink:' + predicate;
       frozen.association = reversedAPIEdge;
       let temp = frozen.subject;
@@ -394,6 +281,7 @@ export class Record {
       object: this.object.freezeVerbose(),
       association: this.association,
       predicate: this.predicate,
+      qualifiers: this.qualifiers,
       publications: this.publications,
       recordHash: this.recordHash,
       api: this.api,
@@ -470,6 +358,17 @@ export class Record {
     return "biolink:" + this.association.predicate;
   }
 
+  get qualifiers(): BulkQualifiers {
+    if (!this.association.qualifiers) {
+      return {};
+    }
+    return Object.fromEntries(
+      Object.entries(this.association.qualifiers).map(([qualifierType, qualifier]) => {
+        return [`biolink:${qualifierType}`, qualifier];
+      }),
+    );
+  }
+
   get api(): string {
     return this.association.api_name;
   }
@@ -488,4 +387,141 @@ export class Record {
   get publications(): string[] {
     return this.mappedResponse.publications;
   }
+}
+
+export interface FrozenRecord {
+  subject: FrozenNode;
+  object: FrozenNode;
+  predicate?: string; // not required if given apiEdge, qXEdge
+  publications?: string[]; // not required if given apiEdge, qXEdge
+  recordHash?: string; // always supplied by Record, not required from user
+  api?: string; // not required if given apiEdge, qXEdge
+  apiInforesCurie?: string; // not required if given apiEdge, qXEdge
+  metaEdgeSource?: string; // not required if given apiEdge, qXEdge
+  mappedResponse?: MappedResponse;
+}
+
+export interface VerboseFrozenRecord {
+  subject: VerboseFrozenNode;
+  object: VerboseFrozenNode;
+  association: Association;
+  predicate?: string; // not required if given apiEdge, qXEdge
+  qualifiers: BulkQualifiers;
+  publications?: string[]; // not required if given apiEdge, qXEdge
+  recordHash?: string; // always supplied by Record, not required from user
+  api?: string; // not required if given apiEdge, qXEdge
+  apiInforesCurie?: string; // not required if given apiEdge, qXEdge
+  metaEdgeSource?: string; // not required if given apiEdge, qXEdge
+  mappedResponse?: MappedResponse;
+}
+
+// removes all computed values on assumption that apiEdge and qXEdge are saved elsewhere
+interface MinimalFrozenRecord {
+  subject: VerboseFrozenNode | MinimalFrozenNode;
+  object: VerboseFrozenNode | MinimalFrozenNode;
+  publications?: string[]; // not always present
+  mappedResponse?: MappedResponse;
+  [additionalProperties: string]: any;
+}
+
+interface FrozenNode {
+  // less verbose, loses extra information from nodeNormalizer
+  original: string;
+  qNodeID: string;
+  isSet: boolean;
+  curie: string;
+  UMLS: string;
+  semanticType: string;
+  label: string;
+  attributes: any;
+  [additionalProperties: string]: any; // cleanest way to handler undefined properties
+}
+
+interface VerboseFrozenNode {
+  original: string;
+  normalizedInfo?: NodeNormalizerResultObj[]; // always supplied by Record, not required from user
+  qNodeID: string;
+  isSet: boolean;
+  curie: string;
+  UMLS: string;
+  semanticType: string;
+  label: string;
+  equivalentCuries?: string[]; // always supplied by Record, not required from user
+  names: string[];
+  attributes: any;
+}
+
+interface MinimalFrozenNode {
+  original: string;
+  normalizedInfo?: NodeNormalizerResultObj[]; // always supplied by Record, not required from user
+  [additionalProperties: string]: any; // cleanest way to handler undefined properties
+}
+
+type RecordPackage = [apiEdges: any[], ...frozenRecords: FrozenRecord[]];
+
+interface MappedResponse {
+  "edge-attributes"?: EdgeAttribute[];
+  [mappedItems: string]: any;
+}
+
+interface Association {
+  input_id?: string;
+  input_type?: string;
+  output_id?: string;
+  output_type?: string;
+  predicate: string;
+  source?: string;
+  api_name?: string;
+  "x-translator"?: any;
+  qualifiers?: BulkQualifiers;
+  [additionalProperties: string]: any;
+}
+
+interface QXEdge {
+  getSubject(): QNode;
+  getObject(): QNode;
+  getHashedEdgeRepresentation(): string;
+  isReversed(): boolean;
+  [additionalProperties: string]: any;
+}
+
+interface QNode {
+  getID(): string;
+  isSet(): boolean;
+  [additionalProperties: string]: any;
+}
+
+interface EdgeAttribute {
+  attribute_source: string;
+  attribute_type_id: string;
+  value: any;
+  value_type_id: string;
+  attributes?: EdgeAttribute[];
+  [additionalProperties: string]: any;
+}
+
+interface Identifier {
+  identifier: string;
+  label?: string;
+}
+
+interface NodeNormalizerResultObj {
+  id?: Identifier;
+  equivalent_identifiers?: Identifier[];
+  type?: string[];
+  information_content?: number;
+  primaryID?: string;
+  label?: string;
+  attributes?: any;
+  semanticType?: string;
+  _leafSemanticType?: string;
+  semanticTypes?: string[];
+  curies?: string[];
+  dbIDs?: any;
+  _dbIDs?: any;
+  [additionalProperties: string]: any;
+}
+
+interface BulkQualifiers {
+  [qualifierTypeID: string]: string; // qualifierValue
 }
