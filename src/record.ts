@@ -160,17 +160,17 @@ export class Record {
           Object.entries(reversedAPIEdge).map(([qualifierType, qualifier]) => {
             let newQualifierType: string;
             let newQualifier: string;
-            if (qualifierType.includes('predicate')) {
+            if (qualifierType.includes("predicate")) {
               newQualifier = this.qXEdge.getReversedPredicate(qualifier);
             }
-            if (qualifierType.includes('subject')) {
-              newQualifierType = qualifierType.replace('subject', 'object');
+            if (qualifierType.includes("subject")) {
+              newQualifierType = qualifierType.replace("subject", "object");
             }
-            if (qualifierType.includes('object')) {
-              newQualifierType = qualifierType.replace('object', 'subject');
+            if (qualifierType.includes("object")) {
+              newQualifierType = qualifierType.replace("object", "subject");
             }
             return [newQualifierType, newQualifier];
-          })
+          }),
         );
       }
       // frozen.predicate = 'biolink:' + predicate;
@@ -224,6 +224,13 @@ export class Record {
   protected makeAPIEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): Association {
     return {
       predicate: record.predicate?.replace("biolink:", ""),
+      qualifiers: record.qualifiers
+        ? Object.fromEntries(
+            Object.entries(record.qualifiers).map(([qualifierType, qualifier]: [string, string]) => {
+              return [qualifierType.replace("biolink:", ""), qualifier];
+            }),
+          )
+        : undefined,
       api_name: record.api,
       source: record.metaEdgeSource,
       "x-translator": {
@@ -393,6 +400,7 @@ export interface FrozenRecord {
   subject: FrozenNode;
   object: FrozenNode;
   predicate?: string; // not required if given apiEdge, qXEdge
+  qualifiers?: BulkQualifiers;
   publications?: string[]; // not required if given apiEdge, qXEdge
   recordHash?: string; // always supplied by Record, not required from user
   api?: string; // not required if given apiEdge, qXEdge
