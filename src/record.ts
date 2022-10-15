@@ -87,8 +87,8 @@ interface Association {
 }
 
 interface QXEdge {
-  getSubject(): QNode;
-  getObject(): QNode;
+  getInputNode(): QNode;
+  getOutputNode(): QNode;
   getHashedEdgeRepresentation(): string;
   isReversed(): boolean;
   [additionalProperties: string]: any;
@@ -262,11 +262,11 @@ export class Record {
     this.qXEdge = qXEdge ? qXEdge : this.makeFakeQXEdge(record);
     this.config = config ? config : { EDGE_ATTRIBUTES_USED_IN_RECORD_HASH: [] };
     if (!reverse) {
-      this.subject = new RecordNode(record.subject, this.qXEdge.getSubject());
-      this.object = new RecordNode(record.object, this.qXEdge.getObject());
+      this.subject = new RecordNode(record.subject, this.qXEdge.getInputNode());
+      this.object = new RecordNode(record.object, this.qXEdge.getOutputNode());
     } else {
-      this.subject = new RecordNode(record.subject, this.qXEdge.getObject());
-      this.object = new RecordNode(record.object, this.qXEdge.getSubject());
+      this.subject = new RecordNode(record.subject, this.qXEdge.getOutputNode());
+      this.object = new RecordNode(record.object, this.qXEdge.getInputNode());
     }
     this.mappedResponse = record.mappedResponse ? record.mappedResponse : {};
     if (!this.mappedResponse.publications) {
@@ -298,7 +298,7 @@ export class Record {
   // for user-made records lacking qXEdge
   protected makeFakeQXEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): QXEdge {
     return {
-      getSubject(): QNode {
+      getInputNode(): QNode {
         return {
           getID(): string {
             return record.subject.qNodeID;
@@ -308,7 +308,7 @@ export class Record {
           },
         };
       },
-      getObject(): QNode {
+      getOutputNode(): QNode {
         return {
           getID(): string {
             return record.object.qNodeID;
