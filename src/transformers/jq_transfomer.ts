@@ -12,7 +12,6 @@ const filterStrings = {
 export default class JQTransformer extends BaseTransformer {
   async wrap (res) {
     res = JSON.parse(await jq.run(filterStrings[this.config.type], res, { input: 'json' }));
-    console.log("THIS IS WHAT WILL BE RETURNED", res.associations[1] )
     return res;
   }
 }
