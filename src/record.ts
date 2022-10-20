@@ -1,5 +1,6 @@
 import crypto from "crypto";
 
+
 function hash(string: string) {
   return crypto.createHash("md5").update(string).digest("hex");
 }
@@ -118,6 +119,8 @@ export class Record {
   config: any;
   subject: RecordNode;
   object: RecordNode;
+  reverseToExecution: Boolean;
+  _qualifiers: BulkQualifiers;
   mappedResponse: MappedResponse;
 
   constructor(
@@ -130,55 +133,61 @@ export class Record {
     this.association = apiEdge ? apiEdge : this.makeAPIEdge(record);
     this.qXEdge = qXEdge ? qXEdge : this.makeFakeQXEdge(record);
     this.config = config ? config : { EDGE_ATTRIBUTES_USED_IN_RECORD_HASH: [] };
-    if (!reverse) {
+    this.reverseToExecution = reverse || false;
+    if (!this.reverseToExecution) {
       this.subject = new RecordNode(record.subject, this.qXEdge.getSubject());
       this.object = new RecordNode(record.object, this.qXEdge.getObject());
     } else {
       this.subject = new RecordNode(record.subject, this.qXEdge.getObject());
       this.object = new RecordNode(record.object, this.qXEdge.getSubject());
     }
+    this._qualifiers = record.qualifiers || this.association.qualifiers;
     this.mappedResponse = record.mappedResponse ? record.mappedResponse : {};
     if (!this.mappedResponse.publications) {
       this.mappedResponse.publications = record.publications;
     }
   }
 
+  reverse() {
+    const frozen = { ...this.freezeVerbose() };
+    const reversedAPIEdge: Association = { ...frozen.association };
+    reversedAPIEdge.input_id = frozen.association.output_id;
+    reversedAPIEdge.input_type = frozen.association.output_type;
+    reversedAPIEdge.output_id = frozen.association.input_id;
+    reversedAPIEdge.output_type = frozen.association.input_type;
+    const predicate = this.qXEdge.getReversedPredicate(frozen.association.predicate);
+    reversedAPIEdge.predicate = predicate;
+    if (reversedAPIEdge.qualifiers) {
+      Object.fromEntries(
+        Object.entries(reversedAPIEdge).map(([qualifierType, qualifier]) => {
+          let newQualifierType: string;
+          let newQualifier: string;
+          if (qualifierType.includes("predicate")) {
+            newQualifier = this.qXEdge.getReversedPredicate(qualifier);
+          }
+          if (qualifierType.includes("subject")) {
+            newQualifierType = qualifierType.replace("subject", "object");
+          }
+          if (qualifierType.includes("object")) {
+            newQualifierType = qualifierType.replace("object", "subject");
+          }
+          return [newQualifierType, newQualifier];
+        }),
+      );
+    }
+    // frozen.predicate = 'biolink:' + predicate;
+    frozen.association = reversedAPIEdge;
+    let temp = frozen.subject;
+    frozen.subject = frozen.object;
+    frozen.object = temp;
+    return new Record(frozen, this.config, frozen.association, this.qXEdge, !this.reverseToExecution);
+  }
+
   queryDirection() {
     if (!this.qXEdge.isReversed()) {
       return this;
     } else {
-      const frozen = { ...this.freezeVerbose() };
-      const reversedAPIEdge: Association = { ...frozen.association };
-      reversedAPIEdge.input_id = frozen.association.output_id;
-      reversedAPIEdge.input_type = frozen.association.output_type;
-      reversedAPIEdge.output_id = frozen.association.input_id;
-      reversedAPIEdge.output_type = frozen.association.input_type;
-      const predicate = this.qXEdge.getReversedPredicate(frozen.association.predicate);
-      reversedAPIEdge.predicate = predicate;
-      if (reversedAPIEdge.qualifiers) {
-        Object.fromEntries(
-          Object.entries(reversedAPIEdge).map(([qualifierType, qualifier]) => {
-            let newQualifierType: string;
-            let newQualifier: string;
-            if (qualifierType.includes("predicate")) {
-              newQualifier = this.qXEdge.getReversedPredicate(qualifier);
-            }
-            if (qualifierType.includes("subject")) {
-              newQualifierType = qualifierType.replace("subject", "object");
-            }
-            if (qualifierType.includes("object")) {
-              newQualifierType = qualifierType.replace("object", "subject");
-            }
-            return [newQualifierType, newQualifier];
-          }),
-        );
-      }
-      // frozen.predicate = 'biolink:' + predicate;
-      frozen.association = reversedAPIEdge;
-      let temp = frozen.subject;
-      frozen.subject = frozen.object;
-      frozen.object = temp;
-      return new Record(frozen, this.config, frozen.association, this.qXEdge, true);
+      return this.reverse();
     }
   }
 
@@ -319,6 +328,7 @@ export class Record {
     return {
       subject: this.subject.freezeMinimal(),
       object: this.object.freezeMinimal(),
+      qualifiers: this.qualifiers,
       publications: this.publications,
       mappedResponse: this.mappedResponse,
     };
@@ -366,12 +376,12 @@ export class Record {
   }
 
   get qualifiers(): BulkQualifiers {
-    if (!this.association.qualifiers) {
+    if (!this._qualifiers) {
       return {};
     }
     return Object.fromEntries(
-      Object.entries(this.association.qualifiers).map(([qualifierType, qualifier]) => {
-        return [`biolink:${qualifierType}`, qualifier];
+      Object.entries(this._qualifiers).map(([qualifierType, qualifier]) => {
+        return [`biolink:${qualifierType.replace("biolink:", "")}`, qualifier];
       }),
     );
   }
