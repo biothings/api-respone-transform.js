@@ -35,7 +35,8 @@ export class Transformer {
             // this.tf = new BiolinkTransformer(this.data, this.config);
             this.tf = new JQTransformer(this.data, { ...this.config, type: "biolink" })
         } else if (api === 'EBI Proteins API') {
-            this.tf = new EBIProteinTransformer(this.data, this.config)
+            // this.tf = new EBIProteinTransformer(this.data, this.config)
+            this.tf = new JQTransformer(this.data, { ...this.config, type: "ebi" })
         } else if (tags.includes("biothings")) {
             this.tf = new BioThingsTransformer(this.data, this.config);
         } else if (tags.includes("ctd")) {
