@@ -1,8 +1,6 @@
-/**
- * @jest-environment node
- */
+import {describe, expect, test} from '@jest/globals';
 
-const { Record } = require('../built/record');
+import { Record } from '../src/record';
 
 describe("test record class", () => {
 

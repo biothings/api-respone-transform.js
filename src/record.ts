@@ -298,6 +298,9 @@ export class Record {
   // for user-made records lacking qXEdge
   protected makeFakeQXEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): QXEdge {
     return {
+      getID(): string {
+        return 'fakeEdge';
+      },
       getInputNode(): QNode {
         return {
           getID(): string {
@@ -443,7 +446,7 @@ export class Record {
   protected get _configuredEdgeAttributesForHash(): string {
     return this._getFlattenedEdgeAttributes(this.mappedResponse["edge-attributes"])
       .filter(attribute => {
-        return this.config.EDGE_ATTRIBUTES_USED_IN_RECORD_HASH.includes(attribute.attribute_type_id);
+        return this.config?.EDGE_ATTRIBUTES_USED_IN_RECORD_HASH?.includes(attribute.attribute_type_id);
       })
       .reduce((acc, attribute) => {
         return [...acc, `${attribute.attribute_type_id}:${attribute.value}`];
