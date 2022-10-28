@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-const biolink_tf = require("../built/transformers/biolink_transformer");
+const jq_tf = require("../built/transformers/jq_transfomer");
 const fs = require("fs");
 const path = require("path");
 
@@ -22,24 +22,24 @@ describe("test biolink transformer", () => {
         }
     })
 
-    test("test biolink wrapper", () => {
-        let tf = new biolink_tf.default(input);
-        let res = tf.wrap(response);
+    test("test biolink wrapper", async () => {
+        let tf = new jq_tf.default(input, { type: "biolink" });
+        let res = await tf.wrap(response);
         expect(res.associations[0].object.HGNC).toBe("10956");
         expect(res.associations[0].publications[0].id).toBe("21685912");
         expect(res.associations[1]).not.toHaveProperty("publications");
         expect(res.associations[1]).not.toHaveProperty("provided_by");
     });
 
-    test("test biolink wrapper if no association field as root key", () => {
-        let tf = new biolink_tf.default(input);
-        let res = tf.wrap({ "data": [] });
+    test("test biolink wrapper if no association field as root key", async () => {
+        let tf = new jq_tf.default(input, { type: "biolink" });
+        let res = await tf.wrap({ "data": [] });
         expect(res).toEqual({ "data": [] })
     });
 
-    test("test biolink wrapper if no object id should be prefixed", () => {
-        const tf = new biolink_tf.default(input);
-        const res = tf.wrap(
+    test("test biolink wrapper if no object id should be prefixed", async () => {
+        const tf = new jq_tf.default(input, { type: "biolink" });
+        const res = await tf.wrap(
             {
                 associations: [
                     {
@@ -52,8 +52,8 @@ describe("test biolink transformer", () => {
         expect(res.associations[0].object.MONDO).toEqual("MONDO:12345")
     });
 
-    test("test biolink wrapper if no object field present", () => {
-        const tf = new biolink_tf.default(input);
+    test("test biolink wrapper if no object field present", async () => {
+        const tf = new jq_tf.default(input, { type: "biolink" });
         const fake_response = {
             associations: [
                 {
@@ -63,12 +63,12 @@ describe("test biolink transformer", () => {
                 }
             ]
         }
-        const res = tf.wrap(fake_response);
+        const res = await tf.wrap(fake_response);
         expect(res).toEqual(fake_response)
     });
 
-    test("test biolink wrapper if no object.id field present", () => {
-        const tf = new biolink_tf.default(input);
+    test("test biolink wrapper if no object.id field present", async () => {
+        const tf = new jq_tf.default(input, { type: "biolink" });
         const fake_response = {
             associations: [
                 {
@@ -78,13 +78,13 @@ describe("test biolink transformer", () => {
                 }
             ]
         }
-        const res = tf.wrap(fake_response);
+        const res = await tf.wrap(fake_response);
         expect(res).toEqual(fake_response)
     });
 
-    test("test biolink jsonTransform function", () => {
-        let tf = new biolink_tf.default(input);
-        const wrapped_response = tf.wrap(response);
+    test("test biolink jsonTransform function", async () => {
+        let tf = new jq_tf.default(input, { type: "biolink" });
+        const wrapped_response = await tf.wrap(response);
         let res = tf.jsonTransform(wrapped_response);
         expect(res).toHaveProperty("related_to");
         expect(res.related_to[0].HGNC).toEqual("10956");
