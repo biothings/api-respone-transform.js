@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-const ebi_tf = require("../built/transformers/ebi_protein_transformer");
+const jq_tf = require("../built/transformers/jq_transfomer");
 const fs = require("fs");
 const path = require("path");
 
@@ -22,9 +22,9 @@ describe("test EBI Protein transformer", () => {
         }
     })
 
-    test("test ebi wrapper", () => {
-        let tf = new ebi_tf.default(input);
-        let res = tf.wrap(response);
+    test("test ebi wrapper", async () => {
+        let tf = new jq_tf.default(input, { type: "ebi" });
+        let res = await tf.wrap(response);
         expect(res.comments[0].reaction.dbReferences).toHaveLength(1);
     })
 })

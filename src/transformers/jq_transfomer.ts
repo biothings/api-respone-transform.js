@@ -6,7 +6,14 @@ const jq = require('node-jq');
 const filterStrings = {
   ebi: `
   # only take comments where dbReferences type is Rhea
-  (select(.comments != null) | .comments | .[] | select(.reaction != null) | .reaction.dbReferences | .[]) |= select(.type == "Rhea")
+  [
+    del(.comments), 
+    {
+      comments: [
+        select(.comments != null) | .comments | .[] | select(.reaction != null) | .reaction.dbReferences = [.reaction.dbReferences | .[] | select(.type == "Rhea")]
+      ]
+    }
+  ] | add
   `,
   ctd: `
   # Split pubMedIDs by |
