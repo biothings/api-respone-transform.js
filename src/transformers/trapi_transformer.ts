@@ -29,7 +29,7 @@ export default class TRAPITransformer extends BaseTransformer {
                 original: edgeBinding.object,
             },
             association: this.edge.association,
-            qXEdge: this.edge.reasoner_edge,
+            qEdge: this.edge.reasoner_edge,
             mappedResponse: { 'edge-attributes': [...edge.attributes] }
         }
 

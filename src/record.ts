@@ -3,12 +3,12 @@ import crypto from "crypto";
 export interface FrozenRecord {
   subject: FrozenNode;
   object: FrozenNode;
-  predicate?: string; // not required if given apiEdge, qXEdge
-  publications?: string[]; // not required if given apiEdge, qXEdge
+  predicate?: string; // not required if given apiEdge, qEdge
+  publications?: string[]; // not required if given apiEdge, qEdge
   recordHash?: string; // always supplied by Record, not required from user
-  api?: string; // not required if given apiEdge, qXEdge
-  apiInforesCurie?: string; // not required if given apiEdge, qXEdge
-  metaEdgeSource?: string; // not required if given apiEdge, qXEdge
+  api?: string; // not required if given apiEdge, qEdge
+  apiInforesCurie?: string; // not required if given apiEdge, qEdge
+  metaEdgeSource?: string; // not required if given apiEdge, qEdge
   mappedResponse?: MappedResponse;
 }
 
@@ -16,16 +16,16 @@ export interface VerboseFrozenRecord {
   subject: VerboseFrozenNode;
   object: VerboseFrozenNode;
   association: Association;
-  predicate?: string; // not required if given apiEdge, qXEdge
-  publications?: string[]; // not required if given apiEdge, qXEdge
+  predicate?: string; // not required if given apiEdge, qEdge
+  publications?: string[]; // not required if given apiEdge, qEdge
   recordHash?: string; // always supplied by Record, not required from user
-  api?: string; // not required if given apiEdge, qXEdge
-  apiInforesCurie?: string; // not required if given apiEdge, qXEdge
-  metaEdgeSource?: string; // not required if given apiEdge, qXEdge
+  api?: string; // not required if given apiEdge, qEdge
+  apiInforesCurie?: string; // not required if given apiEdge, qEdge
+  metaEdgeSource?: string; // not required if given apiEdge, qEdge
   mappedResponse?: MappedResponse;
 }
 
-// removes all computed values on assumption that apiEdge and qXEdge are saved elsewhere
+// removes all computed values on assumption that apiEdge and qEdge are saved elsewhere
 interface MinimalFrozenRecord {
   subject: VerboseFrozenNode | MinimalFrozenNode;
   object: VerboseFrozenNode | MinimalFrozenNode;
@@ -86,7 +86,7 @@ interface Association {
   // [additionalProperties: string]: any;
 }
 
-interface QXEdge {
+interface QEdge {
   getInputNode(): QNode;
   getOutputNode(): QNode;
   getHashedEdgeRepresentation(): string;
@@ -245,7 +245,7 @@ class RecordNode {
 
 export class Record {
   association: Association;
-  qXEdge: QXEdge;
+  qEdge: QEdge;
   config: any;
   subject: RecordNode;
   object: RecordNode;
@@ -255,18 +255,18 @@ export class Record {
     record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord,
     config?: any,
     apiEdge?: Association,
-    qXEdge?: QXEdge,
+    qEdge?: QEdge,
     reverse?: boolean,
   ) {
     this.association = apiEdge ? apiEdge : this.makeAPIEdge(record);
-    this.qXEdge = qXEdge ? qXEdge : this.makeFakeQXEdge(record);
+    this.qEdge = qEdge ? qEdge : this.makeFakeQEdge(record);
     this.config = config ? config : { EDGE_ATTRIBUTES_USED_IN_RECORD_HASH: [] };
     if (!reverse) {
-      this.subject = new RecordNode(record.subject, this.qXEdge.getInputNode());
-      this.object = new RecordNode(record.object, this.qXEdge.getOutputNode());
+      this.subject = new RecordNode(record.subject, this.qEdge.getInputNode());
+      this.object = new RecordNode(record.object, this.qEdge.getOutputNode());
     } else {
-      this.subject = new RecordNode(record.subject, this.qXEdge.getOutputNode());
-      this.object = new RecordNode(record.object, this.qXEdge.getInputNode());
+      this.subject = new RecordNode(record.subject, this.qEdge.getOutputNode());
+      this.object = new RecordNode(record.object, this.qEdge.getInputNode());
     }
     this.mappedResponse = record.mappedResponse ? record.mappedResponse : {};
     if (!this.mappedResponse.publications) {
@@ -275,7 +275,7 @@ export class Record {
   }
 
   queryDirection() {
-    if (!this.qXEdge.isReversed()) {
+    if (!this.qEdge.isReversed()) {
       return this;
     } else {
       const frozen = { ...this.freezeVerbose() };
@@ -284,19 +284,19 @@ export class Record {
       reversedAPIEdge.input_type = frozen.association.output_type;
       reversedAPIEdge.output_id = frozen.association.input_id;
       reversedAPIEdge.output_type = frozen.association.input_type;
-      const predicate = this.qXEdge.getReversedPredicate(frozen.association.predicate);
+      const predicate = this.qEdge.getReversedPredicate(frozen.association.predicate);
       reversedAPIEdge.predicate = predicate;
       // frozen.predicate = 'biolink:' + predicate;
       frozen.association = reversedAPIEdge;
       let temp = frozen.subject;
       frozen.subject = frozen.object;
       frozen.object = temp;
-      return new Record(frozen, this.config, frozen.association, this.qXEdge, true);
+      return new Record(frozen, this.config, frozen.association, this.qEdge, true);
     }
   }
 
-  // for user-made records lacking qXEdge
-  protected makeFakeQXEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): QXEdge {
+  // for user-made records lacking qEdge
+  protected makeFakeQEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): QEdge {
     return {
       getID(): string {
         return 'fakeEdge';
@@ -324,7 +324,7 @@ export class Record {
       isReversed(): boolean {
         return false;
       },
-      // WARNING not useable alongside actual QXEdge.getHashedEdgeRepresentation
+      // WARNING not useable alongside actual QEdge.getHashedEdgeRepresentation
       // However the two should never show up together as this is only for testing purposes
       getHashedEdgeRepresentation(): string {
         return hash(
@@ -383,11 +383,11 @@ export class Record {
     return [apiEdges, ...frozenRecords];
   }
 
-  public static unpackRecords(recordPack: RecordPackage, qXEdge: QXEdge, config?: any): Record[] {
+  public static unpackRecords(recordPack: RecordPackage, qEdge: QEdge, config?: any): Record[] {
     const [apiEdges, ...frozenRecords] = recordPack;
     return frozenRecords.map((record: any): Record => {
       const apiEdge = apiEdges[record.apiEdge];
-      return new Record(record, config, apiEdge, qXEdge);
+      return new Record(record, config, apiEdge, qEdge);
     });
   }
 
