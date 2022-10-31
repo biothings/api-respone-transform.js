@@ -115,7 +115,7 @@ class RecordNode {
 
 export class Record {
   association: Association;
-  qXEdge: QXEdge;
+  qEdge: QEdge;
   config: any;
   subject: RecordNode;
   object: RecordNode;
@@ -127,19 +127,19 @@ export class Record {
     record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord,
     config?: any,
     apiEdge?: Association,
-    qXEdge?: QXEdge,
+    qEdge?: QEdge,
     reverse?: boolean,
   ) {
     this.association = apiEdge ? apiEdge : this.makeAPIEdge(record);
-    this.qXEdge = qXEdge ? qXEdge : this.makeFakeQXEdge(record);
+    this.qEdge = qEdge ? qEdge : this.makeFakeQEdge(record);
     this.config = config ? config : { EDGE_ATTRIBUTES_USED_IN_RECORD_HASH: [] };
     this.reverseToExecution = reverse || false;
     if (!this.reverseToExecution) {
-      this.subject = new RecordNode(record.subject, this.qXEdge.getSubject());
-      this.object = new RecordNode(record.object, this.qXEdge.getObject());
+      this.subject = new RecordNode(record.subject, this.qEdge.getInputNode());
+      this.object = new RecordNode(record.object, this.qEdge.getOutputNode());
     } else {
-      this.subject = new RecordNode(record.subject, this.qXEdge.getObject());
-      this.object = new RecordNode(record.object, this.qXEdge.getSubject());
+      this.subject = new RecordNode(record.subject, this.qEdge.getOutputNode());
+      this.object = new RecordNode(record.object, this.qEdge.getInputNode());
     }
     this._qualifiers = record.qualifiers || this.association.qualifiers;
     this.mappedResponse = record.mappedResponse ? record.mappedResponse : {};
@@ -155,7 +155,7 @@ export class Record {
     reversedAPIEdge.input_type = frozen.association.output_type;
     reversedAPIEdge.output_id = frozen.association.input_id;
     reversedAPIEdge.output_type = frozen.association.input_type;
-    const predicate = this.qXEdge.getReversedPredicate(frozen.association.predicate);
+    const predicate = this.qEdge.getReversedPredicate(frozen.association.predicate);
     reversedAPIEdge.predicate = predicate;
     if (reversedAPIEdge.qualifiers) {
       Object.fromEntries(
@@ -163,7 +163,7 @@ export class Record {
           let newQualifierType: string;
           let newQualifier: string;
           if (qualifierType.includes("predicate")) {
-            newQualifier = this.qXEdge.getReversedPredicate(qualifier);
+            newQualifier = this.qEdge.getReversedPredicate(qualifier);
           }
           if (qualifierType.includes("subject")) {
             newQualifierType = qualifierType.replace("subject", "object");
@@ -180,21 +180,24 @@ export class Record {
     let temp = frozen.subject;
     frozen.subject = frozen.object;
     frozen.object = temp;
-    return new Record(frozen, this.config, frozen.association, this.qXEdge, !this.reverseToExecution);
+    return new Record(frozen, this.config, frozen.association, this.qEdge, !this.reverseToExecution);
   }
 
   queryDirection() {
-    if (!this.qXEdge.isReversed()) {
+    if (!this.qEdge.isReversed()) {
       return this;
     } else {
       return this.reverse();
     }
   }
 
-  // for user-made records lacking qXEdge
-  protected makeFakeQXEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): QXEdge {
+  // for user-made records lacking qEdge
+  protected makeFakeQEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): QEdge {
     return {
-      getSubject(): QNode {
+      getID(): string {
+        return 'fakeEdge';
+      },
+      getInputNode(): QNode {
         return {
           getID(): string {
             return record.subject.qNodeID;
@@ -204,7 +207,7 @@ export class Record {
           },
         };
       },
-      getObject(): QNode {
+      getOutputNode(): QNode {
         return {
           getID(): string {
             return record.object.qNodeID;
@@ -217,7 +220,7 @@ export class Record {
       isReversed(): boolean {
         return false;
       },
-      // WARNING not useable alongside actual QXEdge.getHashedEdgeRepresentation
+      // WARNING not useable alongside actual QEdge.getHashedEdgeRepresentation
       // However the two should never show up together as this is only for testing purposes
       getHashedEdgeRepresentation(): string {
         return hash(
@@ -283,11 +286,11 @@ export class Record {
     return [apiEdges, ...frozenRecords];
   }
 
-  public static unpackRecords(recordPack: RecordPackage, qXEdge: QXEdge, config?: any): Record[] {
+  public static unpackRecords(recordPack: RecordPackage, qEdge: QEdge, config?: any): Record[] {
     const [apiEdges, ...frozenRecords] = recordPack;
     return frozenRecords.map((record: any): Record => {
       const apiEdge = apiEdges[record.apiEdge];
-      return new Record(record, config, apiEdge, qXEdge);
+      return new Record(record, config, apiEdge, qEdge);
     });
   }
 
@@ -348,7 +351,7 @@ export class Record {
   protected get _configuredEdgeAttributesForHash(): string {
     return this._getFlattenedEdgeAttributes(this.mappedResponse["edge-attributes"])
       .filter(attribute => {
-        return this.config.EDGE_ATTRIBUTES_USED_IN_RECORD_HASH.includes(attribute.attribute_type_id);
+        return this.config?.EDGE_ATTRIBUTES_USED_IN_RECORD_HASH?.includes(attribute.attribute_type_id);
       })
       .reduce((acc, attribute) => {
         return [...acc, `${attribute.attribute_type_id}:${attribute.value}`];
@@ -409,13 +412,13 @@ export class Record {
 export interface FrozenRecord {
   subject: FrozenNode;
   object: FrozenNode;
-  predicate?: string; // not required if given apiEdge, qXEdge
+  predicate?: string; // not required if given apiEdge, qEdge
   qualifiers?: BulkQualifiers;
-  publications?: string[]; // not required if given apiEdge, qXEdge
+  publications?: string[]; // not required if given apiEdge, qEdge
   recordHash?: string; // always supplied by Record, not required from user
-  api?: string; // not required if given apiEdge, qXEdge
-  apiInforesCurie?: string; // not required if given apiEdge, qXEdge
-  metaEdgeSource?: string; // not required if given apiEdge, qXEdge
+  api?: string; // not required if given apiEdge, qEdge
+  apiInforesCurie?: string; // not required if given apiEdge, qEdge
+  metaEdgeSource?: string; // not required if given apiEdge, qEdge
   mappedResponse?: MappedResponse;
 }
 
@@ -423,17 +426,17 @@ export interface VerboseFrozenRecord {
   subject: VerboseFrozenNode;
   object: VerboseFrozenNode;
   association: Association;
-  predicate?: string; // not required if given apiEdge, qXEdge
+  predicate?: string; // not required if given apiEdge, qEdge
   qualifiers: BulkQualifiers;
-  publications?: string[]; // not required if given apiEdge, qXEdge
+  publications?: string[]; // not required if given apiEdge, qEdge
   recordHash?: string; // always supplied by Record, not required from user
-  api?: string; // not required if given apiEdge, qXEdge
-  apiInforesCurie?: string; // not required if given apiEdge, qXEdge
-  metaEdgeSource?: string; // not required if given apiEdge, qXEdge
+  api?: string; // not required if given apiEdge, qEdge
+  apiInforesCurie?: string; // not required if given apiEdge, qEdge
+  metaEdgeSource?: string; // not required if given apiEdge, qEdge
   mappedResponse?: MappedResponse;
 }
 
-// removes all computed values on assumption that apiEdge and qXEdge are saved elsewhere
+// removes all computed values on assumption that apiEdge and qEdge are saved elsewhere
 interface MinimalFrozenRecord {
   subject: VerboseFrozenNode | MinimalFrozenNode;
   object: VerboseFrozenNode | MinimalFrozenNode;
@@ -495,9 +498,9 @@ interface Association {
   [additionalProperties: string]: any;
 }
 
-interface QXEdge {
-  getSubject(): QNode;
-  getObject(): QNode;
+interface QEdge {
+  getInputNode(): QNode;
+  getOutputNode(): QNode;
   getHashedEdgeRepresentation(): string;
   isReversed(): boolean;
   [additionalProperties: string]: any;
