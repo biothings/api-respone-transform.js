@@ -24,6 +24,7 @@ interface QueryOperationInterface {
     request_body: object;
     supportBatch: boolean;
     inputSeparator: string;
+    transformer: string;
 }
 
 

@@ -42,7 +42,8 @@ const filterStrings = {
 
 export default class JQTransformer extends BaseTransformer {
   async wrap (res) {
-    res = JSON.parse(await jq.run(functions+"\n"+filterStrings[this.config.type], res, { input: 'json' }));
+    if (this.config.custom) res = JSON.parse(await jq.run(functions+"\n"+this.config.custom, res, { input: 'json' }));
+    else res = JSON.parse(await jq.run(functions+"\n"+filterStrings[this.config.type], res, { input: 'json' }));
     return res;
   }
 }
