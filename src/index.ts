@@ -28,12 +28,12 @@ export class Transformer {
         let tags = this.data.edge.query_operation.tags;
         debug(`api tags: ${tags}`);
 
-        if (!this.data.edge.query_operation.transformer) {
-          console.log(`WE DONT DO THE OP ${api}, ${this.data.edge.query_operation}`)
-        } 
+        // if (!this.data.edge.query_operation.transformer) {
+        //   console.log(`WE DONT DO THE OP ${api}, ${this.data.edge.query_operation}`)
+        // } 
 
         if (this.data.edge.query_operation.transformer) {
-          console.log("WE DO THE OP", this.data.edge.query_operation.transformer)
+          // console.log("WE DO THE OP", this.data.edge.query_operation.transformer)
           this.tf = new JQTransformer(this.data, { ...this.config, custom: this.data.edge.query_operation.transformer })
         } else if (tags.includes('bte-trapi')) {
             this.tf = new TRAPITransformer(this.data, this.config);
