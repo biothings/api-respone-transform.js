@@ -52,3 +52,8 @@ export interface BTEQueryObject {
     response: JSONDoc | JSONDoc[];
     edge: BTEKGOperationObject;
 }
+
+export interface JQVariable {
+    name: string;
+    value: string;
+}

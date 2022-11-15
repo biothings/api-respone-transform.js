@@ -1,5 +1,5 @@
 import BaseTransformer from "./transformer";
-import { functions } from "../jq_utils";
+import { generateFilterString } from "../jq_utils";
 
 const jq = require('node-jq');
 
@@ -42,8 +42,8 @@ const filterStrings = {
 
 export default class JQTransformer extends BaseTransformer {
   async wrap (res) {
-    if (this.config.custom) res = JSON.parse(await jq.run(functions+"\n"+this.config.custom, res, { input: 'json' }));
-    else res = JSON.parse(await jq.run(functions+"\n"+filterStrings[this.config.type], res, { input: 'json' }));
+    if (this.config.custom) res = JSON.parse(await jq.run(generateFilterString(this.config.custom, this.edge), res, { input: 'json' }));
+    else res = JSON.parse(await jq.run(generateFilterString(filterStrings[this.config.type], this.edge), res, { input: 'json' }));
     return res;
   }
 }
