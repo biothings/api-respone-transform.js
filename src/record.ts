@@ -1,6 +1,5 @@
 import crypto from "crypto";
 
-
 function hash(string: string) {
   return crypto.createHash("md5").update(string).digest("hex");
 }
@@ -158,12 +157,12 @@ export class Record {
     const predicate = this.qEdge.getReversedPredicate(frozen.association.predicate);
     reversedAPIEdge.predicate = predicate;
     if (reversedAPIEdge.qualifiers) {
-      Object.fromEntries(
-        Object.entries(reversedAPIEdge).map(([qualifierType, qualifier]) => {
-          let newQualifierType: string;
-          let newQualifier: string;
+      const reversedQualifiers = Object.fromEntries(
+        Object.entries(reversedAPIEdge.qualifiers).map(([qualifierType, qualifier]) => {
+          let newQualifierType: string = qualifierType;
+          let newQualifier: string = qualifier;
           if (qualifierType.includes("predicate")) {
-            newQualifier = this.qEdge.getReversedPredicate(qualifier);
+            newQualifier = `biolink:${this.qEdge.getReversedPredicate(qualifier.replace("biolink:", ""))}`;
           }
           if (qualifierType.includes("subject")) {
             newQualifierType = qualifierType.replace("subject", "object");
@@ -174,6 +173,9 @@ export class Record {
           return [newQualifierType, newQualifier];
         }),
       );
+
+      reversedAPIEdge.qualifiers = reversedQualifiers;
+      frozen.qualifiers = reversedQualifiers;
     }
     // frozen.predicate = 'biolink:' + predicate;
     frozen.association = reversedAPIEdge;
@@ -195,7 +197,7 @@ export class Record {
   protected makeFakeQEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): QEdge {
     return {
       getID(): string {
-        return 'fakeEdge';
+        return "fakeEdge";
       },
       getInputNode(): QNode {
         return {
@@ -364,6 +366,9 @@ export class Record {
       this.subject.curie,
       this.predicate,
       this.object.curie,
+      Object.entries(this.qualifiers)
+        .sort(([qTa, qVa], [qTb, qVb]) => qTa.localeCompare(qTb))
+        .reduce((str, [qualifierType, qualifierValue]) => `${str};${qualifierType}:${qualifierValue}`, ""),
       this.api,
       this.metaEdgeSource,
       this._configuredEdgeAttributesForHash,
