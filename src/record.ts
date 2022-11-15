@@ -389,7 +389,12 @@ export class Record {
     }
     return Object.fromEntries(
       Object.entries(this._qualifiers).map(([qualifierType, qualifier]) => {
-        return [`biolink:${qualifierType.replace("biolink:", "")}`, qualifier];
+        let newQualifierType = `biolink:${qualifierType.replace("biolink:", "")}`;
+        let newQualifier = qualifier;
+        if (qualifierType.includes("predicate")) {
+          newQualifier = `biolink:${qualifier.replace("biolink:", "")}`;
+        }
+        return [newQualifierType, newQualifier];
       }),
     );
   }
