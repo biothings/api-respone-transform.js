@@ -6,6 +6,9 @@ def increment: . + 1;
 
 # deletes key if empty array
 def delifempty(k): (if k == [] then del(k) | . else . end);
+
+# sets inputted value to "empty" if empty array
+def remifempty: (if . == [] then empty else . end);
 `
 
 function generateVariables(variables: JQVariable[]) {

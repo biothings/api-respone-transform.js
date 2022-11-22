@@ -23,12 +23,14 @@ const filterStrings = {
   biolink: `
   .associations = (
     [
-      # take associations that aren't null
-      (select(.associations != null) | .associations | .[] | 
-      # split association object ids & take last (only for CHEMBL, REACT, HGNC)
-      select(.object.id != null) | (.object.id | split(":") | first) as $pref | .object[$pref] = (if $pref == "HGNC" or $pref == "NCBIGene" or $pref == "REACT" then (.object.id | split(":") | last) else .object.id end) |
-      # take publications with PMID & for IDs take last element after splitting by :
-      .publications = [foreach (.publications | .[]? | .id) as $pub ([]; []; if ($pub == null or ($pub | startswith("PMID") | not)) then empty else {id: ($pub | split(":") | last)} end)])
+      (
+        # take associations that aren't null
+        select(.associations != null) | .associations | .[] | 
+        # split association object ids & take last (only for CHEMBL, REACT, HGNC)
+        select(.object.id != null) | (.object.id | split(":") | first) as $pref | .object[$pref] = (if $pref == "HGNC" or $pref == "NCBIGene" or $pref == "REACT" then (.object.id | split(":") | last) else .object.id end) |
+        # take publications with PMID & for IDs take last element after splitting by :
+        .publications = [foreach (.publications | .[]? | .id) as $pub ([]; []; if ($pub == null or ($pub | startswith("PMID") | not)) then empty else {id: ($pub | split(":") | last)} end)]
+      )
       # delete publications if empty array
       | delifempty(.publications)
     ] +
@@ -37,6 +39,25 @@ const filterStrings = {
   )
   # delete association if empty array
   | delifempty(.associations)
+  `,
+  semmedb: `
+  # NOTE: Currently this still needs some functions from Biothings transformer so that needs to be figured out
+  map_values(
+    # checks if value is array and nonzero length
+    if (. | type) == "array" and (. | length) != 0 then 
+      [
+        # check the type for each element against edge type
+        .[] | if (.["@type"] == $edge.association.output_type) or (.["@type"] == "DiseaseOrPhenotypicFeature" and $edge.association.output_type == "Disease") then
+          # rename appropriate fields
+          (.UMLS = .umls | .pubmed = .pmid | del(.umls) | del (.pmid) | .)
+        # empty for unecessary fields
+        else empty end
+      # remove key if empty array
+      ] | remifempty
+    else 
+      empty 
+    end
+  )
   `
 }
 
