@@ -68,3 +68,29 @@ export default class JQTransformer extends BaseTransformer {
     return res;
   }
 }
+
+/* 
+  COULD BE ADDED (pairCurieWithAPIResponse for BioThings Transformer):
+  def generateCurie(idType; id): if (id | type) == "array" then id[0] else id end | split(":") | last | idType + ":" + .;
+
+  {"query_operation": {"method": "get"}, "assocation": {"input_id": "test"}, "input": {"queryInputs": "woahsfd"}} as $edge | 
+
+  if $edge.query_operation.method == "post" then
+    # if response is not an array, then use response.hits
+    if (.response | type) == "array" then .response else .response.hits end |
+    reduce .[] as $item ({};
+      # if the item is notfound, then proceed to next item & keep current object
+      if ($item | keys | contains(["notfound"])) then
+        .
+      else
+        generateCurie($edge.assocation.input_id; $item.query) as $curie | .[$curie] = .[$curie] + [$item]
+      end
+    )
+  else
+    if ($edge.input | type) == "object" then
+      .response as $res | generateCurie($edge.assocation.input_id; $edge.input.queryInputs) as $curie | {} | .[$curie] = $res
+    else
+      .response as $res | generateCurie($edge.assocation.input_id; $edge.input) as $curie | {} | .[$curie] = $res
+    end
+  end
+*/
