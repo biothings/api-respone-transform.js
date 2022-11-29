@@ -63,9 +63,16 @@ const filterStrings = {
 
 export default class JQTransformer extends BaseTransformer {
   async wrap (res) {
-    if (this.config.custom) res = JSON.parse(await jq.run(generateFilterString(this.config.custom, this.edge), res, { input: 'json' }));
-    else res = JSON.parse(await jq.run(generateFilterString(filterStrings[this.config.type], this.edge), res, { input: 'json' }));
+    if (this.config.wrap) res = JSON.parse(await jq.run(generateFilterString(this.config.wrap, this.edge), res, { input: 'json' }));
+    else if (filterStrings[this.config.type]) res = JSON.parse(await jq.run(generateFilterString(filterStrings[this.config.type], this.edge), res, { input: 'json' }));
+    else res = super.wrap(res);
+
     return res;
+  }
+
+  async pairCurieWithAPIResponse () {
+    if (this.config.pair) return JSON.parse(await jq.run(generateFilterString(this.config.pair, this.edge), this.data, { input: 'json' }));
+    return super.pairCurieWithAPIResponse();
   }
 }
 
@@ -88,9 +95,9 @@ export default class JQTransformer extends BaseTransformer {
     )
   else
     if ($edge.input | type) == "object" then
-      .response as $res | generateCurie($edge.assocation.input_id; $edge.input.queryInputs) as $curie | {} | .[$curie] = $res
+      .response as $res | generateCurie($edge.association.input_id; $edge.input.queryInputs) as $curie | {} | .[$curie] = [$res]
     else
-      .response as $res | generateCurie($edge.assocation.input_id; $edge.input) as $curie | {} | .[$curie] = $res
+      .response as $res | generateCurie($edge.association.input_id; $edge.input) as $curie | {} | .[$curie] = [$res]
     end
   end
 */

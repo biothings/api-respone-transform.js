@@ -15,8 +15,8 @@ interface XBTEParametersObject {
 }
 
 interface TransformerObject {
-    wrap_jq: string;
-    pair_jq: string;
+    wrap_jq?: string;
+    pair_jq?: string;
 }
 
 interface QueryOperationInterface {
