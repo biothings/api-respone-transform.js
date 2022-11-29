@@ -14,6 +14,11 @@ interface XBTEParametersObject {
     [key: string]: string | number;
 }
 
+interface TransformerObject {
+    wrap_jq: string;
+    pair_jq: string;
+}
+
 interface QueryOperationInterface {
     path: string;
     method: string;
@@ -24,7 +29,7 @@ interface QueryOperationInterface {
     request_body: object;
     supportBatch: boolean;
     inputSeparator: string;
-    transformer: string;
+    transformer: TransformerObject;
 }
 
 
