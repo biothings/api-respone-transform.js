@@ -32,9 +32,9 @@ export class Transformer {
         //   console.log(`WE DONT DO THE OP ${api}, ${this.data.edge.query_operation}`)
         // } 
 
-        if (this.data.edge.query_operation.transformer) {
+        if (this.data.edge.query_operation?.transformer?.wrap_jq) {
           // console.log("WE DO THE OP", this.data.edge.query_operation.transformer)
-          this.tf = new JQTransformer(this.data, { ...this.config, custom: this.data.edge.query_operation.transformer })
+          this.tf = new JQTransformer(this.data, { ...this.config, custom: this.data.edge.query_operation.transformer.wrap_jq })
         } else if (tags.includes('bte-trapi')) {
             this.tf = new TRAPITransformer(this.data, this.config);
         } else if (api.startsWith('SEMMED')) {
