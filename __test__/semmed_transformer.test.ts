@@ -76,9 +76,9 @@ describe("test semmed transformer", () => {
         }
     });
 
-    test("test semmed pairCurieWithAPIResponse", () => {
+    test("test semmed pairCurieWithAPIResponse", async () => {
         let tf = new semmed_tf(input, {});
-        let res = tf.pairCurieWithAPIResponse();
+        let res = await tf.pairCurieWithAPIResponse();
         expect(res["UMLS:C1332823"][0]['umls']).toBe("C1332823");
         expect(res).toHaveProperty('UMLS:C1332823');
         expect(res["UMLS:123"]).toBeUndefined();
@@ -98,7 +98,7 @@ describe("test semmed transformer", () => {
 
     test("add edge info", async () => {
         let tf = new semmed_tf(input, {});
-        let res = tf.pairCurieWithAPIResponse();
+        let res = await tf.pairCurieWithAPIResponse();
         let rec = res["UMLS:C1332823"][0];
         rec = tf.wrap(rec);
         let result = await tf.formatRecords("UMLS:C1332823", rec["positively_regulates"][0]);

@@ -21,9 +21,9 @@ describe("test biothings transformer", () => {
             }
         })
 
-        test("test biothings wrapper", () => {
+        test("test biothings wrapper", async () => {
             let tf = new biothings_tf(input, {});
-            let res = tf.pairCurieWithAPIResponse();
+            let res = await tf.pairCurieWithAPIResponse();
             expect(Object.keys(res)).toHaveLength(2);
             expect(res).toHaveProperty("DRUGBANK:DB00188");
             expect(res["DRUGBANK:DB00188"]).toHaveLength(2);
@@ -46,9 +46,9 @@ describe("test biothings transformer", () => {
             }
         })
 
-        test("test biothings wrapper", () => {
+        test("test biothings wrapper", async () => {
             let tf = new biothings_tf(input, {});
-            let res = tf.pairCurieWithAPIResponse();
+            let res = await tf.pairCurieWithAPIResponse();
             expect(Object.keys(res)).toHaveLength(1);
             expect(res).toHaveProperty("NCBIGene:1017");
             expect(res["NCBIGene:1017"]).toHaveLength(1);
@@ -78,9 +78,9 @@ describe("test biothings transformer", () => {
             }
         })
 
-        test("test biothings wrapper", () => {
+        test("test biothings wrapper", async () => {
             let tf = new biothings_tf(input, {});
-            let res = tf.pairCurieWithAPIResponse();
+            let res = await tf.pairCurieWithAPIResponse();
             expect(Object.keys(res)).toHaveLength(1);
             expect(res).toHaveProperty("PUBCHEM:11373846");
             expect(res["PUBCHEM:11373846"]).toHaveLength(1);

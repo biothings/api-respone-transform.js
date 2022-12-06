@@ -84,7 +84,7 @@ describe("test biolink transformer", () => {
     test("test biolink jsonTransform function", async () => {
         let tf = new jq_tf(input, { type: "biolink" });
         const wrapped_response = await tf.wrap(response);
-        let res = tf.jsonTransform(wrapped_response);
+        let res: JSONDoc = tf.jsonTransform(wrapped_response);
         expect(res).toHaveProperty("related_to");
         expect(res.related_to[0].HGNC).toEqual("10956");
         expect(res.related_to[0].pubmed[0]).toEqual("21685912");
