@@ -1,10 +1,7 @@
-/**
- * @jest-environment node
- */
-
-const jq_tf = require("../built/transformers/jq_transfomer");
-const fs = require("fs");
-const path = require("path");
+import {describe, expect, test} from '@jest/globals';
+import jq_tf from "../built/transformers/jq_transfomer";
+import fs from "fs";
+import path from "path";
 
 describe("test opentarget transformer", () => {
 
@@ -13,9 +10,9 @@ describe("test opentarget transformer", () => {
 
     beforeEach(() => {
         const response_path = path.resolve(__dirname, './data/opentarget/response.json');
-        response = JSON.parse(fs.readFileSync(response_path));
+        response = JSON.parse(fs.readFileSync(response_path, { encoding: 'utf8' }));
         const edge_path = path.resolve(__dirname, './data/opentarget/edge.json');
-        const edge = JSON.parse(fs.readFileSync(edge_path));
+        const edge = JSON.parse(fs.readFileSync(edge_path, { encoding: 'utf8' }));
         input = {
             response,
             edge
@@ -24,14 +21,14 @@ describe("test opentarget transformer", () => {
 
 // skip these tests since we're not ingesting opentargets right now
     test.skip("test opentarget wrapper", async () => {
-        let tf = new jq_tf.default(input, { type: "opentarget" });
+        let tf = new jq_tf(input, { type: "opentarget" });
         let res = await tf.wrap(response);
         expect(res).toHaveProperty("data");
         expect(res.data[0].drug.id).toEqual("CHEMBL220492");
     })
 
     test.skip("test opentarget wrapper if id field is not chembl", async () => {
-        let tf = new jq_tf.default(input, { type: "opentarget" });
+        let tf = new jq_tf(input, { type: "opentarget" });
         const fake = {
             data: [
                 {
