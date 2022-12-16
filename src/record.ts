@@ -139,11 +139,13 @@ class RecordNode {
   original: string;
   normalizedInfo: NodeNormalizerResultObj[];
   _qNode: QNode;
+  _label: string;
 
-  constructor(node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode, qNode: QNode) {
+  constructor(node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode, qNode: QNode, label: string) {
     this.original = node.original;
     this.normalizedInfo = node.normalizedInfo ? node.normalizedInfo : this.makeFakeInfo(node);
     this._qNode = qNode;
+    this._label = label;
   }
 
   makeFakeInfo(node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode): NodeNormalizerResultObj[] {
@@ -227,7 +229,7 @@ class RecordNode {
   }
 
   get label(): string {
-    return this.normalizedInfo?.[0].label;
+    return this._label ?? this.normalizedInfo?.[0].label;
   }
 
   get equivalentCuries(): string[] {
@@ -262,11 +264,11 @@ export class Record {
     this.qXEdge = qXEdge ? qXEdge : this.makeFakeQXEdge(record);
     this.config = config ? config : { EDGE_ATTRIBUTES_USED_IN_RECORD_HASH: [] };
     if (!reverse) {
-      this.subject = new RecordNode(record.subject, this.qXEdge.getSubject());
-      this.object = new RecordNode(record.object, this.qXEdge.getObject());
+      this.subject = new RecordNode(record.subject, this.qXEdge.getSubject(), config.subject_name);
+      this.object = new RecordNode(record.object, this.qXEdge.getObject(), config.object_name);
     } else {
-      this.subject = new RecordNode(record.subject, this.qXEdge.getObject());
-      this.object = new RecordNode(record.object, this.qXEdge.getSubject());
+      this.subject = new RecordNode(record.subject, this.qXEdge.getObject(), config.subject_name);
+      this.object = new RecordNode(record.object, this.qXEdge.getSubject(), config.object_name);
     }
     this.mappedResponse = record.mappedResponse ? record.mappedResponse : {};
     if (!this.mappedResponse.publications) {
