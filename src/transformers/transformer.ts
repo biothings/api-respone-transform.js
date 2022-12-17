@@ -133,8 +133,8 @@ export default class BaseTransformer {
 
         // mappedResponse = this._updateEdgeMetadata(mappedResponse);
         const objectIDs = this.extractObjectIDs(mappedResponse);
-        const objectName = mappedResponse.object_name;
-        const subjectName = mappedResponse.subject_name; 
+        const objectName = mappedResponse.output_name;
+        const subjectName = mappedResponse.input_name; 
         mappedResponse = this._removeNonEdgeData(mappedResponse);
         mappedResponse = this._updatePublications(mappedResponse);
 
