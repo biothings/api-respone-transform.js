@@ -264,11 +264,11 @@ export class Record {
     this.qXEdge = qXEdge ? qXEdge : this.makeFakeQXEdge(record);
     this.config = config ? config : { EDGE_ATTRIBUTES_USED_IN_RECORD_HASH: [] };
     if (!reverse) {
-      this.subject = new RecordNode(record.subject, this.qXEdge.getSubject(), config.subject_name);
-      this.object = new RecordNode(record.object, this.qXEdge.getObject(), config.object_name);
+      this.subject = new RecordNode(record.subject, this.qXEdge.getSubject(), this.config.subject_name);
+      this.object = new RecordNode(record.object, this.qXEdge.getObject(), this.config.object_name);
     } else {
-      this.subject = new RecordNode(record.subject, this.qXEdge.getObject(), config.object_name);
-      this.object = new RecordNode(record.object, this.qXEdge.getSubject(), config.subject_name);
+      this.subject = new RecordNode(record.subject, this.qXEdge.getObject(), this.config.object_name);
+      this.object = new RecordNode(record.object, this.qXEdge.getSubject(), this.config.subject_name);
     }
     this.mappedResponse = record.mappedResponse ? record.mappedResponse : {};
     if (!this.mappedResponse.publications) {
