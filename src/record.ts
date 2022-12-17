@@ -267,8 +267,8 @@ export class Record {
       this.subject = new RecordNode(record.subject, this.qXEdge.getSubject(), config.subject_name);
       this.object = new RecordNode(record.object, this.qXEdge.getObject(), config.object_name);
     } else {
-      this.subject = new RecordNode(record.subject, this.qXEdge.getObject(), config.subject_name);
-      this.object = new RecordNode(record.object, this.qXEdge.getSubject(), config.object_name);
+      this.subject = new RecordNode(record.subject, this.qXEdge.getObject(), config.object_name);
+      this.object = new RecordNode(record.object, this.qXEdge.getSubject(), config.subject_name);
     }
     this.mappedResponse = record.mappedResponse ? record.mappedResponse : {};
     if (!this.mappedResponse.publications) {
