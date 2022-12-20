@@ -229,7 +229,7 @@ class RecordNode {
   }
 
   get label(): string {
-    return this._label ?? this.normalizedInfo?.[0].label;
+    return this.normalizedInfo?.[0].label ?? this._label;
   }
 
   get equivalentCuries(): string[] {
