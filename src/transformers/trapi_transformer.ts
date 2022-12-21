@@ -24,14 +24,21 @@ export default class TRAPITransformer extends BaseTransformer {
 
     _transformIndividualEdge(edge, edgeBinding) {
         let frozenRecord = {
-            subject: this._getSubject(edgeBinding.subject),
-            object: {
-                original: edgeBinding.object,
-            },
-            association: this.edge.association,
-            qXEdge: this.edge.reasoner_edge,
-            mappedResponse: { 'edge-attributes': [...edge.attributes] }
-        }
+          subject: this._getSubject(edgeBinding.subject),
+          object: {
+            original: edgeBinding.object,
+          },
+          qualifiers: edge.qualifiers
+            ? Object.fromEntries(
+                edge.qualifiers.map(qualifier => {
+                  return [qualifier.qualifier_type_id, qualifier.qualifier_value];
+                }),
+              )
+            : undefined,
+          association: this.edge.association,
+          qEdge: this.edge.reasoner_edge,
+          mappedResponse: { "edge-attributes": [...edge.attributes] },
+        };
 
         if ("subject" in frozenRecord && "normalizedInfo" in frozenRecord["subject"] && !(typeof frozenRecord.subject.normalizedInfo === "undefined")) {
             return new Record(frozenRecord, this.config, this.edge.association, this.edge.reasoner_edge);

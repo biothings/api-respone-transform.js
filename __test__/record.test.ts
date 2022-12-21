@@ -63,12 +63,12 @@ describe("test record class", () => {
     });
 
     test("Record produces fake qEdge", () => {
-      expect(testRecord.qXEdge).toBeTruthy();
-      expect(testRecord.qXEdge.getSubject().getID()).toEqual(testFrozenRecord.subject.qNodeID);
-      expect(testRecord.qXEdge.getSubject().isSet()).toBeFalsy();
-      expect(testRecord.qXEdge.getObject().isSet()).toBeFalsy();
-      expect(testRecord.qXEdge.getObject().getID()).toEqual(testFrozenRecord.object.qNodeID);
-      expect(testRecord.qXEdge.getHashedEdgeRepresentation()).toBeTruthy();
+      expect(testRecord.qEdge).toBeTruthy();
+      expect(testRecord.qEdge.getInputNode().getID()).toEqual(testFrozenRecord.subject.qNodeID);
+      expect(testRecord.qEdge.getInputNode().isSet()).toBeFalsy();
+      expect(testRecord.qEdge.getOutputNode().isSet()).toBeFalsy();
+      expect(testRecord.qEdge.getOutputNode().getID()).toEqual(testFrozenRecord.object.qNodeID);
+      expect(testRecord.qEdge.getHashedEdgeRepresentation()).toBeTruthy();
 
     });
 
