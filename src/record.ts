@@ -8,13 +8,13 @@ class RecordNode {
   original: string;
   normalizedInfo: NodeNormalizerResultObj[];
   _qNode: QNode;
-  _label: string;
+  _apiLabel: string;
 
-  constructor(node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode, qNode: QNode, label: string) {
+  constructor(node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode, qNode: QNode) {
     this.original = node.original;
     this.normalizedInfo = node.normalizedInfo ? node.normalizedInfo : this.makeFakeInfo(node);
     this._qNode = qNode;
-    this._label = label;
+    this._apiLabel = node.apiLabel;
   }
 
   makeFakeInfo(node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode): NodeNormalizerResultObj[] {
@@ -52,6 +52,7 @@ class RecordNode {
       UMLS: this.UMLS,
       semanticType: this.semanticType,
       label: this.label,
+      apiLabel: this._apiLabel,
       equivalentCuries: this.equivalentCuries,
       names: this.names,
       attributes: this.attributes,
@@ -74,6 +75,7 @@ class RecordNode {
     return {
       original: this.original,
       normalizedInfo: this.normalizedInfo,
+      apiLabel: this._apiLabel
     };
   }
 
@@ -98,7 +100,8 @@ class RecordNode {
   }
 
   get label(): string {
-    return this.normalizedInfo?.[0].label ?? this._label;
+    if (this.normalizedInfo?.[0].label === this.curie) return this._apiLabel;
+    return this.normalizedInfo?.[0].label ?? this._apiLabel;
   }
 
   get equivalentCuries(): string[] {
@@ -136,11 +139,11 @@ export class Record {
     this.config = config ? config : { EDGE_ATTRIBUTES_USED_IN_RECORD_HASH: [] };
     this.reverseToExecution = reverse || false;
     if (!this.reverseToExecution) {
-      this.subject = new RecordNode(record.subject, this.qEdge.getInputNode(), this.config.subject_name);
-      this.object = new RecordNode(record.object, this.qEdge.getOutputNode(), this.config.object_name);
+      this.subject = new RecordNode(record.subject, this.qEdge.getInputNode());
+      this.object = new RecordNode(record.object, this.qEdge.getOutputNode());
     } else {
-      this.subject = new RecordNode(record.subject, this.qEdge.getOutputNode(), this.config.object_name);
-      this.object = new RecordNode(record.object, this.qEdge.getInputNode(), this.config.subject_name);
+      this.subject = new RecordNode(record.subject, this.qEdge.getOutputNode());
+      this.object = new RecordNode(record.object, this.qEdge.getInputNode());
     }
     this._qualifiers = record.qualifiers || this.association.qualifiers;
     this.mappedResponse = record.mappedResponse ? record.mappedResponse : {};
@@ -466,6 +469,7 @@ interface FrozenNode {
   UMLS: string;
   semanticType: string;
   label: string;
+  apiLabel: string;
   attributes: any;
   [additionalProperties: string]: any; // cleanest way to handler undefined properties
 }
@@ -479,6 +483,7 @@ interface VerboseFrozenNode {
   UMLS: string;
   semanticType: string;
   label: string;
+  apiLabel: string;
   equivalentCuries?: string[]; // always supplied by Record, not required from user
   names: string[];
   attributes: any;
@@ -487,6 +492,7 @@ interface VerboseFrozenNode {
 interface MinimalFrozenNode {
   original: string;
   normalizedInfo?: NodeNormalizerResultObj[]; // always supplied by Record, not required from user
+  apiLabel: string;
   [additionalProperties: string]: any; // cleanest way to handler undefined properties
 }
 

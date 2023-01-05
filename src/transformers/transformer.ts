@@ -108,8 +108,8 @@ export default class BaseTransformer {
     _removeNonEdgeData(mappedResponse: any) {
         delete mappedResponse["@type"];
         delete mappedResponse[this.edge.association.output_id];
-        delete mappedResponse["subject_name"];
-        delete mappedResponse["object_name"];
+        delete mappedResponse["input_name"];
+        delete mappedResponse["output_name"];
         return mappedResponse;
     }
 
@@ -133,13 +133,13 @@ export default class BaseTransformer {
 
         // mappedResponse = this._updateEdgeMetadata(mappedResponse);
         const objectIDs = this.extractObjectIDs(mappedResponse);
-        const objectName = mappedResponse.output_name;
-        const subjectName = mappedResponse.input_name; 
+        const outputName = mappedResponse.output_name;
+        const inputName = mappedResponse.input_name; 
         mappedResponse = this._removeNonEdgeData(mappedResponse);
         mappedResponse = this._updatePublications(mappedResponse);
 
         const frozenRecord = {
-            subject: this._getSubject(subjectCurie),
+            subject: {...this._getSubject(subjectCurie), apiLabel: inputName},
             association: {...this.edge.association},
             qEdge: this.edge.reasoner_edge,
             mappedResponse: {...mappedResponse},
@@ -156,9 +156,10 @@ export default class BaseTransformer {
                 ...frozenRecord,
                  object: {
                      original: curie,
+                     apiLabel: outputName
                  }
             };
-            return new Record(copyRecord, { ...this.config, subject_name: subjectName, object_name: objectName }, this.edge.association, this.edge.reasoner_edge);
+            return new Record(copyRecord, this.config, this.edge.association, this.edge.reasoner_edge);
         });
         return transformedRecords;
     }
