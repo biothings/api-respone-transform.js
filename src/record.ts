@@ -469,7 +469,7 @@ interface FrozenNode {
   UMLS: string;
   semanticType: string;
   label: string;
-  apiLabel: string;
+  apiLabel?: string;
   attributes: any;
   [additionalProperties: string]: any; // cleanest way to handler undefined properties
 }
@@ -483,7 +483,7 @@ interface VerboseFrozenNode {
   UMLS: string;
   semanticType: string;
   label: string;
-  apiLabel: string;
+  apiLabel?: string;
   equivalentCuries?: string[]; // always supplied by Record, not required from user
   names: string[];
   attributes: any;
@@ -492,7 +492,7 @@ interface VerboseFrozenNode {
 interface MinimalFrozenNode {
   original: string;
   normalizedInfo?: NodeNormalizerResultObj[]; // always supplied by Record, not required from user
-  apiLabel: string;
+  apiLabel?: string;
   [additionalProperties: string]: any; // cleanest way to handler undefined properties
 }
 
