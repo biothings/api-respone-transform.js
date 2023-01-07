@@ -15,21 +15,17 @@ def generateCurie(idType; id): if (id | type) == "array" then id[0] else id end 
 
 # checks if object meets any filter string
 def any_filter(filter_strs):
-. as $obj | . |= foreach filter_strs as $filter_str (false; . or $obj.[filter_str | split(":") | first] == filter_str | split(":") | last; .);
+. as $obj | foreach (filter_strs | .[]) as $filter_str (false; . or (($obj | .[$filter_str | split(":") | first]) == ($filter_str | split(":") | last)); .);
 
 # checks if object meets all filter strings
 def all_filter(filter_strs):
-. as $obj | . |= foreach filter_strs as $filter_str (false; . or $obj.[filter_str | split(":") | first] == filter_str | split(":") | last; .);
+. as $obj | foreach (filter_strs | .[]) as $filter_str (true; . and (($obj | .[$filter_str | split(":") | first]) == ($filter_str | split(":") | last)); .);
 
 # filters the list that is supplied on all conditions
-def list_filter_all(filter_strs): 
-(filter_str | split(":") | first) as $key | (filter_str | split(":") | last) as $value |
-. |= [.[] | if . | all_filter(filter_strs) then . else empty end];
+def list_filter_all(filter_strs): [.[] | if . | all_filter(filter_strs) then . else empty end];
 
 # filters the list that is supplied on any conditions
-def list_filter_any(filter_strs): 
-(filter_str | split(":") | first) as $key | (filter_str | split(":") | last) as $value |
-. |= [.[] | if . | any_filter(filter_strs) then . else empty end];
+def list_filter_any(filter_strs): [.[] | if . | any_filter(filter_strs) then . else empty end];
 `
 
 function generateVariables(variables: JQVariable[]) {
