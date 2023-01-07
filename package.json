@@ -54,7 +54,8 @@
     "common-path-prefix": "^3.0.0",
     "husky": "^4.3.8",
     "jsonata": "^1.8.4",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "node-jq": "^2.3.4"
   },
   "husky": {
     "hooks": {
