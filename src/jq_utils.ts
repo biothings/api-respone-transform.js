@@ -19,11 +19,21 @@ def get_nested_field(field):
 
 # checks if object meets any filter string
 def any_filter(filter_strs):
-. as $obj | reduce (filter_strs | .[]) as $filter_str (false; . or (($obj | get_nested_field($filter_str | split(":") | first)) == ($filter_str | split(":") | last)));
+. as $obj | reduce (filter_strs | .[]) as $filter_str (
+  false; 
+  . or (
+    ($obj | get_nested_field($filter_str | split(":") | first)) == ($filter_str | split(":") | last)
+  )
+);
 
 # checks if object meets all filter strings
 def all_filter(filter_strs):
-. as $obj | reduce (filter_strs | .[]) as $filter_str (true; . and (($obj | get_nested_field($filter_str | split(":") | first)) == ($filter_str | split(":") | last)));
+. as $obj | reduce (filter_strs | .[]) as $filter_str (
+  true; 
+  . and (
+    $obj | any_filter([$filter_str | split(":") | last | split(",") | .[] | ($filter_str | split(":") | first) + ":" + .])
+  )
+);
 
 # filters the list that is supplied on all conditions
 def list_filter_all(filter_strs): if (. | type) == "array" then [.[] | if . | all_filter(filter_strs) then . else empty end] else empty end;
