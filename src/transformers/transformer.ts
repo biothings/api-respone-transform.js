@@ -85,20 +85,20 @@ export default class BaseTransformer {
         //debug(`input: ${input}`);
         let subject = {
             original: typeof this.edge.original_input === "undefined" ? undefined : this.edge.original_input[subjectCurie],
-            normalizedInfo:
-                typeof this.edge.input_resolved_identifiers === "undefined" || typeof this.edge.original_input === "undefined"
-                ? undefined
-                : this.edge.input_resolved_identifiers[this.edge.original_input[subjectCurie]],
+            // normalizedInfo:
+            //     typeof this.edge.input_resolved_identifiers === "undefined" || typeof this.edge.original_input === "undefined"
+            //     ? undefined
+            //     : this.edge.input_resolved_identifiers[this.edge.original_input[subjectCurie]],
         }
-        if (this.edge.input_resolved_identifiers && subject.original === undefined && subject.normalizedInfo === undefined) {
+        if (this.edge.input_resolved_identifiers && subject.original === undefined) {
             //try to find an equivalent ids object if the original input doesn't match (for ICEES)
             for (let curie of Object.keys(this.edge.input_resolved_identifiers)) {
-                if (this.edge.input_resolved_identifiers[curie][0].curies.includes(subjectCurie)) {
-                subject = {
-                    original: curie,
-                    normalizedInfo: this.edge.input_resolved_identifiers[curie],
-                };
-                break;
+                if (this.edge.input_resolved_identifiers[curie].equivalentIDs.includes(subjectCurie)) {
+                    subject = {
+                        original: curie,
+                        // normalizedInfo: this.edge.input_resolved_identifiers[curie],
+                    };
+                    break;
                 }
             }
         }
@@ -120,15 +120,6 @@ export default class BaseTransformer {
             return [];
         }
 
-        const setImmediatePromise = () => {
-            return new Promise((resolve: any) => {
-                setImmediate(() => resolve());
-            });
-        };
-        // blocking timer is kept because this part still blocks w/o it
-        let blockingSince = Date.now();
-
-
         // mappedResponse = this._updateEdgeMetadata(mappedResponse);
         const objectIDs = this.extractObjectIDs(mappedResponse);
         mappedResponse = this._removeNonEdgeData(mappedResponse);
@@ -142,11 +133,6 @@ export default class BaseTransformer {
         }
 
         let transformedRecords = await async.mapSeries(objectIDs, async (curie: string) => {
-            // timer default set to 1ms because this function *should* usually take <1ms
-            if (blockingSince + (parseInt(process.env.SETIMMEDIATE_TIME) || 1) < Date.now()) {
-                await setImmediatePromise();
-                blockingSince = Date.now();
-            }
 
             let copyRecord = {
                 ...frozenRecord,
