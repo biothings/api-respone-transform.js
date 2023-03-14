@@ -18,12 +18,12 @@ class RecordNode {
   makeFakeInfo(node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode): NodeNormalizerResultObj {
     return {
         primaryID: node.curie,
-        equivalentIDs: node.equivalentCuries,
+        equivalentIDs: node.equivalentCuries ?? [],
         label: node.label,
         labelAliases: node.names,
         primaryTypes: [node.semanticType],
-        semanticTypes: node.semanticTypes,
-        attributes: node.attributes,
+        semanticTypes: node.semanticTypes ?? [],
+        attributes: node.attributes ?? {},
       };
   }
 
