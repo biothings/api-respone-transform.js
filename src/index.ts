@@ -52,7 +52,7 @@ export class Transformer {
         } else if (tags.includes("biothings")) {
             this.tf = new BioThingsTransformer(this.data, this.config);
         } else if (tags.includes("ctd")) {
-            this.tf = new CTDTransformer(this.data, this.config);
+            this.tf = new JQTransformer(this.data, { ...this.config, type: "ctd" });
         } else if (tags.includes("opentarget")) {
             this.tf = new OpenTargetTransformer(this.data, this.config)
         } else {

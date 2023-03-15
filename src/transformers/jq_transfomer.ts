@@ -13,8 +13,10 @@ const filterStrings = {
   ctd: `
   # Split pubMedIDs by |
   ((.[] | select(.PubMedIDs != null) | .PubMedIDs) |= split("|")) | 
+  ((.[] | select(.PubMedIds != null) | .PubMedIds) |= split("|")) | 
   # take last element of disease ids after spliting by :
-  ((.[] | select(.DiseaseID != null) | .DiseaseID) |= (split(":") | last)) | {data: .}
+  ((.[] | select(.DiseaseID != null) | .DiseaseID) |= (split(":") | last)) |
+  ((.[] | select(.DiseaseId != null) | .DiseaseId) |= (split(":") | last)) | {data: .}
   `,
   opentarget: `
   # split drug IDs with CHEMBL by /
