@@ -41,8 +41,6 @@ export class Transformer {
             })
         } else if (tags.includes('bte-trapi')) {
             this.tf = new TRAPITransformer(this.data, this.config);
-        } else if (api.startsWith('SEMMED')) {
-            this.tf = new SemmedTransformer(this.data, this.config);
         } else if (api === 'BioLink API') {
             // this.tf = new BiolinkTransformer(this.data, this.config);
             this.tf = new JQTransformer(this.data, { ...this.config, type: "biolink" })
@@ -50,7 +48,7 @@ export class Transformer {
             // this.tf = new EBIProteinTransformer(this.data, this.config)
             this.tf = new JQTransformer(this.data, { ...this.config, type: "ebi" })
         } else if (tags.includes("biothings")) {
-            this.tf = new BioThingsTransformer(this.data, this.config);
+            this.tf = new JQTransformer(this.data, { ...this.config, type: "biothings" })
         } else if (tags.includes("ctd")) {
             this.tf = new JQTransformer(this.data, { ...this.config, type: "ctd" });
         } else if (tags.includes("opentarget")) {
