@@ -67,7 +67,7 @@ const filterStringsPair = {
     end
   end
   `,
-  ctd: ``
+  ctd: `reduce (.response | .[]) as $item ({}; .[generateCurie($edge.association.input_id; $item.Input | ascii_upcase)] = [] + .[generateCurie($edge.association.input_id; $item.Input | ascii_upcase)] + [$item]) | map_values([.])`
 }
 
 export default class JQTransformer extends BaseTransformer {
