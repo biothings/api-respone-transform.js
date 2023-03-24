@@ -34,10 +34,10 @@ export default class BaseTransformer {
     }
 
     /*
-      if 4edge.input | keys | contains(["queryInputs"]) then
-        {[generateCurie($edge.assocation.input_id, $edge.input.queryInputs)]: .response}
+      if $edge.input | keys | contains(["queryInputs"]) then
+        {[generateCurie($edge.association.input_id, $edge.input.queryInputs)]: .response}
       else
-        {[generateCurie($edge.assocation.input_id, $edge.input)]: .response}
+        {[generateCurie($edge.association.input_id, $edge.input)]: .response}
       end
     */
 
