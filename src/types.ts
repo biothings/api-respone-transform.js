@@ -8,6 +8,7 @@ interface KGAssociationObject {
   predicate: string;
   source?: string;
   api_name?: string;
+  has_prefix?: boolean;
 }
 
 interface XBTEParametersObject {

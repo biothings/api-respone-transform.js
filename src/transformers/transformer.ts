@@ -181,6 +181,9 @@ export default class BaseTransformer {
      * @param {Object} mappedResponse - JSON response representing an output.
      */
     extractObjectIDs(mappedResponse: object) {
+        if (this.edge.association.has_prefix) {
+            return toArray(mappedResponse["OUTPUT"]);
+        }
         const output_id_type = this.edge.association.output_id;
         if (!(output_id_type in mappedResponse)) {
             return [];
