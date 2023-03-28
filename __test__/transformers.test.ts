@@ -6,7 +6,12 @@ import ctd_tf from "../src/transformers/ctd_transformer";
 import opentarget_tf from "../src/transformers/opentarget_transformer";
 import biothings_tf from "../src/transformers/biothings_transformer";
 import base_tf from "../src/transformers/transformer";
-import axios from "axios";
+import axios, { AxiosStatic } from "axios";
+import path from "path";
+import fs from "fs/promises";
+
+const og_axios = jest.requireActual('axios')
+jest.mock('axios')
 
 // not ingesting opentargets right now; no need for this test; this api is no longer there
 // describe("test opentarget transformer", () => {
@@ -44,6 +49,11 @@ describe("test ctd transformer", () => {
     let api_response;
 
     beforeAll(async () => {
+        (axios.get as jest.MockedFunction<AxiosStatic>).mockImplementation(async (url) => {
+          const data_path = path.resolve(__dirname, "./data/ctd/response2.json")
+          const data = JSON.parse(await fs.readFile(data_path, 'utf-8'))
+          return {data, status: 200, statusText: "OK", headers: undefined, config: {}}
+        })
         let res = await axios.get("http://ctdbase.org/tools/batchQuery.go?inputType=chem&inputTerms=D003634|mercury&report=diseases_curated&format=json");
         api_response = res.data;
     });
@@ -77,6 +87,11 @@ describe("test biothings transformer", () => {
     let input;
 
     beforeAll(async () => {
+        (axios as jest.MockedFunction<AxiosStatic>).mockImplementation(async (q) => {
+          const data_path = path.resolve(__dirname, "./data/semmedgene/response.json")
+          const data = JSON.parse(await fs.readFile(data_path, 'utf-8'))
+          return {data, status: 200, statusText: "OK", headers: undefined, config: {}}
+        })
         let res = await axios({
             method: 'post',
             url: 'https://biothings.ncats.io/semmedgene/query',

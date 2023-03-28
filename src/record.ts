@@ -6,38 +6,27 @@ function hash(string: string) {
 
 class RecordNode {
   original: string;
-  normalizedInfo: NodeNormalizerResultObj[];
+  normalizedInfo: NodeNormalizerResultObj;
   _qNode: QNode;
+  _apiLabel: string;
 
   constructor(node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode, qNode: QNode) {
     this.original = node.original;
     this.normalizedInfo = node.normalizedInfo ? node.normalizedInfo : this.makeFakeInfo(node);
     this._qNode = qNode;
+    this._apiLabel = node.apiLabel;
   }
 
-  makeFakeInfo(node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode): NodeNormalizerResultObj[] {
-    return [
-      {
-        id: {
-          identifier: node.curie,
-          label: node.label,
-        },
-        equivalent_identifiers: node.equivalentCuries?.map((curie: string): Identifier => {
-          return { identifier: curie };
-        }),
-        type: [node.semanticType],
+  makeFakeInfo(node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode): NodeNormalizerResultObj {
+    return {
         primaryID: node.curie,
-        dbIDs: {
-          UMLS: node.UMLS,
-          name: node.names,
-        },
-        semanticType: node.semanticType,
+        equivalentIDs: node.equivalentCuries ?? [],
         label: node.label,
-        curies: node.equivalentCuries || [node.curie],
-        attributes: node.attributes,
-        semanticTypes: [node.semanticType],
-      },
-    ];
+        labelAliases: node.names,
+        primaryTypes: [node.semanticType],
+        semanticTypes: node.semanticTypes ?? [],
+        attributes: node.attributes ?? {},
+      };
   }
 
   toJSON(): VerboseFrozenNode {
@@ -49,7 +38,9 @@ class RecordNode {
       curie: this.curie,
       UMLS: this.UMLS,
       semanticType: this.semanticType,
+      semanticTypes: this.semanticTypes,
       label: this.label,
+      apiLabel: this._apiLabel,
       equivalentCuries: this.equivalentCuries,
       names: this.names,
       attributes: this.attributes,
@@ -72,6 +63,7 @@ class RecordNode {
     return {
       original: this.original,
       normalizedInfo: this.normalizedInfo,
+      apiLabel: this._apiLabel
     };
   }
 
@@ -84,31 +76,39 @@ class RecordNode {
   }
 
   get curie(): string {
-    return this.normalizedInfo?.[0].primaryID;
+    return this.normalizedInfo?.primaryID;
   }
 
-  get UMLS(): string {
-    return this.normalizedInfo?.[0].dbIDs?.UMLS;
+  get UMLS(): string[] {
+    return this.normalizedInfo?.equivalentIDs.reduce((arr: string[], curie: string) => {
+      if (curie.includes('UMLS')) arr.push(curie.replace('UMLS:', ''));
+      return arr;
+    }, []) ?? [];
   }
 
-  get semanticType(): string {
-    return this.normalizedInfo?.[0].semanticType;
+  get semanticType(): string[] {
+    return this.normalizedInfo?.primaryTypes.map(semanticType => `biolink:${semanticType}`) ?? [];
+  }
+
+  get semanticTypes(): string[] {
+    return this.normalizedInfo?.semanticTypes.map(semanticType => `biolink:${semanticType}`) ?? [];
   }
 
   get label(): string {
-    return this.normalizedInfo?.[0].label;
+    if (this.normalizedInfo?.label === this.curie) return this._apiLabel;
+    return this.normalizedInfo?.label ?? this._apiLabel;
   }
 
   get equivalentCuries(): string[] {
-    return this.normalizedInfo?.[0].curies;
+    return this.normalizedInfo?.equivalentIDs ?? [];
   }
 
   get names(): string[] {
-    return this.normalizedInfo?.[0].dbIDs?.name;
+    return this.normalizedInfo?.labelAliases ?? [];
   }
 
   get attributes(): any {
-    return this.normalizedInfo?.[0].attributes;
+    return this.normalizedInfo?.attributes ?? {};
   }
 }
 
@@ -461,22 +461,25 @@ interface FrozenNode {
   qNodeID: string;
   isSet: boolean;
   curie: string;
-  UMLS: string;
-  semanticType: string;
+  UMLS: string[];
+  semanticType: string[];
   label: string;
+  apiLabel?: string;
   attributes: any;
   [additionalProperties: string]: any; // cleanest way to handler undefined properties
 }
 
 interface VerboseFrozenNode {
   original: string;
-  normalizedInfo?: NodeNormalizerResultObj[]; // always supplied by Record, not required from user
+  normalizedInfo?: NodeNormalizerResultObj; // always supplied by Record, not required from user
   qNodeID: string;
   isSet: boolean;
   curie: string;
-  UMLS: string;
-  semanticType: string;
+  UMLS: string[];
+  semanticType: string[];
+  semanticTypes: string[];
   label: string;
+  apiLabel?: string;
   equivalentCuries?: string[]; // always supplied by Record, not required from user
   names: string[];
   attributes: any;
@@ -484,7 +487,8 @@ interface VerboseFrozenNode {
 
 interface MinimalFrozenNode {
   original: string;
-  normalizedInfo?: NodeNormalizerResultObj[]; // always supplied by Record, not required from user
+  normalizedInfo?: NodeNormalizerResultObj; // always supplied by Record, not required from user
+  apiLabel?: string;
   [additionalProperties: string]: any; // cleanest way to handler undefined properties
 }
 
@@ -537,20 +541,15 @@ interface Identifier {
 }
 
 interface NodeNormalizerResultObj {
-  id?: Identifier;
-  equivalent_identifiers?: Identifier[];
-  type?: string[];
-  information_content?: number;
-  primaryID?: string;
-  label?: string;
-  attributes?: any;
-  semanticType?: string;
-  _leafSemanticType?: string;
-  semanticTypes?: string[];
-  curies?: string[];
-  dbIDs?: any;
-  _dbIDs?: any;
-  [additionalProperties: string]: any;
+  primaryID: string;
+  equivalentIDs: string[];
+  label: string;
+  labelAliases: string[];
+  primaryTypes: string[];
+  semanticTypes: string[];
+  attributes: {
+    [attributeID: string]: any
+  }
 }
 
 interface BulkQualifiers {
