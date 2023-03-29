@@ -25,7 +25,7 @@ describe("test ctd transformer", () => {
         expect(res).toHaveProperty("data");
         expect(res.data).toHaveLength(2);
         expect(res.data[0].PubMedIDs).toEqual(["21559390"]);
-        expect(res.data[0].DiseaseID).toEqual("D008545");
+        expect(res.data[0].DiseaseID).toEqual("MESH:D008545");
     })
 
     test("test ctd wrapper if pubmed id field is not string", async () => {
