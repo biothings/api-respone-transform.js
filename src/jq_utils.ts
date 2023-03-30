@@ -4,6 +4,9 @@ const functions = `
 # example increment function
 def increment: . + 1;
 
+# converts value to array if not already
+def toArray: if (. | type) == "array" then . else [.] end;
+
 # deletes key if empty array
 def delifempty(k): (if k == [] then del(k) | . else . end);
 
@@ -12,6 +15,9 @@ def remifempty: (if . == [] then empty else . end);
 
 # generates a curie from a type and id
 def generateCurie(idType; id): if (id | type) == "array" then id[0] else id end | split(":") | last | idType + ":" + .;
+
+# generates a curie from a type and id [string] (by checking queryInputs)
+def generateCurieWithInputs(idType; id; queryInputs): reduce (queryInputs | toArray | .[]) as $input (""; if (id | ascii_upcase | contains($input | ascii_upcase)) then $input else . end) | idType + ":" + .;
 
 # getting a nested field from inputted object (seperated by ., ie. drugcentral.bioactivity)
 def get_nested_field(field):

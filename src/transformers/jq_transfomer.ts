@@ -54,7 +54,7 @@ const filterStringsPair = {
       if ($item | keys | contains(["notfound"])) then
         .
       else
-        generateCurie($edge.association.input_id; $item.query) as $curie | .[$curie] = .[$curie] + [$item]
+        generateCurieWithInputs($edge.association.input_id; $item.query; $edge.input.queryInputs) as $curie | .[$curie] = .[$curie] + [$item]
       end
     )
   else
