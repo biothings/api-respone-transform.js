@@ -19,14 +19,14 @@ class RecordNode {
 
   makeFakeInfo(node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode): NodeNormalizerResultObj {
     return {
-        primaryID: node.curie,
-        equivalentIDs: node.equivalentCuries ?? [],
-        label: node.label,
-        labelAliases: node.names,
-        primaryTypes: [node.semanticType],
-        semanticTypes: node.semanticTypes ?? [],
-        attributes: node.attributes ?? {},
-      };
+      primaryID: node.curie,
+      equivalentIDs: node.equivalentCuries ?? [],
+      label: node.label,
+      labelAliases: node.names,
+      primaryTypes: [node.semanticType],
+      semanticTypes: node.semanticTypes ?? [],
+      attributes: node.attributes ?? {},
+    };
   }
 
   toJSON(): VerboseFrozenNode {
@@ -63,7 +63,7 @@ class RecordNode {
     return {
       original: this.original,
       normalizedInfo: this.normalizedInfo,
-      apiLabel: this._apiLabel
+      apiLabel: this._apiLabel,
     };
   }
 
@@ -80,10 +80,12 @@ class RecordNode {
   }
 
   get UMLS(): string[] {
-    return this.normalizedInfo?.equivalentIDs.reduce((arr: string[], curie: string) => {
-      if (curie.includes('UMLS')) arr.push(curie.replace('UMLS:', ''));
-      return arr;
-    }, []) ?? [];
+    return (
+      this.normalizedInfo?.equivalentIDs.reduce((arr: string[], curie: string) => {
+        if (curie.includes("UMLS")) arr.push(curie.replace("UMLS:", ""));
+        return arr;
+      }, []) ?? []
+    );
   }
 
   get semanticType(): string[] {
@@ -118,7 +120,7 @@ export class Record {
   config: any;
   subject: RecordNode;
   object: RecordNode;
-  reverseToExecution: Boolean;
+  reverseToExecution: boolean;
   _qualifiers: BulkQualifiers;
   mappedResponse: MappedResponse;
 
@@ -179,7 +181,7 @@ export class Record {
     }
     // frozen.predicate = 'biolink:' + predicate;
     frozen.association = reversedAPIEdge;
-    let temp = frozen.subject;
+    const temp = frozen.subject;
     frozen.subject = frozen.object;
     frozen.object = temp;
     return new Record(frozen, this.config, frozen.association, this.qEdge, !this.reverseToExecution);
@@ -250,6 +252,7 @@ export class Record {
       "x-translator": {
         infores: record.apiInforesCurie,
       },
+      apiIsPrimaryKnowledgeSource: false,
     };
   }
 
@@ -389,7 +392,7 @@ export class Record {
     }
     return Object.fromEntries(
       Object.entries(this._qualifiers).map(([qualifierType, qualifier]) => {
-        let newQualifierType = `biolink:${qualifierType.replace("biolink:", "")}`;
+        const newQualifierType = `biolink:${qualifierType.replace("biolink:", "")}`;
         let newQualifier = qualifier;
         if (qualifierType.includes("predicate")) {
           newQualifier = `biolink:${qualifier.replace("biolink:", "")}`;
@@ -414,8 +417,33 @@ export class Record {
     return this.association.source;
   }
 
+  get provenanceChain(): ProvenanceChainItem[] {
+    let returnValue: ProvenanceChainItem[] = [];
+    if (this.mappedResponse.trapi_sources) {
+      returnValue = [...this.mappedResponse.trapi_sources];
+    } else {
+      returnValue.push({
+        resource_id: this.association.apiIsPrimaryKnowledgeSource ? this.apiInforesCurie : this.metaEdgeSource,
+        resource_role: "primary_knowledge_source",
+      });
+      if (!this.association.apiIsPrimaryKnowledgeSource) {
+        returnValue.push({
+          resource_id: this.apiInforesCurie,
+          resource_role: "aggregator_knowledge_source",
+          upstream_resource_ids: [this.metaEdgeSource],
+        });
+      }
+    }
+    returnValue.push({
+      resource_id: "infores:biothings-explorer",
+      resource_role: "aggregator_knowledge_source",
+      upstream_resource_ids: [this.apiInforesCurie],
+    });
+    return returnValue;
+  }
+
   get publications(): string[] {
-    return this.mappedResponse.publications;
+    return this.mappedResponse.publications || [];
   }
 }
 
@@ -495,6 +523,7 @@ interface MinimalFrozenNode {
 type RecordPackage = [apiEdges: any[], ...frozenRecords: FrozenRecord[]];
 
 interface MappedResponse {
+  trapi_sources?: ProvenanceChainItem[];
   "edge-attributes"?: EdgeAttribute[];
   [mappedItems: string]: any;
 }
@@ -509,6 +538,7 @@ interface Association {
   api_name?: string;
   "x-translator"?: any;
   qualifiers?: BulkQualifiers;
+  apiIsPrimaryKnowledgeSource?: boolean;
   [additionalProperties: string]: any;
 }
 
@@ -548,10 +578,16 @@ interface NodeNormalizerResultObj {
   primaryTypes: string[];
   semanticTypes: string[];
   attributes: {
-    [attributeID: string]: any
-  }
+    [attributeID: string]: any;
+  };
 }
 
 interface BulkQualifiers {
   [qualifierTypeID: string]: string; // qualifierValue
+}
+
+interface ProvenanceChainItem {
+  resource_id: string;
+  resource_role: string;
+  upstream_resource_ids?: string[];
 }
