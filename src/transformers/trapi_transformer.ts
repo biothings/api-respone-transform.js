@@ -41,7 +41,7 @@ export default class TRAPITransformer extends BaseTransformer {
           mappedResponse: { "edge-attributes": [...edge.attributes] },
         };
 
-        if ("subject" in frozenRecord) {
+        if (frozenRecord.subject.original) {
             return new Record(frozenRecord, this.config, this.edge.association, this.edge.reasoner_edge);
         }
 
