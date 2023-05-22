@@ -9,11 +9,22 @@ export default class TRAPITransformer extends BaseTransformer {
       "results" in this.data.response.message &&
       Array.isArray(this.data.response.message.results)
     ) {
-      this.data.response.message.results.map(item => {
-        edges[item.edge_bindings.e01[0].id] = {
-          subject: item.node_bindings.n0[0].id,
-          object: item.node_bindings.n1[0].id,
-        };
+      this.data.response.message.results.forEach(result => {
+        result.analyses.forEach(analysis => {
+          const edgeID = analysis.edge_bindings.e01[0].id;
+          const edge =
+            "message" in this.data.response ? this.data.response.message.knowledge_graph.edges[edgeID] : undefined;
+          const edgeHasSupportGraph = edge.attributes.some(attribute => {
+            if (attribute.attribute_type_id === "biolink:support_graphs" && attribute.value?.length) {
+              return true;
+            }
+          });
+          if  (edgeHasSupportGraph) return;
+          edges[edgeID] = {
+            subject: result.node_bindings.n0[0].id,
+            object: result.node_bindings.n1[0].id,
+          };
+        });
       });
     }
     return edges;
@@ -51,8 +62,7 @@ export default class TRAPITransformer extends BaseTransformer {
         trapi_sources: edge.sources
       },
     };
-
-    if ("subject" in frozenRecord) {
+    if (frozenRecord.subject.original) {
       return new Record(frozenRecord, this.config, this.edge.association, this.edge.reasoner_edge);
     }
   }
