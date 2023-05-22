@@ -57,9 +57,11 @@ export default class TRAPITransformer extends BaseTransformer {
         : undefined,
       association: this.edge.association,
       qEdge: this.edge.reasoner_edge,
-      mappedResponse: { "edge-attributes": [...edge.attributes] },
+      mappedResponse: {
+        "edge-attributes": [...edge.attributes],
+        trapi_sources: edge.sources
+      },
     };
-
     if (frozenRecord.subject.original) {
       return new Record(frozenRecord, this.config, this.edge.association, this.edge.reasoner_edge);
     }
