@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import _ from "lodash";
 
 function hash(string: string) {
   return crypto.createHash("md5").update(string).digest("hex");
@@ -420,7 +421,7 @@ export class Record {
   get provenanceChain(): ProvenanceChainItem[] {
     let returnValue: ProvenanceChainItem[] = [];
     if (this.mappedResponse.trapi_sources) {
-      returnValue = [...this.mappedResponse.trapi_sources];
+      returnValue = _.cloneDeep(this.mappedResponse.trapi_sources);
     } else {
       returnValue.push({
         resource_id: this.association.apiIsPrimaryKnowledgeSource ? this.apiInforesCurie : this.metaEdgeSource,
