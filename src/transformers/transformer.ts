@@ -54,20 +54,42 @@ export default class BaseTransformer {
     }
 
     _updatePublications(mappedResponse: any) {
-        if ("pubmed" in mappedResponse) {
-            mappedResponse.pubmed = toArray(mappedResponse.pubmed);
-            mappedResponse.publications = mappedResponse.pubmed.map(item =>
-                typeof item === "string" && item.toUpperCase().startsWith("PMID:") ? item.toUpperCase() : "PMID:" + item,
-            );
-            delete mappedResponse.pubmed;
+        if (!Array.isArray(mappedResponse.publications)) {
+            mappedResponse.publications = [];
         }
-        if ("pmc" in mappedResponse) {
-            mappedResponse.pmc = toArray(mappedResponse.pmc);
-            mappedResponse.publications = mappedResponse.pmc.map(item =>
-                typeof item === "string" && item.toUpperCase().startsWith("PMC:") ? item.toUpperCase() : "PMC:" + item,
-            );
-            delete mappedResponse.pmc;
+
+        const publicationTypes = [
+            {prop: "ref_pmid", prefix: "PMID:"},
+            {prop: "ref_url", prefix: ""},
+            {prop: "ref_pmcid", prefix: "PMCID:"},
+            {prop: "ref_clinicaltrials", prefix: "clinicaltrials:"},
+            {prop: "ref_doi", prefix: "doi:"},
+            {prop: "ref_isbn", prefix: "isbn:"}
+        ]
+
+        for (let publicationType of publicationTypes) {
+            if (publicationType.prop in mappedResponse) {
+                for (let publication of toArray(mappedResponse[publicationType.prop])) {
+                    if (typeof publication !== "string" || publication.length === 0) {
+                        continue;
+                    }
+
+                    if (publication.toUpperCase().startsWith(publicationType.prefix.toUpperCase())) {
+                        mappedResponse.publications.push(publicationType.prefix + publication.slice(publicationType.prefix.length));
+                    }
+                    else {
+                        mappedResponse.publications.push(publicationType.prefix + publication);
+                    }
+                }
+
+                delete mappedResponse[publicationType.prop];
+            }
         }
+    
+        if (mappedResponse.publications.length === 0) {
+            delete mappedResponse.publications;
+        }
+
         return mappedResponse;
     }
 
