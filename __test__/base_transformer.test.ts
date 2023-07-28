@@ -77,7 +77,7 @@ describe("test base transformer", () => {
     test("Test _updatePublications function if pmc id is prefixed", () => {
         const tf = new base_tf(input, {});
         const fake = {
-            ref_pmcid: "PMC:1233"
+            ref_pmcid: "PMCID:1233"
         }
         const res = tf._updatePublications(fake);
         expect(res).not.toHaveProperty('ref_pmcid');
