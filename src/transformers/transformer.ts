@@ -59,13 +59,50 @@ export default class BaseTransformer {
         }
 
         const publicationTypes = [
-            {prop: "ref_pmid", prefix: "PMID:"},
-            {prop: "ref_url", prefix: ""},
-            {prop: "ref_pmcid", prefix: "PMCID:"},
-            {prop: "ref_clinicaltrials", prefix: "clinicaltrials:"},
-            {prop: "ref_doi", prefix: "doi:"},
-            {prop: "ref_isbn", prefix: "isbn:"}
+            {prop: "ref_pmid", prefix: "PMID:", urls: ["http://www.ncbi.nlm.nih.gov/pubmed/", "http://europepmc.org/abstract/MED/"]},
+            {prop: "ref_pmcid", prefix: "PMCID:", urls: ["http://www.ncbi.nlm.nih.gov/pmc/articles/", "http://europepmc.org/articles/"]},
+            {prop: "ref_clinicaltrials", prefix: "clinicaltrials:", urls: ["https://clinicaltrials.gov/ct2/show/"]},
+            {prop: "ref_doi", prefix: "doi:", urls: ["https://doi.org/", "http://www.nejm.org/doi/full/", "https://www.tandfonline.com/doi/abs/", "http://onlinelibrary.wiley.com/doi/"]},
+            {prop: "ref_isbn", prefix: "isbn:", urls: ["https://www.isbn-international.org/identifier/"]}
         ]
+
+        // handle URLs (which could be CURIEs)
+        if ("ref_url" in mappedResponse) {
+            for (let publication of toArray(mappedResponse.ref_url)) {
+                if (typeof publication !== "string" || publication.length === 0) {
+                    continue;
+                }
+
+                let isCurie = false;
+                for (let publicationType of publicationTypes) {
+                    for (let url of publicationType.urls) {
+                        if (publication.startsWith(url)) {
+                            isCurie = true;
+    
+                            if (!mappedResponse[publicationType.prop]) {
+                                mappedResponse[publicationType.prop] = [];
+                            }
+                            else if (!Array.isArray(mappedResponse[publicationType.prop])) {
+                                mappedResponse[publicationType.prop] = toArray(mappedResponse[publicationType.prop]);
+                            }
+                            
+                            mappedResponse[publicationType.prop].push(publication.slice(url.length));
+                            
+                            break;
+                        }
+                    }
+
+                    if (isCurie) {
+                        break;
+                    }
+                }
+
+                if (!isCurie) {
+                    mappedResponse.publications.push(publication);
+                }
+            }
+        }
+        delete mappedResponse.ref_url;
 
         for (let publicationType of publicationTypes) {
             if (publicationType.prop in mappedResponse) {
