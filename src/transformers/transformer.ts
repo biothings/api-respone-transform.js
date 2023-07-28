@@ -107,6 +107,11 @@ export default class BaseTransformer {
         for (let publicationType of publicationTypes) {
             if (publicationType.prop in mappedResponse) {
                 for (let publication of toArray(mappedResponse[publicationType.prop])) {
+                    // handle numbers
+                    if (typeof publication === "number") {
+                        publication = publication.toString();
+                    }
+
                     if (typeof publication !== "string" || publication.length === 0) {
                         continue;
                     }
