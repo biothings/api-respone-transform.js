@@ -1,80 +1,21 @@
+import fs from "fs";
+import path from "path";
 import semmed_tf from "../src/transformers/semmed_transformer";
-import axios from "axios";
 
 describe("test semmed transformer", () => {
 
-    let api_response, input;
+    let response, input;
 
-    beforeEach(async () => {
-        let res = await axios({
-            method: 'post',
-            url: 'https://biothings.ncats.io/semmedgene/query',
-            data: 'q=C1332823, C1332824, 123&scopes=umls',
-            params: {
-                fields: 'name,umls,positively_regulates',
-            }
-        })
-        api_response = res.data;
+    beforeEach(() => {
+        const response_path = path.resolve(__dirname, './data/semmedgene/response.json');
+        response = JSON.parse(fs.readFileSync(response_path, { encoding: 'utf8' }));
+        const edge_path = path.resolve(__dirname, './data/semmedgene/edge.json');
+        const edge = JSON.parse(fs.readFileSync(edge_path, { encoding: 'utf8' }));
         input = {
-            response: api_response,
-            edge: {
-                "input": ["C1332824", "C1332823", "123"],
-                "query_operation": {
-                    "params": {
-                        "fields": "positively_regulates"
-                    },
-                    "request_body": {
-                        "body": {
-                            size: '5',
-                            "q": "{inputs[0]}",
-                            "scopes": "umls"
-                        }
-                    },
-                    "path": "/query",
-                    "path_params": [],
-                    "method": "post",
-                    "server": "https://biothings.ncats.io/semmedgene",
-                    "tags": [
-                        "disease",
-                        "annotation",
-                        "query",
-                        "translator",
-                        "biothings",
-                        "semmed"
-                    ],
-                    "supportBatch": true,
-                    "inputSeparator": ","
-                },
-                "association": {
-                    "input_id": "UMLS",
-                    "input_type": "Gene",
-                    "output_id": "UMLS",
-                    "output_type": "Gene",
-                    "predicate": "positively_regulates",
-                    "source": "SEMMED",
-                    "api_name": "SEMMED Gene API",
-                    "smartapi": {
-                        "id": "81955d376a10505c1c69cd06dbda3047",
-                        "meta": {
-                            "ETag": "f94053bc78b3c2f0b97f7afd52d7de2fe083b655e56a53090ad73e12be83673b",
-                            "github_username": "kevinxin90",
-                            "timestamp": "2020-05-27T16:53:40.804575",
-                            "uptime_status": "good",
-                            "uptime_ts": "2020-06-12T00:04:31.404599",
-                            "url": "https://raw.githubusercontent.com/NCATS-Tangerine/translator-api-registry/master/semmed/semmed_gene.yaml"
-                        }
-                    }
-                },
-                "response_mapping": {
-                    "positively_regulates": {
-                        "pmid": "positively_regulates.pmid",
-                        "umls": "positively_regulates.umls"
-                    }
-                },
-                "id": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
-            }
+            response,
+            edge
         }
-    });
+    })
 
     test("test semmed pairCurieWithAPIResponse", () => {
         let tf = new semmed_tf(input, {});
