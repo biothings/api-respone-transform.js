@@ -41,6 +41,8 @@ export class Transformer {
             })
         } else if (tags.includes('bte-trapi')) {
             this.tf = new TRAPITransformer(this.data, this.config);
+        } else if (api.startsWith('SEMMED')) {
+            this.tf = new SemmedTransformer(this.data, this.config);
         } else if (api === 'BioLink API') {
             // this.tf = new BiolinkTransformer(this.data, this.config);
             this.tf = new JQTransformer(this.data, { ...this.config, type: "biolink" })
