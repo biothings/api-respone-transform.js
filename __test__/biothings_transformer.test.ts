@@ -55,7 +55,7 @@ describe("test biothings transformer", () => {
         })
 
         test("test biothings transform", async () => {
-            let tf = new biothings_tf(input, {});
+            let tf = new jq_tf(input, {type: "biothings"});
             let res = await tf.transform();
             expect(res).toHaveLength(27);
             expect(res[0]).not.toHaveProperty('pubmed');
