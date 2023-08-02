@@ -1,5 +1,5 @@
 
-import biothings_tf from "../src/transformers/biothings_transformer";
+import jq_tf from "../src/transformers/jq_transfomer";
 import {describe, expect, test} from '@jest/globals';
 import fs from "fs";
 import path from "path";
@@ -22,7 +22,7 @@ describe("test biothings transformer", () => {
         })
 
         test("test biothings wrapper", async () => {
-            let tf = new biothings_tf(input, {});
+            let tf = new jq_tf(input, {type: "biothings"});
             let res = await tf.pairCurieWithAPIResponse();
             expect(Object.keys(res)).toHaveLength(2);
             expect(res).toHaveProperty("DRUGBANK:DB00188");
@@ -47,7 +47,7 @@ describe("test biothings transformer", () => {
         })
 
         test("test biothings wrapper", async () => {
-            let tf = new biothings_tf(input, {});
+            let tf = new jq_tf(input, {type: "biothings"});
             let res = await tf.pairCurieWithAPIResponse();
             expect(Object.keys(res)).toHaveLength(1);
             expect(res).toHaveProperty("NCBIGene:1017");
@@ -79,7 +79,7 @@ describe("test biothings transformer", () => {
         })
 
         test("test biothings wrapper", async () => {
-            let tf = new biothings_tf(input, {});
+            let tf = new jq_tf(input, {type: "biothings"});
             let res = await tf.pairCurieWithAPIResponse();
             expect(Object.keys(res)).toHaveLength(1);
             expect(res).toHaveProperty("PUBCHEM:11373846");
