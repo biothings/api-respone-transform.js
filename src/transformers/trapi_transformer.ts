@@ -1,5 +1,6 @@
 import BaseTransformer from "./transformer";
 import { Record } from "../record";
+import { JSONDoc } from "../json_transform/types";
 
 export default class TRAPITransformer extends BaseTransformer {
   _getUniqueEdges() {
@@ -22,8 +23,8 @@ export default class TRAPITransformer extends BaseTransformer {
             });
             if (edgeHasSupportGraph || !edgeID) return;
             edges[edgeID] = {
-              subject: this.data.response.message.knowledge_graph.edges[edgeID].subject ?? result.node_bindings.n0[0].id,
-              object: this.data.response.message.knowledge_graph.edges[edgeID].object ?? result.node_bindings.n1[0].id,
+              subject: (this.data.response as JSONDoc).message.knowledge_graph.edges[edgeID].subject ?? result.node_bindings.n0[0].id,
+              object: (this.data.response as JSONDoc).message.knowledge_graph.edges[edgeID].object ?? result.node_bindings.n1[0].id,
             };
           })
         });
