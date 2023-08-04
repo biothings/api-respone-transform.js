@@ -11,19 +11,21 @@ export default class TRAPITransformer extends BaseTransformer {
     ) {
       this.data.response.message.results.forEach(result => {
         result.analyses.forEach(analysis => {
-          const edgeID = analysis.edge_bindings.e01[0].id;
-          const edge =
-            "message" in this.data.response ? this.data.response.message.knowledge_graph.edges[edgeID] : undefined;
-          const edgeHasSupportGraph = edge.attributes.some(attribute => {
-            if (attribute.attribute_type_id === "biolink:support_graphs" && attribute.value?.length) {
-              return true;
-            }
-          });
-          if  (edgeHasSupportGraph) return;
-          edges[edgeID] = {
-            subject: result.node_bindings.n0[0].id,
-            object: result.node_bindings.n1[0].id,
-          };
+          analysis?.edge_bindings?.e01?.forEach(binding => {
+            const edgeID = binding?.id;
+            const edge =
+              "message" in this.data.response && edgeID ? this.data.response.message.knowledge_graph.edges[edgeID] : undefined;
+            const edgeHasSupportGraph = edge.attributes.some(attribute => {
+              if (attribute.attribute_type_id === "biolink:support_graphs" && attribute.value?.length) {
+                return true;
+              }
+            });
+            if (edgeHasSupportGraph || !edgeID) return;
+            edges[edgeID] = {
+              subject: result.node_bindings.n0[0].id,
+              object: result.node_bindings.n1[0].id,
+            };
+          })
         });
       });
     }
