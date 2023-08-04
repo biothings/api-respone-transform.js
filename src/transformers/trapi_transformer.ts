@@ -22,8 +22,8 @@ export default class TRAPITransformer extends BaseTransformer {
             });
             if (edgeHasSupportGraph || !edgeID) return;
             edges[edgeID] = {
-              subject: result.node_bindings.n0[0].id,
-              object: result.node_bindings.n1[0].id,
+              subject: this.data.response.message.knowledge_graph.edges[edgeID].subject ?? result.node_bindings.n0[0].id,
+              object: this.data.response.message.knowledge_graph.edges[edgeID].object ?? result.node_bindings.n1[0].id,
             };
           })
         });
