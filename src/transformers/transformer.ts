@@ -59,9 +59,9 @@ export default class BaseTransformer {
         }
 
         const publicationTypes = [
-            {prop: "ref_pmid", prefix: "PMID:", urls: ["http://www.ncbi.nlm.nih.gov/pubmed/", "http://europepmc.org/abstract/MED/"]},
+            {prop: "ref_pmid", prefix: "PMID:", urls: ["http://www.ncbi.nlm.nih.gov/pubmed/", "http://europepmc.org/abstract/MED/", "https://www.ncbi.nlm.nih.gov/pubmed/"]},
             {prop: "ref_pmcid", prefix: "PMCID:", urls: ["http://www.ncbi.nlm.nih.gov/pmc/articles/", "http://europepmc.org/articles/"]},
-            {prop: "ref_clinicaltrials", prefix: "clinicaltrials:", urls: ["https://clinicaltrials.gov/ct2/show/"]},
+            {prop: "ref_clinicaltrials", prefix: "clinicaltrials:", urls: ["https://clinicaltrials.gov/ct2/show/", "https://www.clinicaltrials.gov/ct2/show/"]},
             {prop: "ref_doi", prefix: "doi:", urls: ["https://doi.org/", "http://www.nejm.org/doi/full/", "https://www.tandfonline.com/doi/abs/", "http://onlinelibrary.wiley.com/doi/"]},
             {prop: "ref_isbn", prefix: "isbn:", urls: ["https://www.isbn-international.org/identifier/"]}
         ]
