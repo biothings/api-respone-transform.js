@@ -15,12 +15,18 @@ export default class BiolinkTransformer extends BaseTransformer {
                         rec['object'][prefix] = rec.object.id;
                     }
                 }
-                if (rec.publications === undefined || rec.publications.length === 0 || !(rec.publications[0]['id'].startsWith("PMID"))) {
+                if (rec.publications === undefined || rec.publications.length === 0) {
                     delete rec.publications
                 } else {
-                    rec.publications = rec.publications.map(pub => {
-                        return { "id": pub.id.split(':').slice(-1)[0] }
-                    })
+                    const oldPublications = rec.publications;
+                    rec.publications = [];
+                    for (let oldPub of oldPublications) {
+                        if (!oldPub?.id?.startsWith?.("PMID:")) {
+                            continue;
+                        }
+
+                        rec.publications.push({ id: oldPub.id.split(':').slice(-1)[0] });
+                    }
                 }
                 if (!("provided_by" in rec)) {
                     delete rec.provided_by

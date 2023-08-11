@@ -57,41 +57,41 @@ describe("test base transformer", () => {
     test("Test _updatePublications function if pubmed id is prefixed", () => {
         const tf = new base_tf(input, {});
         const fake = {
-            pubmed: "PMID:1233"
+            ref_pmid: "PMID:1233"
         }
         const res = tf._updatePublications(fake);
-        expect(res).not.toHaveProperty('pubmed');
+        expect(res).not.toHaveProperty('ref_pmid');
         expect(res.publications).toEqual(["PMID:1233"]);
     })
 
     test("Test _updatePublications function if pubmed id is NOT prefixed", () => {
         const tf = new base_tf(input, {});
         const fake = {
-            pubmed: 1233
+            ref_pmid: 1233
         }
         const res = tf._updatePublications(fake);
-        expect(res).not.toHaveProperty('pubmed');
+        expect(res).not.toHaveProperty('ref_pmid');
         expect(res.publications).toEqual(["PMID:1233"])
     })
 
     test("Test _updatePublications function if pmc id is prefixed", () => {
         const tf = new base_tf(input, {});
         const fake = {
-            pmc: "PMC:1233"
+            ref_pmcid: "PMCID:1233"
         }
         const res = tf._updatePublications(fake);
-        expect(res).not.toHaveProperty('pmc');
-        expect(res.publications).toEqual(["PMC:1233"]);
+        expect(res).not.toHaveProperty('ref_pmcid');
+        expect(res.publications).toEqual(["PMCID:1233"]);
     })
 
     test("Test _updatePublications function if pmc id is NOT prefixed", () => {
         const tf = new base_tf(input, {});
         const fake = {
-            pmc: 123
+            ref_pmcid: 123
         }
         const res = tf._updatePublications(fake);
-        expect(res).not.toHaveProperty('pmc');
-        expect(res.publications).toEqual(["PMC:123"])
+        expect(res).not.toHaveProperty('ref_pmcid');
+        expect(res.publications).toEqual(["PMCID:123"])
     })
 
     test("Test extractObjectIDs function if output id type not in result", () => {
