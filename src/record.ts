@@ -436,7 +436,9 @@ export class Record {
       }
     }
     returnValue.push({
-      resource_id: "infores:biothings-explorer",
+      resource_id: this.config.provenanceUsesServiceProvider
+        ? "infores:service-provider-trapi"
+        : "infores:biothings-explorer",
       resource_role: "aggregator_knowledge_source",
       upstream_resource_ids: [this.apiInforesCurie],
     });
