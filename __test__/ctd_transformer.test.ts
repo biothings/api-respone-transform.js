@@ -1,7 +1,7 @@
 import {describe, expect, test} from '@jest/globals';
 import fs from "fs";
 import path from "path";
-import jq_tf from "../built/transformers/jq_transfomer";
+import jq_tf from "../built/transformers/jq_transformer";
 
 describe("test ctd transformer", () => {
 

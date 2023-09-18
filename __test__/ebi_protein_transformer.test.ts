@@ -1,7 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
 import fs from "fs";
 import path from "path";
-import jq_tf from "../src/transformers/jq_transfomer";
+import jq_tf from "../src/transformers/jq_transformer";
 
 describe("test EBI Protein transformer", () => {
   let response;
