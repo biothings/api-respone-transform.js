@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 
-import jq_tf from "../built/transformers/jq_transfomer";
+import jq_tf from "../built/transformers/jq_transformer";
 import fs from "fs";
 import path from "path";
 import { JSONDoc } from '../src/json_transform/types';

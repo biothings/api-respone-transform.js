@@ -7,7 +7,7 @@ import OpenTargetTransformer from "./transformers/opentarget_transformer";
 import BaseTransformer from "./transformers/transformer";
 import TRAPITransformer from './transformers/trapi_transformer';
 import EBIProteinTransformer from './transformers/ebi_protein_transformer'
-import JQTransformer from "./transformers/jq_transfomer";
+import JQTransformer from "./transformers/jq_transformer";
 import { BTEQueryObject } from "./types";
 const debug = require("debug")("bte:api-response-transform:index");
 export { Record } from "./record";
