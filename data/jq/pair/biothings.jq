@@ -1,4 +1,4 @@
-if $edge.query_operation.method == "post" then
+if $edge.query_operation._method == "post" then
   # if response is not an array, then use response.hits
   if (.response | type) == "array" then .response else .response.hits end |
   reduce .[] as $item ({};
@@ -6,7 +6,7 @@ if $edge.query_operation.method == "post" then
     if ($item | keys | contains(["notfound"])) then
       .
     else
-      if $edge.input | type == "object" and $edge.input.queryInputs | type == "object" then
+      if $edge.input | type == "object" then
         generateCurieWithInputs($edge.association.input_id; $item.query; $edge.input.queryInputs) as $curie | .[$curie] = .[$curie] + [$item]
       else
         generateCurie($edge.association.input_id; $item.query) as $curie | .[$curie] = .[$curie] + [$item]
