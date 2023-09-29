@@ -12,7 +12,7 @@
         },
         "_supportBatch": true,
         "_inputSeparator": ",",
-        "method": "post",
+        "_method": "post",
         "_pathParams": [],
         "_server": "https://mygene.info/v3",
         "_path": "/query",

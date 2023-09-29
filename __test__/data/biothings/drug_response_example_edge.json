@@ -8,7 +8,7 @@
             "size": "1000"
         },
         "_supportBatch": false,
-        "method": "get",
+        "_method": "get",
         "_pathParams": [],
         "_server": "https://biothings.ncats.io/drug_response_kp",
         "_path": "/query",

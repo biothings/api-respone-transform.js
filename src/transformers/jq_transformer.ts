@@ -23,7 +23,7 @@ const filterStringsPair = Object.fromEntries(
 
 export default class JQTransformer extends BaseTransformer {
   // TODO more specific typing?
-  async wrap(res: JSONDoc | JSONDoc[]): Promise<JSONDoc | JSONDoc[]> {
+  async wrap(res: JSONDoc | JSONDoc[]): Promise<JSONDoc> {
     if (this.config.wrap)
       res = JSON.parse(
         (await jq.run(generateFilterString(this.config.wrap, this.edge), res, { input: "json" })) as string,

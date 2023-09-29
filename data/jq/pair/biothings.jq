@@ -9,7 +9,7 @@ if $edge.query_operation._method == "post" then
       if $edge.input | type == "object" then
         generateCurieWithInputs($edge.association.input_id; $item.query; $edge.input.queryInputs) as $curie | .[$curie] = .[$curie] + [$item]
       else
-        generateCurie($edge.association.input_id; $item.query) as $curie | .[$curie] = .[$curie] + [$item]
+        generateCurieWithInputs($edge.association.input_id; $item.query; $edge.input | toArray) as $curie | .[$curie] = .[$curie] + [$item]
       end
     end
   )
@@ -17,6 +17,6 @@ else
   if ($edge.input | type) == "object" then
     .response as $res | generateCurie($edge.association.input_id; $edge.input.queryInputs) as $curie | {} | .[$curie] = [$res]
   else
-    .response as $res | generateCurie($edge.association.input_id; $edge.input) as $curie | {} | .[$curie] = [$res]
+    .response as $res | generateCurie($edge.association.input_id; ($edge.input | toArray)[0]) as $curie | {} | .[$curie] = [$res]
   end
 end

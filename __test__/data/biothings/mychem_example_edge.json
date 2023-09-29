@@ -17,7 +17,7 @@
         },
         "_supportBatch": true,
         "_inputSeparator": ",",
-        "method": "post",
+        "_method": "post",
         "_pathParams": [],
         "_server": "https://mychem.info/v1",
         "_path": "/query",
