@@ -18,3 +18,7 @@ export interface JSONDoc {
     [key1: string]: any;
     [key2: number]: any;
 }
+
+export interface PairedResponse {
+    [curie: string]: JSONDoc[]
+}

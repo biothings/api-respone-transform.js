@@ -4,7 +4,7 @@ import fs from "fs";
 import Path from "path";
 
 import * as jq from "node-jq"; // If converted to import, ts compile breaks it (imports default as undefined)
-import { JSONDoc } from "../json_transform/types";
+import { JSONDoc, PairedResponse } from "../json_transform/types";
 
 // Get prefab JQ strings from data/jq
 const filterStringsWrap = Object.fromEntries(
@@ -39,8 +39,7 @@ export default class JQTransformer extends BaseTransformer {
     return res;
   }
 
-  // TODO more specific typing?
-  async pairCurieWithAPIResponse(): Promise<JSONDoc> {
+  async pairCurieWithAPIResponse(): Promise<PairedResponse> {
     if (this.config.pair)
       return JSON.parse(
         (await jq.run(generateFilterString(this.config.pair, this.edge), this.data, { input: "json" })) as string,
