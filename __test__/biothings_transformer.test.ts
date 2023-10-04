@@ -58,7 +58,7 @@ describe("test biothings transformer", () => {
             let tf = new jq_tf(input, {type: "biothings"});
             let res = await tf.transform();
             expect(res).toHaveLength(27);
-            expect(res[0]).not.toHaveProperty('pubmed');
+            expect(res[0]).not.toHaveProperty('ref_pmid');
             expect(res[0]).toHaveProperty('publications', ["PMID:21873635"]);
         })
     })

@@ -62,20 +62,84 @@ export default class BaseTransformer {
     }
 
     _updatePublications(mappedResponse: any) {
-        if ("pubmed" in mappedResponse) {
-            mappedResponse.pubmed = toArray(mappedResponse.pubmed);
-            mappedResponse.publications = mappedResponse.pubmed.map(item =>
-                typeof item === "string" && item.toUpperCase().startsWith("PMID:") ? item.toUpperCase() : "PMID:" + item,
-            );
-            delete mappedResponse.pubmed;
+        if (!Array.isArray(mappedResponse.publications)) {
+            mappedResponse.publications = [];
         }
-        if ("pmc" in mappedResponse) {
-            mappedResponse.pmc = toArray(mappedResponse.pmc);
-            mappedResponse.publications = mappedResponse.pmc.map(item =>
-                typeof item === "string" && item.toUpperCase().startsWith("PMC:") ? item.toUpperCase() : "PMC:" + item,
-            );
-            delete mappedResponse.pmc;
+
+        const publicationTypes = [
+            {prop: "ref_pmid", prefix: "PMID:", urls: ["http://www.ncbi.nlm.nih.gov/pubmed/", "http://europepmc.org/abstract/MED/", "https://www.ncbi.nlm.nih.gov/pubmed/"]},
+            {prop: "ref_pmcid", prefix: "PMCID:", urls: ["http://www.ncbi.nlm.nih.gov/pmc/articles/", "http://europepmc.org/articles/"]},
+            {prop: "ref_clinicaltrials", prefix: "clinicaltrials:", urls: ["https://clinicaltrials.gov/ct2/show/", "https://www.clinicaltrials.gov/ct2/show/"]},
+            {prop: "ref_doi", prefix: "doi:", urls: ["https://doi.org/", "http://www.nejm.org/doi/full/", "https://www.tandfonline.com/doi/abs/", "http://onlinelibrary.wiley.com/doi/"]},
+            {prop: "ref_isbn", prefix: "isbn:", urls: ["https://www.isbn-international.org/identifier/"]}
+        ]
+
+        // handle URLs (which could be CURIEs)
+        if ("ref_url" in mappedResponse) {
+            for (let publication of toArray(mappedResponse.ref_url)) {
+                if (typeof publication !== "string" || publication.length === 0) {
+                    continue;
+                }
+
+                let isCurie = false;
+                for (let publicationType of publicationTypes) {
+                    for (let url of publicationType.urls) {
+                        if (publication.startsWith(url)) {
+                            isCurie = true;
+    
+                            if (!mappedResponse[publicationType.prop]) {
+                                mappedResponse[publicationType.prop] = [];
+                            }
+                            else if (!Array.isArray(mappedResponse[publicationType.prop])) {
+                                mappedResponse[publicationType.prop] = toArray(mappedResponse[publicationType.prop]);
+                            }
+                            
+                            mappedResponse[publicationType.prop].push(publication.slice(url.length));
+                            
+                            break;
+                        }
+                    }
+
+                    if (isCurie) {
+                        break;
+                    }
+                }
+
+                if (!isCurie) {
+                    mappedResponse.publications.push(publication);
+                }
+            }
         }
+        delete mappedResponse.ref_url;
+
+        for (let publicationType of publicationTypes) {
+            if (publicationType.prop in mappedResponse) {
+                for (let publication of toArray(mappedResponse[publicationType.prop])) {
+                    // handle numbers
+                    if (typeof publication === "number") {
+                        publication = publication.toString();
+                    }
+
+                    if (typeof publication !== "string" || publication.length === 0) {
+                        continue;
+                    }
+
+                    if (publication.toUpperCase().startsWith(publicationType.prefix.toUpperCase())) {
+                        mappedResponse.publications.push(publicationType.prefix + publication.slice(publicationType.prefix.length));
+                    }
+                    else {
+                        mappedResponse.publications.push(publicationType.prefix + publication);
+                    }
+                }
+
+                delete mappedResponse[publicationType.prop];
+            }
+        }
+    
+        if (mappedResponse.publications.length === 0) {
+            delete mappedResponse.publications;
+        }
+
         return mappedResponse;
     }
 
