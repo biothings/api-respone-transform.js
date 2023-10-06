@@ -5,7 +5,7 @@ function hash(string: string) {
   return crypto.createHash("md5").update(string).digest("hex");
 }
 
-class RecordNode {
+export class RecordNode {
   original: string;
   normalizedInfo: NodeNormalizerResultObj;
   _qNode: QNode;
@@ -478,7 +478,7 @@ export interface VerboseFrozenRecord {
 }
 
 // removes all computed values on assumption that apiEdge and qEdge are saved elsewhere
-interface MinimalFrozenRecord {
+export interface MinimalFrozenRecord {
   subject: VerboseFrozenNode | MinimalFrozenNode;
   object: VerboseFrozenNode | MinimalFrozenNode;
   publications?: string[]; // not always present
@@ -486,7 +486,7 @@ interface MinimalFrozenRecord {
   [additionalProperties: string]: any;
 }
 
-interface FrozenNode {
+export interface FrozenNode {
   // less verbose, loses extra information from nodeNormalizer
   original: string;
   qNodeID: string;
@@ -500,7 +500,7 @@ interface FrozenNode {
   [additionalProperties: string]: any; // cleanest way to handler undefined properties
 }
 
-interface VerboseFrozenNode {
+export interface VerboseFrozenNode {
   original: string;
   normalizedInfo?: NodeNormalizerResultObj; // always supplied by Record, not required from user
   qNodeID: string;
@@ -516,22 +516,22 @@ interface VerboseFrozenNode {
   attributes: any;
 }
 
-interface MinimalFrozenNode {
+export interface MinimalFrozenNode {
   original: string;
   normalizedInfo?: NodeNormalizerResultObj; // always supplied by Record, not required from user
   apiLabel?: string;
   [additionalProperties: string]: any; // cleanest way to handler undefined properties
 }
 
-type RecordPackage = [apiEdges: any[], ...frozenRecords: FrozenRecord[]];
+export type RecordPackage = [apiEdges: any[], ...frozenRecords: FrozenRecord[]];
 
-interface MappedResponse {
+export interface MappedResponse {
   trapi_sources?: ProvenanceChainItem[];
   "edge-attributes"?: EdgeAttribute[];
   [mappedItems: string]: any;
 }
 
-interface Association {
+export interface Association {
   input_id?: string;
   input_type?: string;
   output_id?: string;
@@ -545,7 +545,7 @@ interface Association {
   [additionalProperties: string]: any;
 }
 
-interface QEdge {
+export interface QEdge {
   getInputNode(): QNode;
   getOutputNode(): QNode;
   getHashedEdgeRepresentation(): string;
@@ -553,13 +553,13 @@ interface QEdge {
   [additionalProperties: string]: any;
 }
 
-interface QNode {
+export interface QNode {
   getID(): string;
   isSet(): boolean;
   [additionalProperties: string]: any;
 }
 
-interface EdgeAttribute {
+export interface EdgeAttribute {
   attribute_source: string;
   attribute_type_id: string;
   value: any;
@@ -568,12 +568,12 @@ interface EdgeAttribute {
   [additionalProperties: string]: any;
 }
 
-interface Identifier {
+export interface Identifier {
   identifier: string;
   label?: string;
 }
 
-interface NodeNormalizerResultObj {
+export interface NodeNormalizerResultObj {
   primaryID: string;
   equivalentIDs: string[];
   label: string;
@@ -585,11 +585,11 @@ interface NodeNormalizerResultObj {
   };
 }
 
-interface BulkQualifiers {
+export interface BulkQualifiers {
   [qualifierTypeID: string]: string; // qualifierValue
 }
 
-interface ProvenanceChainItem {
+export interface ProvenanceChainItem {
   resource_id: string;
   resource_role: string;
   upstream_resource_ids?: string[];
