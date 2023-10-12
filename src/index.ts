@@ -8,10 +8,13 @@ import BaseTransformer from "./transformers/transformer";
 import TRAPITransformer from "./transformers/trapi_transformer";
 import EBIProteinTransformer from "./transformers/ebi_protein_transformer";
 import { BTEQueryObject } from "./types";
-const debug = require("debug")("bte:api-response-transform:index");
+import { Record } from "./record";
+import Debug from "debug";
+const debug = Debug("bte:api-response-transform:index");
 export * from "./record";
+export * from "./types";
 
-export class Transformer {
+export default class Transformer {
   private data: BTEQueryObject;
   private tf: BaseTransformer;
   config: any;
@@ -45,7 +48,7 @@ export class Transformer {
     }
   }
 
-  async transform() {
+  async transform(): Promise<Record[]> {
     return await this.tf.transform();
   }
 }

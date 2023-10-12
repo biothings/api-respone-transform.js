@@ -34,12 +34,13 @@ interface SmartAPIKGOperationObject {
   tags?: string[];
 }
 
-interface templatedInput {
-  queryInputs: any;
+interface TemplatedInput {
+  queryInputs: string | string[];
+  [additionalAttributes: string]: string | string[];
 }
 
 export interface BTEKGOperationObject extends SmartAPIKGOperationObject {
-  input: string | string[] | templatedInput;
+  input: string | string[] | TemplatedInput;
   reasoner_edge?: any;
   filter?: string;
   original_input?: object;
