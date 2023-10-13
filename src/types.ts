@@ -15,8 +15,12 @@ interface XBTEParametersObject {
 }
 
 interface TransformerObject {
-    wrap_jq?: string;
-    pair_jq?: string;
+  wrap?: string;
+  pair?: string;
+}
+
+interface TransformerSet {
+  [transformerPattern: string]: TransformerObject;
 }
 
 interface QueryOperationInterface {
@@ -29,7 +33,7 @@ interface QueryOperationInterface {
   request_body: object;
   supportBatch: boolean;
   inputSeparator: string;
-  transformer: TransformerObject;
+  transformer: TransformerSet;
 }
 
 interface SmartAPIKGOperationObject {
@@ -58,6 +62,6 @@ export interface BTEQueryObject {
 }
 
 export interface JQVariable {
-    name: string;
-    value: string;
+  name: string;
+  value: string;
 }
