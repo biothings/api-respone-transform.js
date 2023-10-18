@@ -197,7 +197,7 @@ export class Record {
   }
 
   // for user-made records lacking qEdge
-  protected makeFakeQEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): QEdge {
+  makeFakeQEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): QEdge {
     return {
       getID(): string {
         return "fakeEdge";
@@ -238,7 +238,7 @@ export class Record {
     };
   }
 
-  protected makeAPIEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): Association {
+  makeAPIEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): Association {
     return {
       predicate: record.predicate?.replace("biolink:", ""),
       qualifiers: record.qualifiers
@@ -343,7 +343,7 @@ export class Record {
     };
   }
 
-  protected _getFlattenedEdgeAttributes(attributes: EdgeAttribute[]): EdgeAttribute[] {
+  _getFlattenedEdgeAttributes(attributes: EdgeAttribute[]): EdgeAttribute[] {
     return attributes
       ? attributes.reduce((arr: EdgeAttribute[], attribute: EdgeAttribute) => {
           attribute.attributes
@@ -354,7 +354,7 @@ export class Record {
       : [];
   }
 
-  protected get _configuredEdgeAttributesForHash(): string {
+  get _configuredEdgeAttributesForHash(): string {
     return this._getFlattenedEdgeAttributes(this.mappedResponse["edge-attributes"])
       .filter(attribute => {
         return this.config?.EDGE_ATTRIBUTES_USED_IN_RECORD_HASH?.includes(attribute.attribute_type_id);
@@ -365,7 +365,7 @@ export class Record {
       .join(",");
   }
 
-  protected get _recordHashContent(): string {
+  get _recordHashContent(): string {
     return [
       this.subject.curie,
       this.predicate,

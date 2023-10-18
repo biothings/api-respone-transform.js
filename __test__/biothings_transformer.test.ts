@@ -1,5 +1,4 @@
 import biothings_tf from "../src/transformers/biothings_transformer";
-import { describe, expect, test } from "@jest/globals";
 import fs from "fs";
 import path from "path";
 
