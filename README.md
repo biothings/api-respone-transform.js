@@ -16,7 +16,7 @@ A NodeJS module to transform the JSON output from APIs into BioLink-compatible J
 ## Install
 
 ```sh
-npm i @biothings-explorer/api-response-transform
+pnpm i @biothings-explorer/api-response-transform
 ```
 
 ## Usage
@@ -144,7 +144,7 @@ This package is desgined to be used as a downstream consumer of [@biothings-expl
 ## Run tests
 
 ```sh
-npm run test
+pnpm run test
 ```
 
 ## Author
