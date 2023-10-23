@@ -15,7 +15,9 @@ export default class TRAPITransformer extends BaseTransformer {
           analysis?.edge_bindings?.e01?.forEach(binding => {
             const edgeID = binding?.id;
             const edge =
-              "message" in this.data.response && edgeID ? this.data.response.message.knowledge_graph.edges[edgeID] : undefined;
+              "message" in this.data.response && edgeID
+                ? this.data.response.message.knowledge_graph.edges[edgeID]
+                : undefined;
             const edgeHasSupportGraph = edge.attributes.some(attribute => {
               if (attribute.attribute_type_id === "biolink:support_graphs" && attribute.value?.length) {
                 return true;
@@ -23,10 +25,14 @@ export default class TRAPITransformer extends BaseTransformer {
             });
             if (edgeHasSupportGraph || !edgeID) return;
             edges[edgeID] = {
-              subject: (this.data.response as JSONDoc).message.knowledge_graph.edges[edgeID].subject ?? result.node_bindings.n0[0].id,
-              object: (this.data.response as JSONDoc).message.knowledge_graph.edges[edgeID].object ?? result.node_bindings.n1[0].id,
+              subject:
+                (this.data.response as JSONDoc).message.knowledge_graph.edges[edgeID].subject ??
+                result.node_bindings.n0[0].id,
+              object:
+                (this.data.response as JSONDoc).message.knowledge_graph.edges[edgeID].object ??
+                result.node_bindings.n1[0].id,
             };
-          })
+          });
         });
       });
     }
@@ -62,7 +68,7 @@ export default class TRAPITransformer extends BaseTransformer {
       qEdge: this.edge.reasoner_edge,
       mappedResponse: {
         "edge-attributes": [...edge.attributes],
-        trapi_sources: edge.sources
+        trapi_sources: edge.sources,
       },
     };
     if (frozenRecord.subject.original) {

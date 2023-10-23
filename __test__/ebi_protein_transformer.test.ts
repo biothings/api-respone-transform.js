@@ -19,7 +19,7 @@ describe("test EBI Protein transformer", () => {
   });
 
   test("test ebi wrapper", async () => {
-    let tf = new jq_tf(input, {type: "ebi"});
+    let tf = new jq_tf(input, { type: "ebi" });
     let res = await tf.wrap(response);
     expect(res.comments[0].reaction.dbReferences).toHaveLength(1);
   });

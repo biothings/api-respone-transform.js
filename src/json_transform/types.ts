@@ -1,24 +1,24 @@
 export interface BaseTemplate {
-    [key: string]: string | string[];
+  [key: string]: string | string[];
 }
 
 export interface ComplexTemplate {
-    [key: string]: BaseTemplate;
+  [key: string]: BaseTemplate;
 }
 
 export interface UserInputTemplate {
-    [key: string]: string | string[] | BaseTemplate;
+  [key: string]: string | string[] | BaseTemplate;
 }
 
 export interface BaseTransformedObject {
-    [key: string]: any;
+  [key: string]: any;
 }
 
 export interface JSONDoc {
-    [key1: string]: any;
-    [key2: number]: any;
+  [key1: string]: any;
+  [key2: number]: any;
 }
 
 export interface PairedResponse {
-    [curie: string]: JSONDoc[]
+  [curie: string]: JSONDoc[];
 }
