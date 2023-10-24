@@ -33,14 +33,6 @@ export default class BaseTransformer {
     };
   }
 
-  /*
-      if $edge.input | keys | contains(["queryInputs"]) then
-        {[generateCurie($edge.association.input_id, $edge.input.queryInputs)]: .response}
-      else
-        {[generateCurie($edge.association.input_id, $edge.input)]: .response}
-      end
-    */
-
   /**
    * Wrapper functions to transform API response before passing to JSON Transformer
    * @return {Object} - key is curie representing input, value is an array of outputs.

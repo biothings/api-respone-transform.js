@@ -1,6 +1,5 @@
-import { describe, expect, test } from "@jest/globals";
-
 import jq_tf from "../built/transformers/jq_transformer";
+import biolink_tf from "../src/transformers/biolink_transformer";
 import fs from "fs";
 import path from "path";
 import { JSONDoc } from "../src/json_transform/types";
@@ -21,8 +20,8 @@ describe("test biolink transformer", () => {
   });
 
   test("test biolink wrapper", async () => {
-    let tf = new jq_tf(input, { type: "biolink" });
-    let res = await tf.wrap(response);
+    const tf = new jq_tf(input, { type: "biolink" });
+    const res = await tf.wrap(response);
     expect(res.associations[0].object.HGNC).toBe("10956");
     expect(res.associations[0].publications[0].id).toBe("21685912");
     expect(res.associations[1]).not.toHaveProperty("publications");
@@ -30,8 +29,8 @@ describe("test biolink transformer", () => {
   });
 
   test("test biolink wrapper if no association field as root key", async () => {
-    let tf = new jq_tf(input, { type: "biolink" });
-    let res = await tf.wrap({ data: [] });
+    const tf = new jq_tf(input, { type: "biolink" });
+    const res = await tf.wrap({ data: [] });
     expect(res).toEqual({ data: [] });
   });
 
@@ -80,9 +79,9 @@ describe("test biolink transformer", () => {
   });
 
   test("test biolink jsonTransform function", async () => {
-    let tf = new jq_tf(input, { type: "biolink" });
+    const tf = new jq_tf(input, { type: "biolink" });
     const wrapped_response = await tf.wrap(response);
-    let res: JSONDoc = tf.jsonTransform(wrapped_response);
+    const res: JSONDoc = tf.jsonTransform(wrapped_response);
     expect(res).toHaveProperty("related_to");
     expect(res.related_to[0].HGNC).toEqual("10956");
     expect(res.related_to[0].pubmed[0]).toEqual("21685912");

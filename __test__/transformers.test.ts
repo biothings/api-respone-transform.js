@@ -52,14 +52,14 @@ describe("test ctd transformer", () => {
       const data = JSON.parse(await fs.readFile(data_path, "utf-8"));
       return { data, status: 200, statusText: "OK", headers: undefined, config: {} };
     });
-    let res = await axios.get(
+    const res = await axios.get(
       "http://ctdbase.org/tools/batchQuery.go?inputType=chem&inputTerms=D003634|mercury&report=diseases_curated&format=json",
     );
     api_response = res.data;
   });
 
   test("test ctd wrapper", () => {
-    let input = {
+    const input = {
       response: api_response,
       edge: {
         input: "238",
@@ -73,16 +73,16 @@ describe("test ctd transformer", () => {
         },
       },
     };
-    let tf = new ctd_tf(input, {});
-    let res = tf.wrap(api_response);
+    const tf = new ctd_tf(input, {});
+    const res = tf.wrap(api_response);
     expect(res.data[0]["DiseaseID"]).toBe("D000022");
     expect(res.data[0]["PubMedIDs"]).toContain("16120699");
   });
 });
 
 describe("test biothings transformer", () => {
-  let api_response;
-  let input;
+  const api_response;
+  const input;
 
   beforeAll(async () => {
     (axios as jest.MockedFunction<AxiosStatic>).mockImplementation(async q => {
@@ -90,7 +90,7 @@ describe("test biothings transformer", () => {
       const data = JSON.parse(await fs.readFile(data_path, "utf-8"));
       return { data, status: 200, statusText: "OK", headers: undefined, config: {} };
     });
-    let res = await axios({
+    const res = await axios({
       method: "post",
       url: "https://biothings.ncats.io/semmedgene/query",
       data: "q=C1332823, C1332824, 123&scopes=umls",
@@ -154,16 +154,16 @@ describe("test biothings transformer", () => {
   });
 
   test("test biothings pairCurieWithAPIResponse", async () => {
-    let tf = new biothings_tf(input, {});
-    let res = await tf.pairCurieWithAPIResponse();
+    const tf = new biothings_tf(input, {});
+    const res = await tf.pairCurieWithAPIResponse();
     expect(res["UMLS:C1332823"][0]["umls"]).toBe("C1332823");
     expect(res).toHaveProperty("UMLS:C1332823");
     expect(res["123"]).toBeUndefined();
   });
 
   test("test wrapper", () => {
-    let tf = new biothings_tf(input, {});
-    let res = tf.wrap(input.response[0]);
+    const tf = new biothings_tf(input, {});
+    const res = tf.wrap(input.response[0]);
     expect(res).toHaveProperty("query");
   });
 });

@@ -1,4 +1,3 @@
-import { describe, expect, test } from "@jest/globals";
 import fs from "fs";
 import path from "path";
 import jq_tf from "../built/transformers/jq_transformer";
@@ -19,8 +18,8 @@ describe("test ctd transformer", () => {
   });
 
   test("test ctd wrapper", async () => {
-    let tf = new jq_tf(input, { type: "ctd" });
-    let res = await tf.wrap(response);
+    const tf = new jq_tf(input, { type: "ctd" });
+    const res = await tf.wrap(response);
     expect(res).toHaveProperty("data");
     expect(res.data).toHaveLength(2);
     expect(res.data[0].PubMedIDs).toEqual(["21559390"]);
