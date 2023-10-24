@@ -63,7 +63,7 @@ export default class Transformer {
     }
   }
 
-  async transform(): Promise<Result[]> {
+  async transform(): Promise<Record[]> {
     return await this.tf.transform();
   }
 }
