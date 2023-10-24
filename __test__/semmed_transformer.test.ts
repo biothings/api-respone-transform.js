@@ -39,7 +39,7 @@ describe("test semmed transformer", () => {
   test("add edge info", async () => {
     const tf = new semmed_tf(input, {});
     const res = await tf.pairCurieWithAPIResponse();
-    const rec = res["UMLS:C1332823"][0];
+    let rec = res["UMLS:C1332823"][0];
     rec = tf.wrap(rec);
     const result = await tf.formatRecords("UMLS:C1332823", rec["positively_regulates"][0]);
     expect(result[0]).toHaveProperty("association");

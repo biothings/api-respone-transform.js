@@ -81,8 +81,8 @@ describe("test ctd transformer", () => {
 });
 
 describe("test biothings transformer", () => {
-  const api_response;
-  const input;
+  let api_response;
+  let input;
 
   beforeAll(async () => {
     (axios as jest.MockedFunction<AxiosStatic>).mockImplementation(async q => {

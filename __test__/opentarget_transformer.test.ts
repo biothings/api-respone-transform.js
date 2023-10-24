@@ -20,8 +20,8 @@ describe("test opentarget transformer", () => {
   // skip these tests since we're not ingesting opentargets right now
   test.skip("test opentarget wrapper", async () => {
     const tf = new jq_tf(input, { type: "opentarget" });
-    let res = await tf.wrap(response);
-    const(res).toHaveProperty("data");
+    const res = await tf.wrap(response);
+    expect(res).toHaveProperty("data");
     expect(res.data[0].drug.id).toEqual("CHEMBL220492");
   });
 
