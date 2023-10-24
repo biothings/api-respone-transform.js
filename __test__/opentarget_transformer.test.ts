@@ -1,6 +1,6 @@
+import jq_tf from "../built/transformers/jq_transformer";
 import fs from "fs";
 import path from "path";
-import opentarget_tf from "../src/transformers/opentarget_transformer";
 
 describe("test opentarget transformer", () => {
   let response;
@@ -18,15 +18,15 @@ describe("test opentarget transformer", () => {
   });
 
   // skip these tests since we're not ingesting opentargets right now
-  test.skip("test opentarget wrapper", () => {
-    const tf = new opentarget_tf(input, {});
-    const res = tf.wrap(response);
-    expect(res).toHaveProperty("data");
+  test.skip("test opentarget wrapper", async () => {
+    const tf = new jq_tf(input, { type: "opentarget" });
+    let res = await tf.wrap(response);
+    const(res).toHaveProperty("data");
     expect(res.data[0].drug.id).toEqual("CHEMBL220492");
   });
 
-  test.skip("test opentarget wrapper if id field is not chembl", () => {
-    const tf = new opentarget_tf(input, {});
+  test.skip("test opentarget wrapper if id field is not chembl", async () => {
+    const tf = new jq_tf(input, { type: "opentarget" });
     const fake = {
       data: [
         {
@@ -36,7 +36,7 @@ describe("test opentarget transformer", () => {
         },
       ],
     };
-    const res = tf.wrap(fake);
+    const res = await tf.wrap(fake);
     expect(res).toHaveProperty("data");
     expect(res.data[0].drug.id).toEqual("http://identifiers.org/drugbank/DB0001");
   });

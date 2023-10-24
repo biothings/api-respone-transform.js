@@ -81,8 +81,8 @@ describe("test ctd transformer", () => {
 });
 
 describe("test biothings transformer", () => {
-  let api_response;
-  let input;
+  const api_response;
+  const input;
 
   beforeAll(async () => {
     (axios as jest.MockedFunction<AxiosStatic>).mockImplementation(async q => {
@@ -153,9 +153,9 @@ describe("test biothings transformer", () => {
     };
   });
 
-  test("test biothings pairCurieWithAPIResponse", () => {
+  test("test biothings pairCurieWithAPIResponse", async () => {
     const tf = new biothings_tf(input, {});
-    const res = tf.pairCurieWithAPIResponse();
+    const res = await tf.pairCurieWithAPIResponse();
     expect(res["UMLS:C1332823"][0]["umls"]).toBe("C1332823");
     expect(res).toHaveProperty("UMLS:C1332823");
     expect(res["123"]).toBeUndefined();

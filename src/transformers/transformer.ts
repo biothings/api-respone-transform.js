@@ -23,7 +23,7 @@ export default class BaseTransformer {
   /**
    * Create an object with key representing input, and value representing the output of API
    */
-  pairCurieWithAPIResponse() {
+  async pairCurieWithAPIResponse() {
     let input = generateCurie(
       this.edge.association.input_id,
       this.edge.input.hasOwnProperty("queryInputs") ? this.edge.input["queryInputs"] : (this.edge.input as string),
@@ -240,12 +240,12 @@ export default class BaseTransformer {
    */
   async transform() {
     let transformedRecords = [];
-    let responses = this.pairCurieWithAPIResponse();
+    let responses = await this.pairCurieWithAPIResponse();
 
     await async.eachSeries(Object.entries(responses), async ([curie, curieResponses]) => {
       if (Array.isArray(curieResponses) && curieResponses.length > 0) {
         await async.eachSeries(curieResponses, async response => {
-          const predicateResponse = this.jsonTransform(this.wrap(response));
+          const predicateResponse = this.jsonTransform(await this.wrap(response));
           await async.eachSeries(Object.entries(predicateResponse), async ([predicate, mappedResponses]) => {
             if (Array.isArray(mappedResponses) && mappedResponses.length > 0) {
               await async.eachSeries(mappedResponses, async (mappedResponse: any[]) => {

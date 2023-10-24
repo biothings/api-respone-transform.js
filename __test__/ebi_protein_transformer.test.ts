@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import ebi_tf from "../src/transformers/ebi_protein_transformer";
+import jq_tf from "../src/transformers/jq_transformer";
 
 describe("test EBI Protein transformer", () => {
   let response;
@@ -17,9 +17,9 @@ describe("test EBI Protein transformer", () => {
     };
   });
 
-  test("test ebi wrapper", () => {
-    const tf = new ebi_tf(input, {});
-    const res = tf.wrap(response);
+  test("test ebi wrapper", async () => {
+    const tf = new jq_tf(input, { type: "ebi" });
+    const res = await tf.wrap(response);
     expect(res.comments[0].reaction.dbReferences).toHaveLength(1);
   });
 });

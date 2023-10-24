@@ -18,9 +18,9 @@ describe("test base transformer", () => {
     };
   });
 
-  test("Test pairInputWithAPIResponse function", () => {
+  test("Test pairInputWithAPIResponse function", async () => {
     const tf = new base_tf(input, {});
-    const res = tf.pairCurieWithAPIResponse();
+    const res = await tf.pairCurieWithAPIResponse();
     expect(res).toHaveProperty("DOID:9562");
     expect(res["DOID:9562"]).toHaveLength(1);
   });

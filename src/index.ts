@@ -7,6 +7,7 @@ import OpenTargetTransformer from "./transformers/opentarget_transformer";
 import BaseTransformer from "./transformers/transformer";
 import TRAPITransformer from "./transformers/trapi_transformer";
 import EBIProteinTransformer from "./transformers/ebi_protein_transformer";
+import JQTransformer from "./transformers/jq_transformer";
 import { BTEQueryObject } from "./types";
 import { Record } from "./record";
 import Debug from "debug";
@@ -29,18 +30,32 @@ export default class Transformer {
     debug(`api name ${api}`);
     const tags = this.data.edge.query_operation.tags;
     debug(`api tags: ${tags}`);
-    if (tags.includes("bte-trapi")) {
+
+    // if (!this.data.edge.query_operation.transformer) {
+    //   console.log(`WE DONT DO THE OP ${api}, ${this.data.edge.query_operation}`)
+    // }
+
+    if (this.data.edge.query_operation?.transformer?.jq) {
+      // console.log("WE DO THE OP", this.data.edge.query_operation.transformer)
+      this.tf = new JQTransformer(this.data, {
+        ...this.config,
+        wrap: this.data.edge.query_operation.transformer.jq.wrap,
+        pair: this.data.edge.query_operation.transformer.jq.pair,
+      });
+    } else if (tags.includes("bte-trapi")) {
       this.tf = new TRAPITransformer(this.data, this.config);
     } else if (api.startsWith("SEMMED")) {
       this.tf = new SemmedTransformer(this.data, this.config);
     } else if (api === "BioLink API") {
-      this.tf = new BiolinkTransformer(this.data, this.config);
+      // this.tf = new BiolinkTransformer(this.data, this.config);
+      this.tf = new JQTransformer(this.data, { ...this.config, type: "biolink" });
     } else if (api === "EBI Proteins API") {
-      this.tf = new EBIProteinTransformer(this.data, this.config);
+      // this.tf = new EBIProteinTransformer(this.data, this.config)
+      this.tf = new JQTransformer(this.data, { ...this.config, type: "ebi" });
     } else if (tags.includes("biothings")) {
-      this.tf = new BioThingsTransformer(this.data, this.config);
+      this.tf = new JQTransformer(this.data, { ...this.config, type: "biothings" });
     } else if (tags.includes("ctd")) {
-      this.tf = new CTDTransformer(this.data, this.config);
+      this.tf = new JQTransformer(this.data, { ...this.config, type: "ctd" });
     } else if (tags.includes("opentarget")) {
       this.tf = new OpenTargetTransformer(this.data, this.config);
     } else {
@@ -48,7 +63,7 @@ export default class Transformer {
     }
   }
 
-  async transform(): Promise<Record[]> {
+  async transform(): Promise<Result[]> {
     return await this.tf.transform();
   }
 }
