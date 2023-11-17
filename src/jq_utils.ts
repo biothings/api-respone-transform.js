@@ -1,8 +1,12 @@
 import { JQVariable, BTEKGOperationObject } from "./types";
 import Path from "path";
 import fs from "fs";
+import { toArray } from "./utils";
 
-const functions = fs.readFileSync(Path.resolve(`${__dirname}/../data/jq/utils.jq`), { encoding: "utf8" });
+const functions = fs.readFileSync(
+  Path.resolve(`${__dirname}/../data/jq/utils.jq`),
+  { encoding: "utf8" },
+);
 
 function generateVariables(variables: JQVariable[]) {
   let variableString = "";
@@ -12,12 +16,6 @@ function generateVariables(variables: JQVariable[]) {
   return variableString;
 }
 
-export function generateFilterString(filterString: string, edge: BTEKGOperationObject) {
-  const variables = [
-    {
-      name: "$edge",
-      value: JSON.stringify(edge),
-    },
-  ];
-  return `${functions}\n${generateVariables(variables)}${filterString}`;
+export function generateFilterString(filterString: string) {
+  return `${functions}\n${filterString}`;
 }

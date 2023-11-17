@@ -1,23 +1,11 @@
 reduce .response[] as $item (
-  {}; .[(
-      if ($edge.input | type) == "object" then
-        ($edge.input.queryInputs | toArray)[]
-      else
-        ($edge.input | toArray)[]
-      end
-    ) 
+  {}; .[$edge.input.curies 
     | select(($item.Input | ascii_upcase | split(":") | last) == (. | ascii_upcase))
-    | generateCurie($edge.association.input_id; .)
+    | generateCurie($edge.input.id; .)
   ] = [] 
-  + .[(
-      if ($edge.input | type) == "object" then
-        ($edge.input.queryInputs | toArray)[]
-      else
-        ($edge.input | toArray)[]
-      end
-    )
+  + .[$edge.input.curies
     | select(($item.Input | ascii_upcase | split(":") | last) == (. | ascii_upcase))
-    | generateCurie($edge.association.input_id; .)
+    | generateCurie($edge.input.id; .)
   ] 
   + [$item]
 ) | map_values([.])
