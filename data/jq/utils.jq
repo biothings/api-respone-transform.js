@@ -46,3 +46,6 @@ def list_filter_all(filter_strs): if (. | type) == "array" then [.[] | if . | al
 
 # filters the list that is supplied on any conditions
 def list_filter_any(filter_strs): if (. | type) == "array" then [.[] | if . | any_filter(filter_strs) then . else empty end] else empty end;
+
+# essential Array.find()
+def find(cond): . as $iter | 0 | until((. == ($iter | length)) or ($iter[.] | cond); . + 1) | if (. == ($iter | length)) then false else $iter[.] end;
