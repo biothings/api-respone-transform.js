@@ -31,11 +31,12 @@ const filterStringsPair = Object.fromEntries(
 export default class JQTransformer extends BaseTransformer {
   // TODO more specific typing?
   async wrap(res: JSONDoc | JSONDoc[]): Promise<JSONDoc> {
-    const filterString: string | undefined =
+    let filterString: string | undefined =
       this.config.wrap ?? filterStringsWrap[this.config.type];
     if (typeof filterString === "undefined") return super.wrap(res);
+    filterString = generateFilterString(filterString);
     return JSON.parse(
-      (await jq.run(generateFilterString(filterString), res, {
+      (await jq.run(filterString, res, {
         input: "json",
       })) as string,
     );
