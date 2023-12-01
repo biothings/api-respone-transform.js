@@ -11,7 +11,7 @@ if $edge.query.method == "post" then
         $item.query; 
         $edge.input.curies
           | toArray
-          | map(. | split(":"))[0]
+          | map(. | split(":")[1])
       ) as $curie | .[$curie] = .[$curie] + [$item]
     end
   )
