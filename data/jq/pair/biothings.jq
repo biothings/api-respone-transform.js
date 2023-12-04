@@ -10,14 +10,14 @@ if $edge.query.method == "post" then
         $edge.input.id;
         $item.query; 
         $edge.input.curies
-          | toArray
-          | map(. | split(":")[1])
-      ) as $curie | .[$curie] = .[$curie] + [$item]
+        | toArray
+        | map(. | split(":") | last)
+      ) as $curie | .[$curie] += [$item]
     end
   )
 else
   .response as $res | generateCurie(
     $edge.input.id;
-    ($edge.input.curies | toArray | map(. | split(":"))[0])[0]
+    ($edge.input.curies | toArray | map(. | split(":") | last) | first)
   ) as $curie | {} | .[$curie] = [$res]
 end
