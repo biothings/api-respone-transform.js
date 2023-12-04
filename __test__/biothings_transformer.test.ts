@@ -57,7 +57,8 @@ describe("test biothings transformer", () => {
       const res = await tf.transform();
       expect(res).toHaveLength(27);
       expect(res[0]).not.toHaveProperty("ref_pmid");
-      expect(res[0]).toHaveProperty("publications", ["PMID:21873635"]);
+      expect(res[0].mappedResponse).toHaveProperty("pubmed", 21873635);
+      // expect(res[0]).toHaveProperty("publications", ["PMID:21873635"]);
     });
   });
 
