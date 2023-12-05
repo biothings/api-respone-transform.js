@@ -163,9 +163,15 @@ export class Record {
       const reversedQualifiers = Object.fromEntries(
         Object.entries(reversedAPIEdge.qualifiers).map(([qualifierType, qualifier]) => {
           let newQualifierType: string = qualifierType;
-          let newQualifier: string = qualifier;
+          let newQualifier: string | string[] = qualifier;
           if (qualifierType.includes("predicate")) {
-            newQualifier = `biolink:${this.qEdge.getReversedPredicate(qualifier.replace("biolink:", ""))}`;
+            if (Array.isArray(qualifier)) {
+              newQualifier = qualifier.map(
+                (str: string) => `biolink:${this.qEdge.getReversedPredicate(str.replace("biolink:", ""))}`,
+              );
+            } else {
+              newQualifier = `biolink:${this.qEdge.getReversedPredicate(qualifier.replace("biolink:", ""))}`;
+            }
           }
           if (qualifierType.includes("subject")) {
             newQualifierType = qualifierType.replace("subject", "object");
@@ -230,9 +236,9 @@ export class Record {
       getHashedEdgeRepresentation(): string {
         return hash(
           record.subject.semanticType +
-            record.predicate +
-            record.object.semanticType +
-            (record.subject.equivalentCuries || record.object.equivalentCuries),
+          record.predicate +
+          record.object.semanticType +
+          (record.subject.equivalentCuries || record.object.equivalentCuries),
         );
       },
     };
@@ -243,10 +249,10 @@ export class Record {
       predicate: record.predicate?.replace("biolink:", ""),
       qualifiers: record.qualifiers
         ? Object.fromEntries(
-            Object.entries(record.qualifiers).map(([qualifierType, qualifier]: [string, string]) => {
-              return [qualifierType.replace("biolink:", ""), qualifier];
-            }),
-          )
+          Object.entries(record.qualifiers).map(([qualifierType, qualifier]: [string, string]) => {
+            return [qualifierType.replace("biolink:", ""), qualifier];
+          }),
+        )
         : undefined,
       api_name: record.api,
       source: record.metaEdgeSource,
@@ -346,11 +352,11 @@ export class Record {
   _getFlattenedEdgeAttributes(attributes: EdgeAttribute[]): EdgeAttribute[] {
     return attributes
       ? attributes.reduce((arr: EdgeAttribute[], attribute: EdgeAttribute) => {
-          attribute.attributes
-            ? arr.push(attribute, ...this._getFlattenedEdgeAttributes(attribute.attributes))
-            : arr.push(attribute);
-          return arr;
-        }, [])
+        attribute.attributes
+          ? arr.push(attribute, ...this._getFlattenedEdgeAttributes(attribute.attributes))
+          : arr.push(attribute);
+        return arr;
+      }, [])
       : [];
   }
 
@@ -396,7 +402,11 @@ export class Record {
         const newQualifierType = `biolink:${qualifierType.replace("biolink:", "")}`;
         let newQualifier = qualifier;
         if (qualifierType.includes("predicate")) {
-          newQualifier = `biolink:${qualifier.replace("biolink:", "")}`;
+          if (Array.isArray(qualifier)) {
+            newQualifier = qualifier.map(str => `biolink:${str.replace("biolink", "")}`);
+          } else {
+            newQualifier = `biolink:${qualifier.replace("biolink:", "")}`;
+          }
         }
         return [newQualifierType, newQualifier];
       }),
@@ -586,7 +596,7 @@ export interface NodeNormalizerResultObj {
 }
 
 export interface BulkQualifiers {
-  [qualifierTypeID: string]: string; // qualifierValue
+  [qualifierTypeID: string]: string | string[]; // qualifierValue
 }
 
 export interface ProvenanceChainItem {
