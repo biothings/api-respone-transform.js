@@ -193,7 +193,7 @@ export default class BaseTransformer {
 
   _removeNonEdgeData(mappedResponse: any) {
     delete mappedResponse["@type"];
-    delete mappedResponse[this.edge.association.output_id];
+    delete mappedResponse["output"];
     delete mappedResponse["input_name"];
     delete mappedResponse["output_name"];
     return mappedResponse;
@@ -241,6 +241,7 @@ export default class BaseTransformer {
   async transform() {
     let transformedRecords = [];
     let responses = await this.pairCurieWithAPIResponse();
+    console.log((this.edge.input as any).queryInputs)
 
     await async.eachSeries(Object.entries(responses), async ([curie, curieResponses]) => {
       if (Array.isArray(curieResponses) && curieResponses.length > 0) {
@@ -267,10 +268,10 @@ export default class BaseTransformer {
    */
   extractObjectIDs(mappedResponse: object) {
     const output_id_type = this.edge.association.output_id;
-    if (!(output_id_type in mappedResponse)) {
+    if (!('output' in mappedResponse)) {
       return [];
     }
-    mappedResponse[output_id_type] = toArray(mappedResponse[output_id_type]);
-    return mappedResponse[output_id_type].map((id: string) => generateCurie(output_id_type, id));
+    mappedResponse.output = toArray(mappedResponse['output']);
+    return (mappedResponse['output'] as any[]).map((id: string) => generateCurie(output_id_type, id));
   }
 }

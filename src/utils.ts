@@ -8,7 +8,7 @@ export function generateCurie(idType: string, id: string | string[]) {
   return idType + ":" + id;
 }
 
-export function toArray(item) {
+export function toArray(item): any[] {
   if (!Array.isArray(item)) {
     return [item];
   }

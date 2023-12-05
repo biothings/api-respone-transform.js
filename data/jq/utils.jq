@@ -16,8 +16,11 @@ def getfirst: if (. | type) == "array" then .[0] else . end;
 # generates a curie from a type and id
 def generateCurie(idType; id): id | getfirst | split(":") | last | idType + ":" + .;
 
+# removes prefix if there
+def rmPrefix: . | split(":") | last;
+
 # generates a curie from a type and id [string] (by checking queryInputs)
-def generateCurieWithInputs(idType; id; queryInputs): (id | getfirst) as $id | reduce (queryInputs | toArray | .[]) as $input (""; if ($id | ascii_upcase | contains($input | ascii_upcase)) then $input else . end) | idType + ":" + .;
+def generateCurieWithInputs(idType; id; queryInputs): (id | getfirst) as $id | reduce (queryInputs | toArray | .[] | rmPrefix) as $input (""; if ($id | ascii_upcase | contains($input | ascii_upcase)) then $input else . end) | idType + ":" + .;
 
 # getting a nested field from inputted object (seperated by ., ie. drugcentral.bioactivity)
 def get_nested_field(field):

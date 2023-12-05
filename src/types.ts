@@ -3,7 +3,10 @@ import { JSONDoc } from "./json_transform/types";
 interface KGAssociationObject {
   input_id?: string;
   input_type: string;
+  input_name_field?: string;
   output_id?: string;
+  output_id_field: string;
+  output_name_field?: string;
   output_type: string;
   predicate: string;
   source?: string;
