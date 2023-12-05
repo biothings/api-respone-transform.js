@@ -1,23 +1,14 @@
-reduce .response[] as $item (
-  {}; .[(
-      if ($edge.input | type) == "object" then
-        ($edge.input.queryInputs | toArray)[]
-      else
-        ($edge.input | toArray)[]
-      end
-    ) 
-    | select(($item.Input | ascii_upcase | split(":") | last) == (. | ascii_upcase))
-    | generateCurie($edge.association.input_id; .)
-  ] = [] 
-  + .[(
-      if ($edge.input | type) == "object" then
-        ($edge.input.queryInputs | toArray)[]
-      else
-        ($edge.input | toArray)[]
-      end
-    )
-    | select(($item.Input | ascii_upcase | split(":") | last) == (. | ascii_upcase))
-    | generateCurie($edge.association.input_id; .)
-  ] 
-  + [$item]
+(reduce .response[].Input as $id (
+  {}; if (. as $mapping | $id | in($mapping) | not)
+  then
+    ($edge.input.curies | find((. | ascii_upcase) == ($id | split(":") | last | ascii_upcase))) as $fixedID
+    | .[$id] = $fixedID
+  end
+)) as $idMapping # maps response[].Input -> appropriate $edge.input.curies
+| reduce .response[] as $item (
+  {}; if ($idMapping[$item.Input])
+  then
+    (generateCurie($edge.input.id; $idMapping[$item.Input])) as $curie
+    | .[$curie] += [$item]
+  end
 ) | map_values([.])
