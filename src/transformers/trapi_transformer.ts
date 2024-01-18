@@ -1,6 +1,7 @@
 import BaseTransformer from "./transformer";
 import { Record } from "../record";
 import { JSONDoc } from "../json_transform/types";
+import { removeBioLinkPrefix } from "@biothings-explorer/utils";
 
 export default class TRAPITransformer extends BaseTransformer {
   _getUniqueEdges() {
@@ -19,18 +20,23 @@ export default class TRAPITransformer extends BaseTransformer {
                 ? this.data.response.message.knowledge_graph.edges[edgeID]
                 : undefined;
             const edgeHasSupportGraph = edge.attributes.some(attribute => {
-              if (attribute.attribute_type_id === "biolink:support_graphs" && attribute.value?.length) {
+              if (
+                attribute.attribute_type_id === "biolink:support_graphs" &&
+                attribute.value?.length
+              ) {
                 return true;
               }
             });
             if (edgeHasSupportGraph || !edgeID) return;
             edges[edgeID] = {
               subject:
-                (this.data.response as JSONDoc).message.knowledge_graph.edges[edgeID].subject ??
-                result.node_bindings.n0[0].id,
+                (this.data.response as JSONDoc).message.knowledge_graph.edges[
+                  edgeID
+                ].subject ?? result.node_bindings.n0[0].id,
               object:
-                (this.data.response as JSONDoc).message.knowledge_graph.edges[edgeID].object ??
-                result.node_bindings.n1[0].id,
+                (this.data.response as JSONDoc).message.knowledge_graph.edges[
+                  edgeID
+                ].object ?? result.node_bindings.n1[0].id,
             };
           });
         });
@@ -51,8 +57,11 @@ export default class TRAPITransformer extends BaseTransformer {
   }
 
   _transformIndividualEdge(edge, edgeBinding) {
-    let frozenRecord = {
-      subject: { ...this._getSubject(edgeBinding.subject), apiLabel: undefined },
+    const frozenRecord = {
+      subject: {
+        ...this._getSubject(edgeBinding.subject),
+        apiLabel: undefined,
+      },
       object: {
         original: edgeBinding.object,
         apiLabel: undefined, // could get from API
@@ -71,8 +80,17 @@ export default class TRAPITransformer extends BaseTransformer {
         trapi_sources: edge.sources,
       },
     };
-    if (frozenRecord.subject.original) {
-      return new Record(frozenRecord, this.config, this.edge.association, this.edge.reasoner_edge);
+    const hasOriginal = !!frozenRecord.subject.original;
+    const predicateMatches =
+      removeBioLinkPrefix(this.edge.association.predicate) ==
+      removeBioLinkPrefix(edge.predicate);
+    if (hasOriginal && predicateMatches) {
+      return new Record(
+        frozenRecord,
+        this.config,
+        this.edge.association,
+        this.edge.reasoner_edge,
+      );
     }
   }
 
