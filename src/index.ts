@@ -1,4 +1,3 @@
-import BiolinkTransformer from "./transformers/biolink_transformer";
 import BioThingsTransformer from "./transformers/biothings_transformer";
 // import CordTransformer from "./transformers/cord_transformer";
 import CTDTransformer from "./transformers/ctd_transformer";
@@ -46,9 +45,8 @@ export default class Transformer {
       this.tf = new TRAPITransformer(this.data, this.config);
     } else if (api.startsWith("SEMMED")) {
       this.tf = new SemmedTransformer(this.data, this.config);
-    } else if (api === "BioLink API") {
-      // this.tf = new BiolinkTransformer(this.data, this.config);
-      this.tf = new JQTransformer(this.data, { ...this.config, type: "biolink" });
+    } else if (api === "Monarch API") {
+      this.tf = new JQTransformer(this.data, { ...this.config, type: "monarch" });
     } else if (api === "EBI Proteins API") {
       // this.tf = new EBIProteinTransformer(this.data, this.config)
       this.tf = new JQTransformer(this.data, { ...this.config, type: "ebi" });
