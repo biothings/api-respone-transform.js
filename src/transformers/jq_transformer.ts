@@ -68,6 +68,7 @@ export default class JQTransformer extends BaseTransformer {
           id: this.edge.association.output_id,
           type: this.edge.association.output_type,
         },
+        response_mapping: this.edge.response_mapping,
       },
     };
     filterString = `.edge as $edge | ${generateFilterString(filterString)}`;
