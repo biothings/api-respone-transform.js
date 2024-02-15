@@ -71,7 +71,7 @@ export default class JQTransformer extends BaseTransformer {
         response_mapping: this.edge.response_mapping,
       },
     };
-    filterString = `.edge as $edge | ${generateFilterString(filterString)}`;
+    filterString = `.edge as $edge | .response as $response | ${generateFilterString(filterString)}`;
     return JSON.parse(
       (await jq.run(filterString, data, { input: "json" })) as string,
     );
