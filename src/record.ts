@@ -11,14 +11,21 @@ export class RecordNode {
   _qNode: QNode;
   _apiLabel: string;
 
-  constructor(node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode, qNode: QNode) {
+  constructor(
+    node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode,
+    qNode: QNode,
+  ) {
     this.original = node.original;
-    this.normalizedInfo = node.normalizedInfo ? node.normalizedInfo : this.makeFakeInfo(node);
+    this.normalizedInfo = node.normalizedInfo
+      ? node.normalizedInfo
+      : this.makeFakeInfo(node);
     this._qNode = qNode;
     this._apiLabel = node.apiLabel;
   }
 
-  makeFakeInfo(node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode): NodeNormalizerResultObj {
+  makeFakeInfo(
+    node: FrozenNode | VerboseFrozenNode | MinimalFrozenNode,
+  ): NodeNormalizerResultObj {
     return {
       primaryID: node.curie,
       equivalentIDs: node.equivalentCuries ?? [],
@@ -82,19 +89,30 @@ export class RecordNode {
 
   get UMLS(): string[] {
     return (
-      this.normalizedInfo?.equivalentIDs.reduce((arr: string[], curie: string) => {
-        if (curie.includes("UMLS")) arr.push(curie.replace("UMLS:", ""));
-        return arr;
-      }, []) ?? []
+      this.normalizedInfo?.equivalentIDs.reduce(
+        (arr: string[], curie: string) => {
+          if (curie.includes("UMLS")) arr.push(curie.replace("UMLS:", ""));
+          return arr;
+        },
+        [],
+      ) ?? []
     );
   }
 
   get semanticType(): string[] {
-    return this.normalizedInfo?.primaryTypes.map(semanticType => `biolink:${semanticType}`) ?? [];
+    return (
+      this.normalizedInfo?.primaryTypes.map(
+        semanticType => `biolink:${semanticType}`,
+      ) ?? []
+    );
   }
 
   get semanticTypes(): string[] {
-    return this.normalizedInfo?.semanticTypes.map(semanticType => `biolink:${semanticType}`) ?? [];
+    return (
+      this.normalizedInfo?.semanticTypes.map(
+        semanticType => `biolink:${semanticType}`,
+      ) ?? []
+    );
   }
 
   get label(): string {
@@ -157,30 +175,39 @@ export class Record {
     reversedAPIEdge.input_type = frozen.association.output_type;
     reversedAPIEdge.output_id = frozen.association.input_id;
     reversedAPIEdge.output_type = frozen.association.input_type;
-    const predicate = this.qEdge.getReversedPredicate(frozen.association.predicate);
+    const predicate = this.qEdge.getReversedPredicate(
+      frozen.association.predicate,
+    );
     reversedAPIEdge.predicate = predicate;
     if (reversedAPIEdge.qualifiers) {
       const reversedQualifiers = Object.fromEntries(
-        Object.entries(reversedAPIEdge.qualifiers).map(([qualifierType, qualifier]) => {
-          let newQualifierType: string = qualifierType;
-          let newQualifier: string | string[] = qualifier;
-          if (qualifierType.includes("predicate")) {
-            if (Array.isArray(qualifier)) {
-              newQualifier = qualifier.map(
-                (str: string) => `biolink:${this.qEdge.getReversedPredicate(str.replace("biolink:", ""))}`,
-              );
-            } else {
-              newQualifier = `biolink:${this.qEdge.getReversedPredicate(qualifier.replace("biolink:", ""))}`;
+        Object.entries(reversedAPIEdge.qualifiers).map(
+          ([qualifierType, qualifier]) => {
+            let newQualifierType: string = qualifierType;
+            let newQualifier: string | string[] = qualifier;
+            if (qualifierType.includes("predicate")) {
+              if (Array.isArray(qualifier)) {
+                newQualifier = qualifier.map(
+                  (str: string) =>
+                    `biolink:${this.qEdge.getReversedPredicate(
+                      str.replace("biolink:", ""),
+                    )}`,
+                );
+              } else {
+                newQualifier = `biolink:${this.qEdge.getReversedPredicate(
+                  qualifier.replace("biolink:", ""),
+                )}`;
+              }
             }
-          }
-          if (qualifierType.includes("subject")) {
-            newQualifierType = qualifierType.replace("subject", "object");
-          }
-          if (qualifierType.includes("object")) {
-            newQualifierType = qualifierType.replace("object", "subject");
-          }
-          return [newQualifierType, newQualifier];
-        }),
+            if (qualifierType.includes("subject")) {
+              newQualifierType = qualifierType.replace("subject", "object");
+            }
+            if (qualifierType.includes("object")) {
+              newQualifierType = qualifierType.replace("object", "subject");
+            }
+            return [newQualifierType, newQualifier];
+          },
+        ),
       );
 
       reversedAPIEdge.qualifiers = reversedQualifiers;
@@ -191,7 +218,13 @@ export class Record {
     const temp = frozen.subject;
     frozen.subject = frozen.object;
     frozen.object = temp;
-    return new Record(frozen, this.config, frozen.association, this.qEdge, !this.reverseToExecution);
+    return new Record(
+      frozen,
+      this.config,
+      frozen.association,
+      this.qEdge,
+      !this.reverseToExecution,
+    );
   }
 
   queryDirection() {
@@ -203,7 +236,9 @@ export class Record {
   }
 
   // for user-made records lacking qEdge
-  makeFakeQEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): QEdge {
+  makeFakeQEdge(
+    record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord,
+  ): QEdge {
     return {
       getID(): string {
         return "fakeEdge";
@@ -244,14 +279,18 @@ export class Record {
     };
   }
 
-  makeAPIEdge(record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord): Association {
+  makeAPIEdge(
+    record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord,
+  ): Association {
     return {
       predicate: record.predicate?.replace("biolink:", ""),
       qualifiers: record.qualifiers
         ? Object.fromEntries(
-          Object.entries(record.qualifiers).map(([qualifierType, qualifier]: [string, string]) => {
-            return [qualifierType.replace("biolink:", ""), qualifier];
-          }),
+          Object.entries(record.qualifiers).map(
+            ([qualifierType, qualifier]: [string, string]) => {
+              return [qualifierType.replace("biolink:", ""), qualifier];
+            },
+          ),
         )
         : undefined,
       api_name: record.api,
@@ -267,8 +306,13 @@ export class Record {
     return records.map((record: Record): FrozenRecord => record.freeze());
   }
 
-  public static unfreezeRecords(records: FrozenRecord[], config?: any): Record[] {
-    return records.map((record: FrozenRecord): Record => new Record(record, config));
+  public static unfreezeRecords(
+    records: FrozenRecord[],
+    config?: any,
+  ): Record[] {
+    return records.map(
+      (record: FrozenRecord): Record => new Record(record, config),
+    );
   }
 
   public static packRecords(records: Record[]): RecordPackage {
@@ -281,7 +325,9 @@ export class Record {
 
       const apiEdgeHash = hash(JSON.stringify(record.association));
 
-      let apiEdgeHashIndex = apiEdgeHashes.findIndex(hash => hash === apiEdgeHash);
+      let apiEdgeHashIndex = apiEdgeHashes.findIndex(
+        hash => hash === apiEdgeHash,
+      );
 
       if (apiEdgeHashIndex === -1) {
         apiEdgeHashes.push(apiEdgeHash);
@@ -298,7 +344,11 @@ export class Record {
     return [apiEdges, ...frozenRecords];
   }
 
-  public static unpackRecords(recordPack: RecordPackage, qEdge: QEdge, config?: any): Record[] {
+  public static unpackRecords(
+    recordPack: RecordPackage,
+    qEdge: QEdge,
+    config?: any,
+  ): Record[] {
     const [apiEdges, ...frozenRecords] = recordPack;
     return frozenRecords.map((record: any): Record => {
       const apiEdge = apiEdges[record.apiEdge];
@@ -353,7 +403,10 @@ export class Record {
     return attributes
       ? attributes.reduce((arr: EdgeAttribute[], attribute: EdgeAttribute) => {
         attribute.attributes
-          ? arr.push(attribute, ...this._getFlattenedEdgeAttributes(attribute.attributes))
+          ? arr.push(
+            attribute,
+            ...this._getFlattenedEdgeAttributes(attribute.attributes),
+          )
           : arr.push(attribute);
         return arr;
       }, [])
@@ -361,9 +414,13 @@ export class Record {
   }
 
   get _configuredEdgeAttributesForHash(): string {
-    return this._getFlattenedEdgeAttributes(this.mappedResponse["edge-attributes"])
+    return this._getFlattenedEdgeAttributes(
+      this.mappedResponse["edge-attributes"],
+    )
       .filter(attribute => {
-        return this.config?.EDGE_ATTRIBUTES_USED_IN_RECORD_HASH?.includes(attribute.attribute_type_id);
+        return this.config?.EDGE_ATTRIBUTES_USED_IN_RECORD_HASH?.includes(
+          attribute.attribute_type_id,
+        );
       })
       .reduce((acc, attribute) => {
         return [...acc, `${attribute.attribute_type_id}:${attribute.value}`];
@@ -378,10 +435,19 @@ export class Record {
       this.object.curie,
       Object.entries(this.qualifiers)
         .sort(([qTa, qVa], [qTb, qVb]) => qTa.localeCompare(qTb))
-        .reduce((str, [qualifierType, qualifierValue]) => `${str};${qualifierType}:${qualifierValue}`, ""),
+        .reduce(
+          (str, [qualifierType, qualifierValue]) =>
+            `${str};${qualifierType}:${JSON.stringify(qualifierValue)}`,
+          "",
+        ),
       this.api,
       this.metaEdgeSource,
       this._configuredEdgeAttributesForHash,
+      JSON.stringify(
+        this.provenanceChain.sort((sourceA, sourceB) =>
+          sourceA.resource_id.localeCompare(sourceB.resource_id),
+        ),
+      ),
     ].join("-");
   }
 
@@ -399,11 +465,16 @@ export class Record {
     }
     return Object.fromEntries(
       Object.entries(this._qualifiers).map(([qualifierType, qualifier]) => {
-        const newQualifierType = `biolink:${qualifierType.replace("biolink:", "")}`;
+        const newQualifierType = `biolink:${qualifierType.replace(
+          "biolink:",
+          "",
+        )}`;
         let newQualifier = qualifier;
         if (qualifierType.includes("predicate")) {
           if (Array.isArray(qualifier)) {
-            newQualifier = qualifier.map(str => `biolink:${str.replace("biolink", "")}`);
+            newQualifier = qualifier.map(
+              str => `biolink:${str.replace("biolink", "")}`,
+            );
           } else {
             newQualifier = `biolink:${qualifier.replace("biolink:", "")}`;
           }
@@ -434,7 +505,9 @@ export class Record {
       returnValue = _.cloneDeep(this.mappedResponse.trapi_sources);
     } else {
       returnValue.push({
-        resource_id: this.association.apiIsPrimaryKnowledgeSource ? this.apiInforesCurie : this.metaEdgeSource,
+        resource_id: this.association.apiIsPrimaryKnowledgeSource
+          ? this.apiInforesCurie
+          : this.metaEdgeSource,
         resource_role: "primary_knowledge_source",
       });
       if (!this.association.apiIsPrimaryKnowledgeSource) {
