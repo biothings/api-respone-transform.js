@@ -7,9 +7,9 @@ generateCurie($edge.input.id; $edge.input.curies) as $input_curie
 | { $input_curie: [$response] } | .[$input_curie][0].items = [
   $response.items[]
   | select(. != null)
-  | select(
-    .[$output_namespace] == $edge.output.id
-  ) 
+  # | select(
+  #   .[$output_namespace] == $edge.output.id
+  # ) 
   | .publications = [
     if .publications != null
     then .publications
