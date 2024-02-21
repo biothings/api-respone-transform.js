@@ -24,9 +24,11 @@ export default class BaseTransformer {
    * Create an object with key representing input, and value representing the output of API
    */
   async pairCurieWithAPIResponse() {
-    let input = generateCurie(
+    const input = generateCurie(
       this.edge.association.input_id,
-      this.edge.input.hasOwnProperty("queryInputs") ? this.edge.input["queryInputs"] : (this.edge.input as string),
+      this.edge.input.hasOwnProperty("queryInputs")
+        ? this.edge.input["queryInputs"]
+        : (this.edge.input as string),
     );
     return {
       [input]: [this.data.response],
@@ -71,12 +73,18 @@ export default class BaseTransformer {
       {
         prop: "ref_pmcid",
         prefix: "PMCID:",
-        urls: ["http://www.ncbi.nlm.nih.gov/pmc/articles/", "http://europepmc.org/articles/"],
+        urls: [
+          "http://www.ncbi.nlm.nih.gov/pmc/articles/",
+          "http://europepmc.org/articles/",
+        ],
       },
       {
         prop: "ref_clinicaltrials",
         prefix: "clinicaltrials:",
-        urls: ["https://clinicaltrials.gov/ct2/show/", "https://www.clinicaltrials.gov/ct2/show/"],
+        urls: [
+          "https://clinicaltrials.gov/ct2/show/",
+          "https://www.clinicaltrials.gov/ct2/show/",
+        ],
       },
       {
         prop: "ref_doi",
@@ -88,29 +96,37 @@ export default class BaseTransformer {
           "http://onlinelibrary.wiley.com/doi/",
         ],
       },
-      { prop: "ref_isbn", prefix: "isbn:", urls: ["https://www.isbn-international.org/identifier/"] },
+      {
+        prop: "ref_isbn",
+        prefix: "isbn:",
+        urls: ["https://www.isbn-international.org/identifier/"],
+      },
     ];
 
     // handle URLs (which could be CURIEs)
     if ("ref_url" in mappedResponse) {
-      for (let publication of toArray(mappedResponse.ref_url)) {
+      for (const publication of toArray(mappedResponse.ref_url)) {
         if (typeof publication !== "string" || publication.length === 0) {
           continue;
         }
 
         let isCurie = false;
-        for (let publicationType of publicationTypes) {
-          for (let url of publicationType.urls) {
+        for (const publicationType of publicationTypes) {
+          for (const url of publicationType.urls) {
             if (publication.startsWith(url)) {
               isCurie = true;
 
               if (!mappedResponse[publicationType.prop]) {
                 mappedResponse[publicationType.prop] = [];
               } else if (!Array.isArray(mappedResponse[publicationType.prop])) {
-                mappedResponse[publicationType.prop] = toArray(mappedResponse[publicationType.prop]);
+                mappedResponse[publicationType.prop] = toArray(
+                  mappedResponse[publicationType.prop],
+                );
               }
 
-              mappedResponse[publicationType.prop].push(publication.slice(url.length));
+              mappedResponse[publicationType.prop].push(
+                publication.slice(url.length),
+              );
 
               break;
             }
@@ -128,7 +144,7 @@ export default class BaseTransformer {
     }
     delete mappedResponse.ref_url;
 
-    for (let publicationType of publicationTypes) {
+    for (const publicationType of publicationTypes) {
       if (publicationType.prop in mappedResponse) {
         for (let publication of toArray(mappedResponse[publicationType.prop])) {
           // handle numbers
@@ -140,10 +156,19 @@ export default class BaseTransformer {
             continue;
           }
 
-          if (publication.toUpperCase().startsWith(publicationType.prefix.toUpperCase())) {
-            mappedResponse.publications.push(publicationType.prefix + publication.slice(publicationType.prefix.length));
+          if (
+            publication
+              .toUpperCase()
+              .startsWith(publicationType.prefix.toUpperCase())
+          ) {
+            mappedResponse.publications.push(
+              publicationType.prefix +
+              publication.slice(publicationType.prefix.length),
+            );
           } else {
-            mappedResponse.publications.push(publicationType.prefix + publication);
+            mappedResponse.publications.push(
+              publicationType.prefix + publication,
+            );
           }
         }
 
@@ -170,16 +195,26 @@ export default class BaseTransformer {
   _getSubject(subjectCurie: any) {
     //debug(`input: ${input}`);
     let subject = {
-      original: typeof this.edge.original_input === "undefined" ? undefined : this.edge.original_input[subjectCurie],
+      original:
+        typeof this.edge.original_input === "undefined"
+          ? undefined
+          : this.edge.original_input[subjectCurie],
       // normalizedInfo:
       //     typeof this.edge.input_resolved_identifiers === "undefined" || typeof this.edge.original_input === "undefined"
       //     ? undefined
       //     : this.edge.input_resolved_identifiers[this.edge.original_input[subjectCurie]],
     };
-    if (this.edge.input_resolved_identifiers && subject.original === undefined) {
+    if (
+      this.edge.input_resolved_identifiers &&
+      subject.original === undefined
+    ) {
       //try to find an equivalent ids object if the original input doesn't match (for ICEES)
-      for (let curie of Object.keys(this.edge.input_resolved_identifiers)) {
-        if (this.edge.input_resolved_identifiers[curie].equivalentIDs.includes(subjectCurie)) {
+      for (const curie of Object.keys(this.edge.input_resolved_identifiers)) {
+        if (
+          this.edge.input_resolved_identifiers[curie].equivalentIDs.includes(
+            subjectCurie,
+          )
+        ) {
           subject = {
             original: curie,
             // normalizedInfo: this.edge.input_resolved_identifiers[curie],
@@ -204,7 +239,10 @@ export default class BaseTransformer {
    * @param {Object} mappedResponse - JSON response representing an output.
    */
   async formatRecords(subjectCurie: string, mappedResponse: any) {
-    if (mappedResponse === undefined || Object.keys(mappedResponse).length === 0) {
+    if (
+      mappedResponse === undefined ||
+      Object.keys(mappedResponse).length === 0
+    ) {
       return [];
     }
 
@@ -222,16 +260,24 @@ export default class BaseTransformer {
       mappedResponse: { ...mappedResponse },
     };
 
-    let transformedRecords = await async.mapSeries(objectIDs, async (curie: string) => {
-      let copyRecord = {
-        ...frozenRecord,
-        object: {
-          original: curie,
-          apiLabel: outputName,
-        },
-      };
-      return new Record(copyRecord, this.config, this.edge.association, this.edge.reasoner_edge);
-    });
+    const transformedRecords = await async.mapSeries(
+      objectIDs,
+      async (curie: string) => {
+        const copyRecord = {
+          ...frozenRecord,
+          object: {
+            original: curie,
+            apiLabel: outputName,
+          },
+        };
+        return new Record(
+          copyRecord,
+          this.config,
+          this.edge.association,
+          this.edge.reasoner_edge,
+        );
+      },
+    );
     return transformedRecords;
   }
 
@@ -239,25 +285,43 @@ export default class BaseTransformer {
    * Main function to transform API response
    */
   async transform() {
-    let transformedRecords = [];
-    let responses = await this.pairCurieWithAPIResponse();
+    const transformedRecords = [];
+    const responses = await this.pairCurieWithAPIResponse();
 
-    await async.eachSeries(Object.entries(responses), async ([curie, curieResponses]) => {
-      if (Array.isArray(curieResponses) && curieResponses.length > 0) {
-        await async.eachSeries(curieResponses, async response => {
-          const predicateResponse = this.jsonTransform(await this.wrap(response));
-          await async.eachSeries(Object.entries(predicateResponse), async ([predicate, mappedResponses]) => {
-            if (Array.isArray(mappedResponses) && mappedResponses.length > 0) {
-              await async.eachSeries(mappedResponses, async (mappedResponse: any[]) => {
-                transformedRecords.push(...(await this.formatRecords(curie, mappedResponse)));
-              });
-            } else {
-              transformedRecords.push(...(await this.formatRecords(curie, mappedResponses)));
-            }
+    await async.eachSeries(
+      Object.entries(responses),
+      async ([curie, curieResponses]) => {
+        if (Array.isArray(curieResponses) && curieResponses.length > 0) {
+          await async.eachSeries(curieResponses, async response => {
+            const predicateResponse = this.jsonTransform(
+              await this.wrap(response),
+            );
+            await async.eachSeries(
+              Object.entries(predicateResponse),
+              async ([predicate, mappedResponses]) => {
+                if (
+                  Array.isArray(mappedResponses) &&
+                  mappedResponses.length > 0
+                ) {
+                  await async.eachSeries(
+                    mappedResponses,
+                    async (mappedResponse: any[]) => {
+                      transformedRecords.push(
+                        ...(await this.formatRecords(curie, mappedResponse)),
+                      );
+                    },
+                  );
+                } else {
+                  transformedRecords.push(
+                    ...(await this.formatRecords(curie, mappedResponses)),
+                  );
+                }
+              },
+            );
           });
-        });
-      }
-    });
+        }
+      },
+    );
     return transformedRecords;
   }
 
@@ -271,6 +335,8 @@ export default class BaseTransformer {
       return [];
     }
     mappedResponse[output_id_type] = toArray(mappedResponse[output_id_type]);
-    return mappedResponse[output_id_type].map((id: string) => generateCurie(output_id_type, id));
+    return mappedResponse[output_id_type].map((id: string) =>
+      generateCurie(output_id_type, id),
+    );
   }
 }

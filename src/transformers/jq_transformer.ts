@@ -11,21 +11,28 @@ import { toArray } from "../utils";
 const filterStringsWrap = Object.fromEntries(
   fs.readdirSync(Path.resolve(`${__dirname}/../../data/jq/wrap`)).map(file => {
     const filePath = Path.resolve(`${__dirname}/../../data/jq/wrap/${file}`);
-    return [Path.parse(filePath).name, fs.readFileSync(filePath, { encoding: "utf8" })];
+    return [
+      Path.parse(filePath).name,
+      fs.readFileSync(filePath, { encoding: "utf8" }),
+    ];
   }),
 );
 
 const filterStringsPair = Object.fromEntries(
   fs.readdirSync(Path.resolve(`${__dirname}/../../data/jq/pair`)).map(file => {
     const filePath = Path.resolve(`${__dirname}/../../data/jq/pair/${file}`);
-    return [Path.parse(filePath).name, fs.readFileSync(filePath, { encoding: "utf8" })];
+    return [
+      Path.parse(filePath).name,
+      fs.readFileSync(filePath, { encoding: "utf8" }),
+    ];
   }),
 );
 
 export default class JQTransformer extends BaseTransformer {
   // TODO more specific typing?
   async wrap(res: JSONDoc | JSONDoc[]): Promise<JSONDoc> {
-    let filterString: string | undefined = this.config.wrap ?? filterStringsWrap[this.config.type];
+    let filterString: string | undefined =
+      this.config.wrap ?? filterStringsWrap[this.config.type];
     if (typeof filterString === "undefined") return super.wrap(res);
     filterString = generateFilterString(filterString);
     return JSON.parse(
@@ -36,8 +43,10 @@ export default class JQTransformer extends BaseTransformer {
   }
 
   async pairCurieWithAPIResponse(): Promise<PairedResponse> {
-    let filterString: string | undefined = this.config.pair ?? filterStringsPair[this.config.type];
-    if (typeof filterString === "undefined") return super.pairCurieWithAPIResponse();
+    let filterString: string | undefined =
+      this.config.pair ?? filterStringsPair[this.config.type];
+    if (typeof filterString === "undefined")
+      return super.pairCurieWithAPIResponse();
     const data = {
       response: this.data.response,
       edge: {
@@ -49,7 +58,8 @@ export default class JQTransformer extends BaseTransformer {
           type: this.edge.association.input_type,
           // input is array or is object with queryInputs
           curies:
-            Array.isArray(this.edge.input) || typeof this.edge.input === "string"
+            Array.isArray(this.edge.input) ||
+              typeof this.edge.input === "string"
               ? toArray(this.edge.input)
               : toArray(this.edge.input.queryInputs),
         },
@@ -58,9 +68,12 @@ export default class JQTransformer extends BaseTransformer {
           id: this.edge.association.output_id,
           type: this.edge.association.output_type,
         },
+        response_mapping: this.edge.response_mapping,
       },
     };
-    filterString = `.edge as $edge | ${generateFilterString(filterString)}`;
-    return JSON.parse((await jq.run(filterString, data, { input: "json" })) as string);
+    filterString = `.edge as $edge | .response as $response | ${generateFilterString(filterString)}`;
+    return JSON.parse(
+      (await jq.run(filterString, data, { input: "json" })) as string,
+    );
   }
 }
