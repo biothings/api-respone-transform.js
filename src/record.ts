@@ -142,7 +142,7 @@ export class Record {
   object: RecordNode;
   reverseToExecution: boolean;
   _qualifiers: BulkQualifiers;
-  mappedResponse: MappedResponse;
+  _mappedResponse: MappedResponse;
 
   constructor(
     record: FrozenRecord | VerboseFrozenRecord | MinimalFrozenRecord,
@@ -163,9 +163,9 @@ export class Record {
       this.object = new RecordNode(record.object, this.qEdge.getInputNode());
     }
     this._qualifiers = record.qualifiers || this.association.qualifiers;
-    this.mappedResponse = record.mappedResponse ? record.mappedResponse : {};
-    if (!this.mappedResponse.publications) {
-      this.mappedResponse.publications = record.publications;
+    this._mappedResponse = record.mappedResponse ? record.mappedResponse : {};
+    if (!this._mappedResponse.publications) {
+      this._mappedResponse.publications = record.publications;
     }
   }
 
@@ -321,7 +321,7 @@ export class Record {
     const frozenRecords = [];
     const apiEdgeHashes = [];
     const apiEdges = [];
-    records.forEach((record: Record, i: number) => {
+    records.forEach((record: Record) => {
       const frozenRecord = record.freezeMinimal();
 
       const apiEdgeHash = hash(JSON.stringify(record.association));
@@ -369,7 +369,7 @@ export class Record {
       api: this.api,
       apiInforesCurie: this.apiInforesCurie,
       metaEdgeSource: this.metaEdgeSource,
-      mappedResponse: this.mappedResponse,
+      mappedResponse: this._mappedResponse,
     };
   }
 
@@ -396,7 +396,7 @@ export class Record {
       object: this.object.freezeMinimal(),
       qualifiers: this.qualifiers,
       publications: this.publications,
-      mappedResponse: this.mappedResponse,
+      mappedResponse: this._mappedResponse,
     };
   }
 
@@ -414,9 +414,15 @@ export class Record {
       : [];
   }
 
+  get mappedResponse() {
+    return Object.fromEntries(Object.entries(this._mappedResponse).filter(([key, _val]) => {
+      return key !== "source_url"
+    }))
+  }
+
   get _configuredEdgeAttributesForHash(): string {
     return this._getFlattenedEdgeAttributes(
-      this.mappedResponse["edge-attributes"],
+      this._mappedResponse["edge-attributes"],
     )
       .filter(attribute => {
         return this.config?.EDGE_ATTRIBUTES_USED_IN_RECORD_HASH?.includes(
@@ -500,16 +506,18 @@ export class Record {
     return this.association.source;
   }
 
-    if (this.mappedResponse.trapi_sources) {
-      returnValue = _.cloneDeep(this.mappedResponse.trapi_sources);
   get provenanceChain(): TrapiSource[] {
+    const source_urls = this._mappedResponse.source_url ?? [];
     let returnValue: TrapiSource[] = [];
+    if (this._mappedResponse.trapi_sources) {
+      returnValue = _.cloneDeep(this._mappedResponse.trapi_sources);
     } else {
       returnValue.push({
         resource_id: this.association.apiIsPrimaryKnowledgeSource
           ? this.apiInforesCurie
           : this.metaEdgeSource,
         resource_role: "primary_knowledge_source",
+        source_record_urls: source_urls,
       });
       if (!this.association.apiIsPrimaryKnowledgeSource) {
         returnValue.push({
@@ -530,7 +538,7 @@ export class Record {
   }
 
   get publications(): string[] {
-    return this.mappedResponse.publications || [];
+    return this._mappedResponse.publications || [];
   }
 }
 
