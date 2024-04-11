@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import _ from "lodash";
+import { TrapiSource } from "@biothings-explorer/types";
 
 function hash(string: string) {
   return crypto.createHash("md5").update(string).digest("hex");
@@ -434,7 +435,7 @@ export class Record {
       this.predicate,
       this.object.curie,
       Object.entries(this.qualifiers)
-        .sort(([qTa, qVa], [qTb, qVb]) => qTa.localeCompare(qTb))
+        .sort(([qTa, _qVa], [qTb, _qVb]) => qTa.localeCompare(qTb))
         .reduce(
           (str, [qualifierType, qualifierValue]) =>
             `${str};${qualifierType}:${JSON.stringify(qualifierValue)}`,
@@ -499,10 +500,10 @@ export class Record {
     return this.association.source;
   }
 
-  get provenanceChain(): ProvenanceChainItem[] {
-    let returnValue: ProvenanceChainItem[] = [];
     if (this.mappedResponse.trapi_sources) {
       returnValue = _.cloneDeep(this.mappedResponse.trapi_sources);
+  get provenanceChain(): TrapiSource[] {
+    let returnValue: TrapiSource[] = [];
     } else {
       returnValue.push({
         resource_id: this.association.apiIsPrimaryKnowledgeSource
@@ -609,7 +610,7 @@ export interface MinimalFrozenNode {
 export type RecordPackage = [apiEdges: any[], ...frozenRecords: FrozenRecord[]];
 
 export interface MappedResponse {
-  trapi_sources?: ProvenanceChainItem[];
+  trapi_sources?: TrapiSource[];
   "edge-attributes"?: EdgeAttribute[];
   [mappedItems: string]: any;
 }
@@ -670,10 +671,4 @@ export interface NodeNormalizerResultObj {
 
 export interface BulkQualifiers {
   [qualifierTypeID: string]: string | string[]; // qualifierValue
-}
-
-export interface ProvenanceChainItem {
-  resource_id: string;
-  resource_role: string;
-  upstream_resource_ids?: string[];
 }

@@ -5,7 +5,8 @@
     "outDir": "./built",
     "rootDir": "./src",
     "paths": {
-      "@biothings-explorer/utils": ["../utils"]
+      "@biothings-explorer/utils": ["../utils"],
+      "@biothings-explorer/types": ["../types"]
     }
   },
   "include": ["./src/**/*"],
@@ -13,6 +14,9 @@
   "references": [
     {
       "path": "../utils"
+    },
+    {
+      "path": "../types"
     }
   ]
 }
