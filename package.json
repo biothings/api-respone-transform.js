@@ -59,6 +59,7 @@
   },
   "dependencies": {
     "@biothings-explorer/utils": "workspace:../utils",
+    "@biothings-explorer/types": "workspace:../types",
     "@commitlint/cli": "^17.8.1",
     "@commitlint/config-conventional": "^11.0.0",
     "async": "^3.2.4",
