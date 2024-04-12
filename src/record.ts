@@ -531,6 +531,14 @@ export class Record {
   get publications(): string[] {
     return this.mappedResponse.publications || [];
   }
+
+  get knowledge_level(): string | undefined {
+    return this.association.knowledge_level;
+  }
+
+  get agent_type(): string | undefined {
+    return this.association.agent_type;
+  }
 }
 
 export interface FrozenRecord {
