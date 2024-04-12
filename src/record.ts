@@ -507,7 +507,7 @@ export class Record {
   }
 
   get provenanceChain(): TrapiSource[] {
-    const source_urls = this._mappedResponse.source_url ?? [];
+    const source_urls = this._mappedResponse.source_url ?? undefined;
     let returnValue: TrapiSource[] = [];
     if (this._mappedResponse.trapi_sources) {
       returnValue = _.cloneDeep(this._mappedResponse.trapi_sources);
