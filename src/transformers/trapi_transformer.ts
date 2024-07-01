@@ -1,5 +1,5 @@
 import BaseTransformer from "./transformer";
-import { Record } from "../record";
+import { Record } from "@biothings-explorer/types";
 import { JSONDoc } from "../json_transform/types";
 import { removeBioLinkPrefix } from "@biothings-explorer/utils";
 
