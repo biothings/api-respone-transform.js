@@ -2,8 +2,7 @@ import { transform } from "../json_transform/index";
 import { JSONDoc } from "../json_transform/types";
 import { generateCurie, toArray } from "../utils";
 import { BTEKGOperationObject, BTEQueryObject } from "../types";
-import { Record } from "../record";
-import { FrozenRecord } from "../record";
+import { Record } from "@biothings-explorer/types";
 import * as _ from "lodash";
 import Debug from "debug";
 import async from "async";
@@ -25,7 +24,7 @@ export default class BaseTransformer {
    */
   async pairCurieWithAPIResponse() {
     const input = generateCurie(
-      this.edge.association.input_id,
+      this.edge.association.input_id as string,
       this.edge.input.hasOwnProperty("queryInputs")
         ? this.edge.input["queryInputs"]
         : (this.edge.input as string),
@@ -228,7 +227,7 @@ export default class BaseTransformer {
 
   _removeNonEdgeData(mappedResponse: any) {
     delete mappedResponse["@type"];
-    delete mappedResponse[this.edge.association.output_id];
+    delete mappedResponse[this.edge.association.output_id as string];
     delete mappedResponse["input_name"];
     delete mappedResponse["output_name"];
     return mappedResponse;
@@ -330,7 +329,7 @@ export default class BaseTransformer {
    * @param {Object} mappedResponse - JSON response representing an output.
    */
   extractObjectIDs(mappedResponse: object) {
-    const output_id_type = this.edge.association.output_id;
+    const output_id_type = this.edge.association.output_id as string;
     if (!(output_id_type in mappedResponse)) {
       return [];
     }

@@ -8,10 +8,9 @@ import TRAPITransformer from "./transformers/trapi_transformer";
 import EBIProteinTransformer from "./transformers/ebi_protein_transformer";
 import JQTransformer from "./transformers/jq_transformer";
 import { BTEQueryObject } from "./types";
-import { Record } from "./record";
+import { Record } from "@biothings-explorer/types";
 import Debug from "debug";
 const debug = Debug("bte:api-response-transform:index");
-export * from "./record";
 export * from "./types";
 
 export default class Transformer {
