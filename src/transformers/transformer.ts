@@ -297,7 +297,7 @@ export default class BaseTransformer {
             );
             await async.eachSeries(
               Object.entries(predicateResponse),
-              async ([predicate, mappedResponses]) => {
+              async ([_predicate, mappedResponses]) => {
                 if (
                   Array.isArray(mappedResponses) &&
                   mappedResponses.length > 0
