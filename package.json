@@ -58,9 +58,9 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@biothings-explorer/utils": "workspace:../utils",
-    "@biothings-explorer/types": "workspace:../types",
-    "@biothings-explorer/smartapi-kg": "workspace:../smartapi-kg",
+    "@biothings-explorer/utils": "workspace:*",
+    "@biothings-explorer/types": "workspace:*",
+    "@biothings-explorer/smartapi-kg": "workspace:*",
     "@commitlint/cli": "^17.8.1",
     "@commitlint/config-conventional": "^11.0.0",
     "async": "^3.2.4",
