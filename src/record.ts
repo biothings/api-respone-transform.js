@@ -497,9 +497,9 @@ export class Record {
 
   get apiInforesCurie(): string {
     if (this.association["x-translator"]) {
-      return this.association["x-translator"]["infores"] || undefined;
+      return this.association["x-translator"]["infores"] || "infores:error-not-provided";
     }
-    return undefined;
+    return "infores:error-not-provided";
   }
 
   get metaEdgeSource(): string {
