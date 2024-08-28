@@ -17,14 +17,14 @@ def index_text(main; sub): (main|index(sub)|tostring)+"|"+((main|index(sub)) + (
       "attribute_type_id": "biolink:publications",
       "value": ( "PMID:"+(.pmid|tostring) ),
     }
-#      {
-#        "attribute_type_id": "biolink:subject_location_in_text",
-#        "value": ( .subject_text as $text | index_text(.sentence; $text) ),
-#      },
-#      {
-#        "attribute_type_id": "biolink:object_location_in_text",
-#        "value": ( .object_text as $text | index_text(.sentence; $text) ),
-#      }
+      {
+        "attribute_type_id": "biolink:subject_location_in_text",
+        "value": ( .subject_text as $text | index_text(.sentence; $text) ),
+      },
+      {
+        "attribute_type_id": "biolink:object_location_in_text",
+        "value": ( .object_text as $text | index_text(.sentence; $text) ),
+      }
   ],
-  "value": .predication_id,
+  "value": ( .predication_id | tostring ),
 }]
