@@ -455,6 +455,8 @@ export class Record {
           sourceA.resource_id.localeCompare(sourceB.resource_id),
         ).map(source => _.omit(source, ["source_record_urls"])),
       ),
+      this.knowledge_level,
+      this.agent_type
     ].join("-");
   }
 
