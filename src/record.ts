@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import _ from "lodash";
-import { TrapiSource } from "@biothings-explorer/types";
+import { TrapiAttribute, TrapiSource } from "@biothings-explorer/types";
 
 function hash(string: string) {
   return crypto.createHash("md5").update(string).digest("hex");
@@ -400,9 +400,9 @@ export class Record {
     };
   }
 
-  _getFlattenedEdgeAttributes(attributes: EdgeAttribute[]): EdgeAttribute[] {
+  _getFlattenedEdgeAttributes(attributes: TrapiAttribute[]): TrapiAttribute[] {
     return attributes
-      ? attributes.reduce((arr: EdgeAttribute[], attribute: EdgeAttribute) => {
+      ? attributes.reduce((arr: TrapiAttribute[], attribute: TrapiAttribute) => {
         attribute.attributes
           ? arr.push(
             attribute,
@@ -629,7 +629,7 @@ export type RecordPackage = [apiEdges: any[], ...frozenRecords: FrozenRecord[]];
 
 export interface MappedResponse {
   trapi_sources?: TrapiSource[];
-  "edge-attributes"?: EdgeAttribute[];
+  "edge-attributes"?: TrapiAttribute[];
   [mappedItems: string]: any;
 }
 
@@ -658,15 +658,6 @@ export interface QEdge {
 export interface QNode {
   getID(): string;
   isSet(): boolean;
-  [additionalProperties: string]: any;
-}
-
-export interface EdgeAttribute {
-  attribute_source: string;
-  attribute_type_id: string;
-  value: any;
-  value_type_id: string;
-  attributes?: EdgeAttribute[];
   [additionalProperties: string]: any;
 }
 
