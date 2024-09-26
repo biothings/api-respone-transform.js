@@ -1,17 +1,32 @@
 import BaseTransformer from "./transformer";
 import { Record } from "../record";
 import { JSONDoc } from "../json_transform/types";
-import { removeBioLinkPrefix } from "@biothings-explorer/utils";
+import { removeBioLinkPrefix, biolink } from "@biothings-explorer/utils";
+import {
+  TrapiAttribute,
+  TrapiKGEdge,
+  TrapiResponse,
+} from "@biothings-explorer/types";
+
+interface ExtractedEdge {
+  subject: string;
+  object: string;
+  usedReversedEdge?: boolean;
+}
+
+interface ExtractedEdges {
+  [edgeID: string]: ExtractedEdge;
+}
 
 export default class TRAPITransformer extends BaseTransformer {
-  _getUniqueEdges() {
+  _getUniqueEdges(): ExtractedEdges {
     const edges = {};
     if (
       "message" in this.data.response &&
       "results" in this.data.response.message &&
       Array.isArray(this.data.response.message.results)
     ) {
-      this.data.response.message.results.forEach(result => {
+      (this.data.response as TrapiResponse).message.results.forEach(result => {
         result.analyses.forEach(analysis => {
           analysis?.edge_bindings?.e01?.forEach(binding => {
             const edgeID = binding?.id;
@@ -19,25 +34,33 @@ export default class TRAPITransformer extends BaseTransformer {
               "message" in this.data.response && edgeID
                 ? this.data.response.message.knowledge_graph.edges[edgeID]
                 : undefined;
-            const edgeHasSupportGraph = edge.attributes.some(attribute => {
-              if (
-                attribute.attribute_type_id === "biolink:support_graphs" &&
-                attribute.value?.length
-              ) {
-                return true;
-              }
-            });
+            const edgeHasSupportGraph = edge.attributes.some(
+              (attribute: TrapiAttribute) => {
+                if (
+                  attribute.attribute_type_id === "biolink:support_graphs" &&
+                  (attribute.value as string[])?.length
+                ) {
+                  return true;
+                }
+              },
+            );
             if (edgeHasSupportGraph || !edgeID) return;
-            edges[edgeID] = {
-              subject:
-                (this.data.response as JSONDoc).message.knowledge_graph.edges[
-                  edgeID
-                ].subject ?? result.node_bindings.n0[0].id,
-              object:
-                (this.data.response as JSONDoc).message.knowledge_graph.edges[
-                  edgeID
-                ].object ?? result.node_bindings.n1[0].id,
-            };
+            if (
+              edge?.subject === result.node_bindings.n1[0].id &&
+              edge?.object === result.node_bindings.n0[0].id
+            ) {
+              // Result relies on reversed edge, use either reverse of edge or node bindings
+              edges[edgeID] = {
+                subject: edge?.object ?? result.node_bindings.n0[0].id,
+                object: edge?.subject ?? result.node_bindings.n1[0].id,
+                usedReversedEdge: true,
+              };
+            } else {
+              edges[edgeID] = {
+                subject: edge?.subject ?? result.node_bindings.n0[0].id,
+                object: edge?.object ?? result.node_bindings.n1[0].id,
+              };
+            }
           });
         });
       });
@@ -45,7 +68,7 @@ export default class TRAPITransformer extends BaseTransformer {
     return edges;
   }
 
-  _getEdgeInfo(edgeID) {
+  _getEdgeInfo(edgeID: string): TrapiKGEdge {
     if (
       "message" in this.data.response &&
       "knowledge_graph" in this.data.response.message &&
@@ -56,22 +79,22 @@ export default class TRAPITransformer extends BaseTransformer {
     return undefined;
   }
 
-  _transformIndividualEdge(edge, edgeBinding) {
+  _transformIndividualEdge(edge: TrapiKGEdge, extractedEdge: ExtractedEdge) {
     const frozenRecord = {
       subject: {
-        ...this._getSubject(edgeBinding.subject),
+        ...this._getSubject(extractedEdge.subject),
         apiLabel: undefined,
       },
       object: {
-        original: edgeBinding.object,
+        original: extractedEdge.object,
         apiLabel: undefined, // could get from API
       },
       qualifiers: edge.qualifiers
         ? Object.fromEntries(
-            edge.qualifiers.map(qualifier => {
-              return [qualifier.qualifier_type_id, qualifier.qualifier_value];
-            }),
-          )
+          edge.qualifiers.map(qualifier => {
+            return [qualifier.qualifier_type_id, qualifier.qualifier_value];
+          }),
+        )
         : undefined,
       association: this.edge.association,
       qEdge: this.edge.reasoner_edge,
@@ -81,8 +104,10 @@ export default class TRAPITransformer extends BaseTransformer {
       },
     };
     const hasOriginal = !!frozenRecord.subject.original;
-    const predicateMatches =
-      removeBioLinkPrefix(this.edge.association.predicate) ==
+    const predicateMatches = extractedEdge.usedReversedEdge
+      ? removeBioLinkPrefix(this.edge.association.predicate) ===
+      biolink.reverse(removeBioLinkPrefix(edge.predicate))
+      : removeBioLinkPrefix(this.edge.association.predicate) ===
       removeBioLinkPrefix(edge.predicate);
     if (hasOriginal && predicateMatches) {
       return new Record(
