@@ -50,6 +50,8 @@ export default class Transformer {
     } else if (api === "EBI Proteins API") {
       // this.tf = new EBIProteinTransformer(this.data, this.config)
       this.tf = new JQTransformer(this.data, { ...this.config, type: "ebi" });
+    } else if (api === "BioThings SEMMEDDB API") {
+      this.tf = new JQTransformer(this.data, { ...this.config, type: "semmed" });
     } else if (tags.includes("biothings")) {
       this.tf = new JQTransformer(this.data, { ...this.config, type: "biothings" });
     } else if (tags.includes("ctd")) {
