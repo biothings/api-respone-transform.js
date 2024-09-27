@@ -3,7 +3,7 @@
 def index_text(main; sub): (main|index(sub)|tostring)+"|"+((main|index(sub)) + (sub|length) | tostring);
 
 
-.["edge-attributes"] = [.predication | group_by(.pmid) | .[] | .[0] |
+.["edge-attributes"] = ([.predication | group_by(.pmid) | .[] | .[0] |
 # create edge attributes for each publication
 {
   "attribute_type_id": "biolink:has_supporting_study_result",
@@ -26,4 +26,4 @@ def index_text(main; sub): (main|index(sub)|tostring)+"|"+((main|index(sub)) + (
     }
   ],
   "value": ( .predication_id | tostring ),
-}]
+}] | .[:50])
