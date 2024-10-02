@@ -95,7 +95,7 @@ export default class TRAPITransformer extends BaseTransformer {
             return [qualifier.qualifier_type_id, qualifier.qualifier_value];
           }),
         )
-        : undefined,
+        : {},  // set to empty to avoid record init from association
       association: this.edge.association,
       qEdge: this.edge.reasoner_edge,
       mappedResponse: {
