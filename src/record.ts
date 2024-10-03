@@ -169,7 +169,7 @@ export class Record {
     }
   }
 
-  reverseQualifierEntry(qualifierType, qualifier) {
+  reverseQualifierEntry(qualifierType: string, qualifier: string | string[]) {
     let newQualifierType: string = qualifierType;
     let newQualifier: string | string[] = qualifier;
     if (qualifierType.includes("predicate")) {
@@ -218,6 +218,8 @@ export class Record {
       reversedAPIEdge.qualifiers = reversedQualifiers;
     }
 
+    // avoid setting record qualifiers to its association qualifiers as
+    // that may result in an invalid TRAPI response
     if (frozen.qualifiers) {
       frozen.qualifiers = Object.fromEntries(
         Object.entries(frozen.qualifiers).map(
