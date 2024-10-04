@@ -169,6 +169,32 @@ export class Record {
     }
   }
 
+  reverseQualifierEntry(qualifierType: string, qualifier: string | string[]) {
+    let newQualifierType: string = qualifierType;
+    let newQualifier: string | string[] = qualifier;
+    if (qualifierType.includes("predicate")) {
+      if (Array.isArray(qualifier)) {
+        newQualifier = qualifier.map(
+          (str: string) =>
+            `biolink:${this.qEdge.getReversedPredicate(
+              str.replace("biolink:", ""),
+            )}`,
+        );
+      } else {
+        newQualifier = `biolink:${this.qEdge.getReversedPredicate(
+          qualifier.replace("biolink:", ""),
+        )}`;
+      }
+    }
+    if (qualifierType.includes("subject")) {
+      newQualifierType = qualifierType.replace("subject", "object");
+    }
+    if (qualifierType.includes("object")) {
+      newQualifierType = qualifierType.replace("object", "subject");
+    }
+    return [newQualifierType, newQualifier];
+  }
+
   reverse() {
     const frozen = { ...this.freezeVerbose() };
     const reversedAPIEdge: Association = { ...frozen.association };
@@ -183,36 +209,25 @@ export class Record {
     if (reversedAPIEdge.qualifiers) {
       const reversedQualifiers = Object.fromEntries(
         Object.entries(reversedAPIEdge.qualifiers).map(
-          ([qualifierType, qualifier]) => {
-            let newQualifierType: string = qualifierType;
-            let newQualifier: string | string[] = qualifier;
-            if (qualifierType.includes("predicate")) {
-              if (Array.isArray(qualifier)) {
-                newQualifier = qualifier.map(
-                  (str: string) =>
-                    `biolink:${this.qEdge.getReversedPredicate(
-                      str.replace("biolink:", ""),
-                    )}`,
-                );
-              } else {
-                newQualifier = `biolink:${this.qEdge.getReversedPredicate(
-                  qualifier.replace("biolink:", ""),
-                )}`;
-              }
-            }
-            if (qualifierType.includes("subject")) {
-              newQualifierType = qualifierType.replace("subject", "object");
-            }
-            if (qualifierType.includes("object")) {
-              newQualifierType = qualifierType.replace("object", "subject");
-            }
-            return [newQualifierType, newQualifier];
-          },
+          ([qualifierType, qualifier]) => this.reverseQualifierEntry(
+            qualifierType, qualifier
+          ),
         ),
       );
 
       reversedAPIEdge.qualifiers = reversedQualifiers;
-      frozen.qualifiers = reversedQualifiers;
+    }
+
+    // avoid setting record qualifiers to its association qualifiers as
+    // that may result in an invalid TRAPI response
+    if (frozen.qualifiers) {
+      frozen.qualifiers = Object.fromEntries(
+        Object.entries(frozen.qualifiers).map(
+          ([qualifierType, qualifier]) => this.reverseQualifierEntry(
+            qualifierType, qualifier
+          ),
+        ),
+      );
     }
     // frozen.predicate = 'biolink:' + predicate;
     frozen.association = reversedAPIEdge;
