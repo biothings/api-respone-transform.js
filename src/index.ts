@@ -9,7 +9,7 @@ import EBIProteinTransformer from "./transformers/ebi_protein_transformer";
 import JQTransformer from "./transformers/jq_transformer";
 import { BTEQueryObject } from "./types";
 import { Record } from "./record";
-import Debug from "debug";
+import { Debug } from "@biothings-explorer/utils";
 const debug = Debug("bte:api-response-transform:index");
 export * from "./record";
 export * from "./types";

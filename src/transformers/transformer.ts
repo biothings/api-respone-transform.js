@@ -5,7 +5,7 @@ import { BTEKGOperationObject, BTEQueryObject } from "../types";
 import { Record } from "../record";
 import { FrozenRecord } from "../record";
 import * as _ from "lodash";
-import Debug from "debug";
+import { Debug } from "@biothings-explorer/utils";
 import async from "async";
 const debug = Debug("bte:api-response-transform:transformer");
 
